@@ -57,20 +57,20 @@ import { getAuditLogs } from "@/lib/actions/audit";
 // ── PERSONAS ────────────────────────────────────────────────────────────────
 const PERSONAS = {
   employee: {
-    name: "Master Admin",
-    role: "Employee",
+    name: "Manvi Mehta",
+    role: "Project Manager",
     dept: "Product Team",
-    email: "admin@newage.com",
-    initials: "MA",
-    avatarTone: "#0F1B33",
+    email: "manvi@newage.com",
+    initials: "MM",
+    avatarTone: "#2563EB",
   },
   admin: {
-    name: "Master Admin",
-    role: "Master Admin",
+    name: "Rahul Sharma",
+    role: "IT Support · Access Provider / Board Admin",
     dept: "IT Support",
-    email: "admin@newage.com",
-    initials: "MA",
-    avatarTone: "#0F1B33",
+    email: "rahul@newage.com",
+    initials: "RS",
+    avatarTone: "#334155",
   },
 };
 
@@ -343,8 +343,8 @@ export default function PortalPage() {
           <div className="brand">
             <div className="brand-badge">NA</div>
             <div>
-              <div className="brand-text-title">New Age</div>
-              <div className="brand-text-sub">Access Management Portal</div>
+              <div className="brand-text-title">Access Management</div>
+              <div className="brand-text-sub">New Age Portal</div>
             </div>
           </div>
 
@@ -448,7 +448,6 @@ export default function PortalPage() {
                         </div>
                       );
                     })
-
                   )}
                 </div>
               </div>
@@ -469,7 +468,7 @@ export default function PortalPage() {
               </div>
               <div>
                 <div className="name">{persona.name}</div>
-                <div className="role">{persona.dept}</div>
+                <div className="role">{persona.role}</div>
               </div>
               <button
                 onClick={() => logout()}
@@ -486,31 +485,37 @@ export default function PortalPage() {
 
       {/* MAIN */}
       <main className="main-container">
-        {/* Welcome */}
+        {/* Welcome Hero */}
         <div className="welcome">
-          <h1>Good morning, {persona.name.split(" ")[0]} 👋</h1>
-          <p>
-            {view === "employee"
-              ? "Search and request access to Monday.com boards, Salesforce instances, Zendesk queues, and other connected tools."
-              : "Manage provisioning queues, board configuration, Access ID governance, and monitor the full request lifecycle."}
-          </p>
+          {view === "employee" ? (
+            <>
+              <h1>Welcome back, Manvi</h1>
+              <p>
+                Search for access, track your requests, and act on anything awaiting your approval — all in one place.
+              </p>
+            </>
+          ) : (
+            <>
+              <h1>Board Admin · Rahul Sharma</h1>
+              <p>
+                Manage the boards you administer, provision access, and review governed configuration changes.
+              </p>
+            </>
+          )}
         </div>
 
         {/* SEARCH */}
         <div className="card">
-          <div className="section-head">
-            <div className="section-head-left">
-              <div className="section-icon">
-                <Search size={18} />
-              </div>
-              <div>
-                <div className="section-title">Find & Request Access</div>
-                <div className="section-sub">Search across all connected tools and boards</div>
+          <div className="section-head" style={{ borderBottom: "none", paddingBottom: "4px" }}>
+            <div>
+              <div className="section-title">Find access</div>
+              <div className="section-sub">
+                Search by tool, board, or team — you don&apos;t need to know the exact internal name.
               </div>
             </div>
           </div>
 
-          <div className="search-row">
+          <div className="search-row" style={{ marginTop: "12px" }}>
             <div className="search-input-wrap">
               <div className="search-ico">
                 <Search size={16} />
@@ -518,13 +523,18 @@ export default function PortalPage() {
               <input
                 type="text"
                 className="search-input"
-                placeholder="Search by board name, tool, team, or access ID..."
+                placeholder="Search for an application, tool, account or board..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-            <button className="browse-btn" onClick={() => setSearchQuery("")}>
-              <AlignJustify size={15} /> Browse All
+            <button
+              className="btn btn-secondary"
+              onClick={() => {
+                if (catalog.length > 0) setAccessDetailsItem(catalog[0]);
+              }}
+            >
+              Browse directory
             </button>
           </div>
 
@@ -622,7 +632,7 @@ export default function PortalPage() {
                     <div>
                       <div className="section-title">My Requests</div>
                       <div className="section-sub">
-                        {myRequests.length} request{myRequests.length !== 1 ? "s" : ""} total
+                        Requests you&apos;ve raised, for yourself or on behalf of other employees.
                       </div>
                     </div>
                   </div>
@@ -651,11 +661,14 @@ export default function PortalPage() {
                             <span style={{ fontSize: "13.5px", fontWeight: 700, color: "#111827" }}>
                               {req.accessLabel}
                             </span>
+                            <span className="badge badge-gray" style={{ fontSize: "11px" }}>
+                              {req.accessItem?.category === "APPLICATION" ? "Application" : "Board"}
+                            </span>
                             <StatusBadge status={req.status} />
                             {req.isException && <span className="badge badge-amber">Exception</span>}
                           </div>
                           <div style={{ fontSize: "12px", color: "#9CA3AF", marginTop: "4px" }}>
-                            <span className="mono">{req.id}</span> · Approver: {req.approverName}
+                            <span className="mono">{req.id}</span> · Updated {new Date(req.updatedAt || req.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
                           </div>
                         </div>
                         {/* Quick-decision for on-behalf provisioned */}
@@ -677,7 +690,7 @@ export default function PortalPage() {
                 )}
               </div>
 
-              {/* Pending Approvals (employee as approver) */}
+              {/* Approvals Requiring My Action */}
               <div className="card card-tinted-amber">
                 <div className="section-head">
                   <div className="section-head-left">
@@ -685,12 +698,17 @@ export default function PortalPage() {
                       <CheckSquare size={18} />
                     </div>
                     <div>
-                      <div className="section-title">Pending Approvals</div>
+                      <div className="section-title">Approvals Requiring My Action</div>
                       <div className="section-sub">
-                        {pendingApprovals.length} awaiting your decision
+                        You&apos;re the configured approver (or backup) for these requests.
                       </div>
                     </div>
                   </div>
+                  {pendingApprovals.length > 0 && (
+                    <span className="badge badge-amber" style={{ fontWeight: 700 }}>
+                      {pendingApprovals.length} pending
+                    </span>
+                  )}
                 </div>
 
                 {pendingApprovals.length === 0 ? (
@@ -704,7 +722,31 @@ export default function PortalPage() {
                 ) : (
                   <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                     {pendingApprovals.map((req) => (
-                      <div key={req.id} className="list-row">
+                      <div
+                        key={req.id}
+                        className="list-row"
+                        style={{ borderLeft: "3px solid #D97706" }}
+                        onClick={() => setApprovalRequest(req)}
+                      >
+                        <div
+                          className="avatar"
+                          style={{
+                            width: "32px",
+                            height: "32px",
+                            fontSize: "11px",
+                            background: "#1E293B",
+                            color: "#fff",
+                            fontWeight: 700,
+                            flexShrink: 0,
+                          }}
+                        >
+                          {(req.requester?.name || req.beneficiaryName || "NA")
+                            .split(" ")
+                            .map((n: string) => n[0])
+                            .join("")
+                            .slice(0, 2)
+                            .toUpperCase()}
+                        </div>
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
                             <span style={{ fontSize: "13.5px", fontWeight: 700, color: "#111827" }}>
@@ -713,39 +755,10 @@ export default function PortalPage() {
                             <StatusBadge status={req.status} />
                           </div>
                           <div style={{ fontSize: "12px", color: "#9CA3AF", marginTop: "4px" }}>
-                            <span className="mono">{req.id}</span> · From: {req.requester?.name || req.beneficiaryName}
+                            <span className="mono">{req.id}</span> · {req.requester?.name || req.beneficiaryName} · {new Date(req.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
                           </div>
                         </div>
-                        {/* Part 4: Inline quick-decision buttons */}
-                        <div style={{ display: "flex", gap: "6px", flexShrink: 0 }}>
-                          <button
-                            className="btn btn-danger"
-                            style={{ fontSize: "11px", height: "28px", padding: "0 10px" }}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleReject(req.id, "Rejected by approver");
-                            }}
-                          >
-                            Reject
-                          </button>
-                          <button
-                            className="btn btn-primary"
-                            style={{ fontSize: "11px", height: "28px", padding: "0 10px" }}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleApprove(req.id);
-                            }}
-                          >
-                            Approve
-                          </button>
-                          <button
-                            className="btn btn-secondary"
-                            style={{ fontSize: "11px", height: "28px", padding: "0 10px" }}
-                            onClick={() => setApprovalRequest(req)}
-                          >
-                            Review
-                          </button>
-                        </div>
+                        <ChevronRight size={16} style={{ color: "#9CA3AF", flexShrink: 0 }} />
                       </div>
                     ))}
                   </div>
@@ -815,83 +828,119 @@ export default function PortalPage() {
         {/* ADMIN VIEW */}
         {view === "admin" && (
           <>
-            {/* ── MY BOARDS (Admin personal scope) ────────────────────── */}
-            {(() => {
-              const myAdminBoards = catalog.filter(
-                (item) => item.provider === persona.name || item.approver === persona.name
-              );
-              return (
-                <div className="card">
-                  <div className="section-head">
-                    <div className="section-head-left">
-                      <div className="section-icon">
-                        <LayoutDashboard size={18} />
-                      </div>
-                      <div>
-                        <div className="section-title">My Boards</div>
-                        <div className="section-sub">
-                          Boards you administer or provide access for ({myAdminBoards.length})
-                        </div>
-                      </div>
+            {/* 1. Admin's My Requests */}
+            <div className="card">
+              <div className="section-head">
+                <div className="section-head-left">
+                  <div className="section-icon">
+                    <Package size={18} />
+                  </div>
+                  <div>
+                    <div className="section-title">My Requests</div>
+                    <div className="section-sub">
+                      Requests you&apos;ve raised, for yourself or on behalf of other employees.
                     </div>
                   </div>
-                  {myAdminBoards.length === 0 ? (
-                    <div className="empty-state">
-                      <div className="circle"><LayoutDashboard size={22} /></div>
-                      <div className="title">No boards assigned</div>
-                      <div className="sub">You are not listed as approver or provider for any board.</div>
+                </div>
+              </div>
+
+              {myRequests.length === 0 ? (
+                <div className="empty-state">
+                  <div className="circle">
+                    <Package size={22} />
+                  </div>
+                  <div className="title">No requests yet</div>
+                  <div className="sub">
+                    Search for a board or tool above to request access.
+                  </div>
+                </div>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                  {myRequests.map((req) => (
+                    <div
+                      key={req.id}
+                      className="list-row"
+                      onClick={() => setSelectedRequest(req)}
+                    >
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                          <span style={{ fontSize: "13.5px", fontWeight: 700, color: "#111827" }}>
+                            {req.accessLabel}
+                          </span>
+                          <span className="badge badge-gray" style={{ fontSize: "11px" }}>
+                            {req.accessItem?.category === "APPLICATION" ? "Application" : "Board"}
+                          </span>
+                          <StatusBadge status={req.status} />
+                          {req.isException && <span className="badge badge-amber">Exception</span>}
+                        </div>
+                        <div style={{ fontSize: "12px", color: "#9CA3AF", marginTop: "4px" }}>
+                          <span className="mono">{req.id}</span> · Updated {new Date(req.updatedAt || req.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
+                        </div>
+                      </div>
                     </div>
-                  ) : (
-                    <div className="grid-3">
-                      {myAdminBoards.map((item) => (
-                        <div key={item.id} className="board-card">
-                          <div className="board-card-body">
-                            <div className="row1">
-                              <div>
-                                <div className="t">{item.name}</div>
-                                <div style={{ fontSize: "12px", color: "#6B7280", marginTop: "3px" }}>{item.tool}</div>
-                              </div>
-                              {item.automation ? (
-                                <span className="badge badge-blue"><Zap size={11} /> Auto</span>
-                              ) : (
-                                <span className="badge badge-gray">Manual</span>
-                              )}
-                            </div>
-                            <div style={{ marginTop: "10px", display: "flex", flexDirection: "column", gap: "3px" }}>
-                              <div style={{ fontSize: "11.5px", color: "#6B7280" }}>
-                                {item.approver === persona.name ? (
-                                  <span style={{ fontWeight: 700, color: "#2F6FED" }}>✓ You are Approver</span>
-                                ) : (
-                                  <span>Approver: <strong style={{ color: "#374151" }}>{item.approver}</strong></span>
-                                )}
-                              </div>
-                              <div style={{ fontSize: "11.5px", color: "#6B7280" }}>
-                                {item.provider === persona.name ? (
-                                  <span style={{ fontWeight: 700, color: "#EA580C" }}>✓ You are Provider</span>
-                                ) : (
-                                  <span>Provider: <strong style={{ color: "#374151" }}>{item.provider}</strong></span>
-                                )}
-                              </div>
-                              {item.accessId ? (
-                                <span className="mono" style={{ fontSize: "11px", color: "#9CA3AF" }}>{item.accessId}</span>
-                              ) : (
-                                <span style={{ fontSize: "11px", color: "#D97706", fontWeight: 600 }}>No Access ID</span>
-                              )}
-                            </div>
-                          </div>
-                          <div className="manage-link" style={{ cursor: "pointer" }} onClick={() => setBoardConfigItem(item)}>
-                            <Settings size={12} /> Manage Configuration
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* 2. My Boards / Access (Image 2) */}
+            <div className="card">
+              <div className="section-head">
+                <div className="section-head-left">
+                  <div className="section-icon">
+                    <LayoutDashboard size={18} />
+                  </div>
+                  <div>
+                    <div className="section-title">My Boards / Access</div>
+                    <div className="section-sub">
+                      Boards and accounts you administer as the access provider.
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="grid-3">
+                {catalog.slice(0, 3).map((item) => (
+                  <div key={item.id} className="board-card">
+                    <div className="board-card-body">
+                      <div className="row1">
+                        <div>
+                          <div className="t" style={{ fontSize: "13.5px", fontWeight: 700, color: "#111827" }}>
+                            {item.tool} – {item.name}
                           </div>
                         </div>
-                      ))}
+                        {item.automation ? (
+                          <span className="badge badge-blue">Automated</span>
+                        ) : (
+                          <span className="badge badge-gray">Manual</span>
+                        )}
+                      </div>
+                      <div style={{ marginTop: "12px", display: "flex", flexDirection: "column", gap: "4px" }}>
+                        <div style={{ fontSize: "12px", color: "#6B7280" }}>
+                          {item.accessId ? (
+                            <span>Access ID: <span className="mono">{item.accessId}</span></span>
+                          ) : (
+                            <span style={{ color: "#9CA3AF" }}>Access ID not yet created</span>
+                          )}
+                        </div>
+                        <div style={{ fontSize: "12px", color: "#6B7280" }}>
+                          Approver: <strong style={{ color: "#374151" }}>{item.approver}</strong>
+                        </div>
+                      </div>
                     </div>
-                  )}
-                </div>
-              );
-            })()}
+                    <div
+                      className="manage-link"
+                      style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: "6px" }}
+                      onClick={() => setBoardConfigItem(item)}
+                    >
+                      <Settings size={12} /> Manage configuration
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
 
+            {/* 3. Requests Requiring Admin Action */}
             <div className="grid-2">
-              {/* Admin Queue - Manual Provisioning */}
               <div className="card card-tinted-orange">
                 <div className="section-head">
                   <div className="section-head-left">
@@ -899,12 +948,17 @@ export default function PortalPage() {
                       <Package size={18} />
                     </div>
                     <div>
-                      <div className="section-title">Provisioning Queue</div>
+                      <div className="section-title">Requests Requiring Admin Action</div>
                       <div className="section-sub">
-                        {manualProvisionQueue.length} request{manualProvisionQueue.length !== 1 ? "s" : ""} awaiting manual provisioning
+                        Approved requests that need manual provisioning.
                       </div>
                     </div>
                   </div>
+                  {manualProvisionQueue.length > 0 && (
+                    <span className="badge badge-orange" style={{ fontWeight: 700 }}>
+                      {manualProvisionQueue.length} pending
+                    </span>
+                  )}
                 </div>
 
                 {manualProvisionQueue.length === 0 ? (
