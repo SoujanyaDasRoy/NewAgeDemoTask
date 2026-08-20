@@ -24,24 +24,6 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
     const cookieStore = await cookies();
     const sessionCookie = cookieStore.get(SESSION_COOKIE);
     if (!sessionCookie?.value) {
-      // Default to Master Admin if no session set
-      let defaultUser = await prisma.user.findUnique({
-        where: { email: "admin@newage.com" },
-      });
-      if (!defaultUser) {
-        defaultUser = await prisma.user.findFirst();
-      }
-      if (defaultUser) {
-        return {
-          id: defaultUser.id,
-          name: defaultUser.name,
-          email: defaultUser.email,
-          role: defaultUser.role as "EMPLOYEE" | "ADMIN",
-          department: defaultUser.department,
-          initials: defaultUser.initials,
-          avatarTone: defaultUser.avatarTone,
-        };
-      }
       return null;
     }
     return JSON.parse(sessionCookie.value) as SessionUser;
@@ -172,6 +154,9 @@ export async function signup(formData: {
     const tones = ["#2563EB", "#7C3AED", "#059669", "#D97706", "#DC2626", "#4F46E5"];
     const avatarTone = tones[Math.floor(Math.random() * tones.length)];
 
+    const userCount = await prisma.user.count();
+    const finalRole: "EMPLOYEE" | "ADMIN" = userCount === 0 ? "ADMIN" : (role || "EMPLOYEE");
+
     // 2. Persist application user record in PostgreSQL
     const newUser = await prisma.user.create({
       data: {
@@ -179,7 +164,7 @@ export async function signup(formData: {
         email,
         passwordHash,
         department,
-        role,
+        role: finalRole,
         initials,
         avatarTone,
       },
@@ -213,5 +198,73 @@ export async function signup(formData: {
   } catch (error: any) {
     console.error("Signup error:", error);
     return { success: false, error: error.message || "Failed to create account" };
+  }
+}
+
+/**
+ * Fetch all registered users for Admin Role Management
+ */
+export async function getAllUsers() {
+  try {
+    return await prisma.user.findMany({
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        department: true,
+        initials: true,
+        avatarTone: true,
+        createdAt: true,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    return [];
+  }
+}
+
+/**
+ * Update user role and department from Admin Dashboard
+ */
+export async function updateUserRole(
+  userId: string,
+  newRole: "EMPLOYEE" | "ADMIN",
+  newDepartment?: string
+) {
+  try {
+    const updated = await prisma.user.update({
+      where: { id: userId },
+      data: {
+        role: newRole,
+        ...(newDepartment ? { department: newDepartment } : {}),
+      },
+    });
+    try {
+      revalidatePath("/");
+    } catch {}
+    return { success: true, user: updated };
+  } catch (error: any) {
+    console.error("Error updating user role:", error);
+    return { success: false, error: error.message || "Failed to update role" };
+  }
+}
+
+/**
+ * Delete a user account from Admin Dashboard
+ */
+export async function deleteUser(userId: string) {
+  try {
+    await prisma.user.delete({
+      where: { id: userId },
+    });
+    try {
+      revalidatePath("/");
+    } catch {}
+    return { success: true };
+  } catch (error: any) {
+    console.error("Error deleting user:", error);
+    return { success: false, error: error.message || "Failed to delete user" };
   }
 }

@@ -1,32 +1,21 @@
+import "dotenv/config";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log("🌱 Resetting and initializing clean production database...");
+  console.log("🌱 Resetting and initializing clean production catalog...");
 
-  // 1. Create single Master User
-  const passwordHash = await bcrypt.hash("password123", 10);
+  // Clear any existing dummy requests, notifications, and accessIdQueue
+  await prisma.timelineStep.deleteMany({});
+  await prisma.accessRequest.deleteMany({});
+  await prisma.accessIdQueue.deleteMany({});
+  await prisma.notification.deleteMany({});
+  await prisma.auditLog.deleteMany({});
+  await prisma.user.deleteMany({});
 
-  const masterAdmin = await prisma.user.upsert({
-    where: { email: "admin@newage.com" },
-    update: {
-      passwordHash,
-      role: "ADMIN",
-    },
-    create: {
-      name: "Master Admin",
-      email: "admin@newage.com",
-      passwordHash,
-      role: "ADMIN",
-      department: "IT Support",
-      initials: "MA",
-      avatarTone: "#0F1B33",
-    },
-  });
-
-  console.log(`✅ Master Admin user created: ${masterAdmin.email}`);
+  console.log("✅ All previous users and test data wiped. Ready for fresh user signup.");
 
   // 2. Create core access catalog items (clean directory)
   await prisma.accessItem.upsert({

@@ -3,35 +3,37 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { login, signup } from "@/lib/actions/auth";
-import { ArrowRight, Lock, CheckCircle2, AlertCircle, Sparkles } from "lucide-react";
+import { Lock, AlertCircle, CheckCircle2 } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
   const [tab, setTab] = useState<"login" | "signup">("login");
 
   // Login form state
-  const [email, setEmail] = useState("admin@newage.com");
-  const [password, setPassword] = useState("password123");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   // Signup form state
   const [signupName, setSignupName] = useState("");
   const [signupEmail, setSignupEmail] = useState("");
-  const [signupPassword, setSignupPassword] = useState("password123");
+  const [signupPassword, setSignupPassword] = useState("");
   const [signupDepartment, setSignupDepartment] = useState("Product Team");
-  const [signupRole, setSignupRole] = useState<"EMPLOYEE" | "ADMIN">("EMPLOYEE");
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
 
-  const handleLogin = async (e?: React.FormEvent, customEmail?: string) => {
-    if (e) e.preventDefault();
-    const targetEmail = customEmail || email;
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !password) {
+      setError("Please enter both email and password.");
+      return;
+    }
     setLoading(true);
     setError("");
     setSuccessMsg("");
 
-    const res = await login({ email: targetEmail, password });
+    const res = await login({ email, password });
     setLoading(false);
 
     if (res.success) {
@@ -44,6 +46,10 @@ export default function LoginPage() {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!signupName || !signupEmail || !signupPassword) {
+      setError("Please fill in all required fields.");
+      return;
+    }
     setLoading(true);
     setError("");
     setSuccessMsg("");
@@ -53,12 +59,12 @@ export default function LoginPage() {
       email: signupEmail,
       password: signupPassword,
       department: signupDepartment,
-      role: signupRole,
+      role: "EMPLOYEE", // Every new user starts as Employee until Admin elevates them
     });
     setLoading(false);
 
     if (res.success) {
-      setSuccessMsg("Account created! Redirecting to portal...");
+      setSuccessMsg("Account created successfully! Signing you in...");
       setTimeout(() => {
         router.push("/");
         router.refresh();
@@ -84,31 +90,31 @@ export default function LoginPage() {
       <div
         style={{
           width: "100%",
-          maxWidth: "420px",
+          maxWidth: "400px",
           background: "#FFFFFF",
-          borderRadius: "16px",
+          borderRadius: "14px",
           border: "1px solid #E2E8F0",
-          boxShadow: "0 10px 25px -5px rgba(15, 27, 51, 0.06), 0 8px 10px -6px rgba(15, 27, 51, 0.04)",
+          boxShadow: "0 4px 20px -2px rgba(15, 27, 51, 0.05), 0 2px 6px -1px rgba(15, 27, 51, 0.03)",
           overflow: "hidden",
         }}
       >
         {/* Brand Header */}
         <div
           style={{
-            padding: "32px 32px 24px",
+            padding: "32px 32px 20px",
             textAlign: "center",
             borderBottom: "1px solid #F1F5F9",
           }}
         >
           <div
             style={{
-              width: "44px",
-              height: "44px",
+              width: "42px",
+              height: "42px",
               borderRadius: "10px",
               background: "#0F1B33",
               color: "#FFFFFF",
-              fontWeight: 800,
-              fontSize: "16px",
+              fontWeight: 700,
+              fontSize: "15px",
               letterSpacing: "0.02em",
               display: "flex",
               alignItems: "center",
@@ -120,8 +126,8 @@ export default function LoginPage() {
           </div>
           <h1
             style={{
-              fontSize: "20px",
-              fontWeight: 700,
+              fontSize: "19px",
+              fontWeight: 600,
               color: "#0F1B33",
               margin: 0,
               letterSpacing: "-0.01em",
@@ -139,7 +145,7 @@ export default function LoginPage() {
             New Age Portal
           </p>
 
-          {/* Clean Segmented Tab Switcher */}
+          {/* Segmented Tab Switcher */}
           <div
             style={{
               display: "flex",
@@ -155,6 +161,7 @@ export default function LoginPage() {
               onClick={() => {
                 setTab("login");
                 setError("");
+                setSuccessMsg("");
               }}
               style={{
                 flex: 1,
@@ -166,7 +173,7 @@ export default function LoginPage() {
                 fontWeight: 600,
                 fontSize: "13px",
                 cursor: "pointer",
-                boxShadow: tab === "login" ? "0 1px 2px rgba(0,0,0,0.05)" : "none",
+                boxShadow: tab === "login" ? "0 1px 2px rgba(0,0,0,0.06)" : "none",
                 transition: "all 0.15s ease",
               }}
             >
@@ -177,6 +184,7 @@ export default function LoginPage() {
               onClick={() => {
                 setTab("signup");
                 setError("");
+                setSuccessMsg("");
               }}
               style={{
                 flex: 1,
@@ -188,7 +196,7 @@ export default function LoginPage() {
                 fontWeight: 600,
                 fontSize: "13px",
                 cursor: "pointer",
-                boxShadow: tab === "signup" ? "0 1px 2px rgba(0,0,0,0.05)" : "none",
+                boxShadow: tab === "signup" ? "0 1px 2px rgba(0,0,0,0.06)" : "none",
                 transition: "all 0.15s ease",
               }}
             >
@@ -198,11 +206,11 @@ export default function LoginPage() {
         </div>
 
         {/* Content Body */}
-        <div style={{ padding: "28px 32px 32px" }}>
+        <div style={{ padding: "26px 32px 32px" }}>
           {error && (
             <div
               style={{
-                marginBottom: "20px",
+                marginBottom: "18px",
                 padding: "10px 14px",
                 borderRadius: "8px",
                 background: "#FEF2F2",
@@ -222,7 +230,7 @@ export default function LoginPage() {
           {successMsg && (
             <div
               style={{
-                marginBottom: "20px",
+                marginBottom: "18px",
                 padding: "10px 14px",
                 borderRadius: "8px",
                 background: "#F0FDF4",
@@ -242,171 +250,100 @@ export default function LoginPage() {
 
           {/* TAB 1: SIGN IN */}
           {tab === "login" && (
-            <div>
-              {/* 1-Click Master Sign-In */}
+            <form onSubmit={handleLogin}>
+              <div style={{ marginBottom: "16px" }}>
+                <label
+                  htmlFor="login-email"
+                  style={{
+                    display: "block",
+                    fontSize: "12.5px",
+                    fontWeight: 600,
+                    color: "#334155",
+                    marginBottom: "6px",
+                  }}
+                >
+                  Work Email
+                </label>
+                <input
+                  id="login-email"
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="name@company.com"
+                  style={{
+                    width: "100%",
+                    height: "38px",
+                    padding: "0 12px",
+                    borderRadius: "8px",
+                    border: "1px solid #CBD5E1",
+                    fontSize: "13.5px",
+                    color: "#0F1B33",
+                    outline: "none",
+                    boxSizing: "border-box",
+                  }}
+                />
+              </div>
+
+              <div style={{ marginBottom: "22px" }}>
+                <label
+                  htmlFor="login-password"
+                  style={{
+                    display: "block",
+                    fontSize: "12.5px",
+                    fontWeight: 600,
+                    color: "#334155",
+                    marginBottom: "6px",
+                  }}
+                >
+                  Password
+                </label>
+                <input
+                  id="login-password"
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  style={{
+                    width: "100%",
+                    height: "38px",
+                    padding: "0 12px",
+                    borderRadius: "8px",
+                    border: "1px solid #CBD5E1",
+                    fontSize: "13.5px",
+                    color: "#0F1B33",
+                    outline: "none",
+                    boxSizing: "border-box",
+                  }}
+                />
+              </div>
+
               <button
-                type="button"
-                onClick={() => handleLogin(undefined, "admin@newage.com")}
+                type="submit"
                 disabled={loading}
                 style={{
                   width: "100%",
+                  height: "40px",
+                  borderRadius: "8px",
+                  border: "none",
+                  background: "#0F1B33",
+                  color: "#FFFFFF",
+                  fontSize: "13.5px",
+                  fontWeight: 600,
+                  cursor: loading ? "not-allowed" : "pointer",
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "space-between",
-                  padding: "12px 14px",
-                  borderRadius: "10px",
-                  border: "1px solid #E2E8F0",
-                  background: "#FAFAFA",
-                  color: "#0F1B33",
-                  cursor: "pointer",
-                  textAlign: "left",
-                  transition: "all 0.15s ease",
-                  marginBottom: "20px",
+                  justifyContent: "center",
+                  gap: "6px",
                 }}
               >
-                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                  <div
-                    style={{
-                      width: "32px",
-                      height: "32px",
-                      borderRadius: "50%",
-                      background: "#0F1B33",
-                      color: "#FFFFFF",
-                      fontWeight: 700,
-                      fontSize: "11px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    MA
-                  </div>
-                  <div>
-                    <div style={{ fontSize: "13px", fontWeight: 700, color: "#0F1B33", display: "flex", alignItems: "center", gap: "5px" }}>
-                      Master Admin <Sparkles size={12} color="#D97706" />
-                    </div>
-                    <div style={{ fontSize: "11.5px", color: "#64748B" }}>
-                      1-click instant sign-in
-                    </div>
-                  </div>
-                </div>
-                <ArrowRight size={15} color="#94A3B8" />
+                {loading ? "Signing in..." : "Sign In"}
               </button>
-
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "12px",
-                  marginBottom: "20px",
-                  color: "#94A3B8",
-                  fontSize: "12px",
-                }}
-              >
-                <div style={{ flex: 1, height: "1px", background: "#E2E8F0" }} />
-                <span>or continue with email</span>
-                <div style={{ flex: 1, height: "1px", background: "#E2E8F0" }} />
-              </div>
-
-              {/* Login Form */}
-              <form onSubmit={(e) => handleLogin(e)}>
-                <div style={{ marginBottom: "16px" }}>
-                  <label
-                    htmlFor="login-email"
-                    style={{
-                      display: "block",
-                      fontSize: "12.5px",
-                      fontWeight: 600,
-                      color: "#334155",
-                      marginBottom: "6px",
-                    }}
-                  >
-                    Email
-                  </label>
-                  <input
-                    id="login-email"
-                    type="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="name@newage.com"
-                    style={{
-                      width: "100%",
-                      height: "38px",
-                      padding: "0 12px",
-                      borderRadius: "8px",
-                      border: "1px solid #CBD5E1",
-                      fontSize: "13.5px",
-                      color: "#0F1B33",
-                      outline: "none",
-                      boxSizing: "border-box",
-                      transition: "border-color 0.15s ease",
-                    }}
-                  />
-                </div>
-
-                <div style={{ marginBottom: "22px" }}>
-                  <label
-                    htmlFor="login-password"
-                    style={{
-                      display: "block",
-                      fontSize: "12.5px",
-                      fontWeight: 600,
-                      color: "#334155",
-                      marginBottom: "6px",
-                    }}
-                  >
-                    Password
-                  </label>
-                  <input
-                    id="login-password"
-                    type="password"
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
-                    style={{
-                      width: "100%",
-                      height: "38px",
-                      padding: "0 12px",
-                      borderRadius: "8px",
-                      border: "1px solid #CBD5E1",
-                      fontSize: "13.5px",
-                      color: "#0F1B33",
-                      outline: "none",
-                      boxSizing: "border-box",
-                      transition: "border-color 0.15s ease",
-                    }}
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={loading}
-                  style={{
-                    width: "100%",
-                    height: "40px",
-                    borderRadius: "8px",
-                    border: "none",
-                    background: "#0F1B33",
-                    color: "#FFFFFF",
-                    fontSize: "13.5px",
-                    fontWeight: 600,
-                    cursor: loading ? "not-allowed" : "pointer",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: "6px",
-                    transition: "background 0.15s ease",
-                  }}
-                >
-                  {loading ? "Signing in..." : "Sign In"}
-                </button>
-              </form>
-            </div>
+            </form>
           )}
 
-          {/* TAB 2: SIGN UP */}
+          {/* TAB 2: CREATE ACCOUNT */}
           {tab === "signup" && (
             <form onSubmit={handleSignup}>
               <div style={{ marginBottom: "14px" }}>
@@ -428,7 +365,7 @@ export default function LoginPage() {
                   required
                   value={signupName}
                   onChange={(e) => setSignupName(e.target.value)}
-                  placeholder="e.g. Priya Menon"
+                  placeholder="e.g. Alex Morgan"
                   style={{
                     width: "100%",
                     height: "38px",
@@ -462,7 +399,7 @@ export default function LoginPage() {
                   required
                   value={signupEmail}
                   onChange={(e) => setSignupEmail(e.target.value)}
-                  placeholder="priya@newage.com"
+                  placeholder="alex@company.com"
                   style={{
                     width: "100%",
                     height: "38px",
@@ -477,87 +414,43 @@ export default function LoginPage() {
                 />
               </div>
 
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 1fr",
-                  gap: "10px",
-                  marginBottom: "14px",
-                }}
-              >
-                <div>
-                  <label
-                    htmlFor="signup-department"
-                    style={{
-                      display: "block",
-                      fontSize: "12.5px",
-                      fontWeight: 600,
-                      color: "#334155",
-                      marginBottom: "5px",
-                    }}
-                  >
-                    Department
-                  </label>
-                  <select
-                    id="signup-department"
-                    value={signupDepartment}
-                    onChange={(e) => setSignupDepartment(e.target.value)}
-                    style={{
-                      width: "100%",
-                      height: "38px",
-                      padding: "0 8px",
-                      borderRadius: "8px",
-                      border: "1px solid #CBD5E1",
-                      fontSize: "13px",
-                      color: "#0F1B33",
-                      outline: "none",
-                      background: "#FFFFFF",
-                      boxSizing: "border-box",
-                    }}
-                  >
-                    <option value="Product Team">Product Team</option>
-                    <option value="Marketing Team">Marketing Team</option>
-                    <option value="Sales Team">Sales Team</option>
-                    <option value="Support Team">Support Team</option>
-                    <option value="Finance Team">Finance Team</option>
-                    <option value="IT Support">IT Support</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="signup-role"
-                    style={{
-                      display: "block",
-                      fontSize: "12.5px",
-                      fontWeight: 600,
-                      color: "#334155",
-                      marginBottom: "5px",
-                    }}
-                  >
-                    Role
-                  </label>
-                  <select
-                    id="signup-role"
-                    value={signupRole}
-                    onChange={(e) => setSignupRole(e.target.value as any)}
-                    style={{
-                      width: "100%",
-                      height: "38px",
-                      padding: "0 8px",
-                      borderRadius: "8px",
-                      border: "1px solid #CBD5E1",
-                      fontSize: "13px",
-                      color: "#0F1B33",
-                      outline: "none",
-                      background: "#FFFFFF",
-                      boxSizing: "border-box",
-                    }}
-                  >
-                    <option value="EMPLOYEE">Employee</option>
-                    <option value="ADMIN">Board Admin</option>
-                  </select>
-                </div>
+              <div style={{ marginBottom: "14px" }}>
+                <label
+                  htmlFor="signup-department"
+                  style={{
+                    display: "block",
+                    fontSize: "12.5px",
+                    fontWeight: 600,
+                    color: "#334155",
+                    marginBottom: "5px",
+                  }}
+                >
+                  Department
+                </label>
+                <select
+                  id="signup-department"
+                  value={signupDepartment}
+                  onChange={(e) => setSignupDepartment(e.target.value)}
+                  style={{
+                    width: "100%",
+                    height: "38px",
+                    padding: "0 10px",
+                    borderRadius: "8px",
+                    border: "1px solid #CBD5E1",
+                    fontSize: "13px",
+                    color: "#0F1B33",
+                    outline: "none",
+                    background: "#FFFFFF",
+                    boxSizing: "border-box",
+                  }}
+                >
+                  <option value="Product Team">Product Team</option>
+                  <option value="Marketing Team">Marketing Team</option>
+                  <option value="Sales Team">Sales Team</option>
+                  <option value="Support Team">Support Team</option>
+                  <option value="Finance Team">Finance Team</option>
+                  <option value="IT Support">IT Support</option>
+                </select>
               </div>
 
               <div style={{ marginBottom: "22px" }}>
@@ -618,7 +511,7 @@ export default function LoginPage() {
             </form>
           )}
 
-          {/* Subtle footer info */}
+          {/* Footer note */}
           <div
             style={{
               marginTop: "24px",

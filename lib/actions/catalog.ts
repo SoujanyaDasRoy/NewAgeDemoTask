@@ -44,7 +44,7 @@ export async function updateAccessConfig(
     backupApprover: string;
     provider: string;
   },
-  actingUserName: string
+  actingUserName: string = "Admin"
 ) {
   try {
     const access = await prisma.accessItem.findUnique({
@@ -90,7 +90,7 @@ export async function updateAccessConfig(
   }
 }
 
-export async function toggleAutomation(accessId: string, actingUserName: string) {
+export async function toggleAutomation(accessId: string, actingUserName: string = "Admin") {
   try {
     const access = await prisma.accessItem.findUnique({
       where: { id: accessId },
