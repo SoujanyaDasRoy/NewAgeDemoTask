@@ -19,7 +19,7 @@ import {
 } from "../lib/actions/access-id";
 import { getNotifications, markNotificationsRead } from "../lib/actions/notifications";
 import { getAuditLogs } from "../lib/actions/audit";
-import { login, switchSessionUser } from "../lib/actions/auth";
+import { login, signup, switchSessionUser } from "../lib/actions/auth";
 
 interface TestResult {
   suite: string;
@@ -245,6 +245,29 @@ async function runTestSuite() {
 
   const switchRes = await switchSessionUser("manvi@newage.com");
   assert(switchRes.success === true, "Auth", "Session switch succeeded");
+
+  // Test Signup
+  const testSignupEmail = `newuser_${Date.now()}@newage.com`;
+  const signupRes = await signup({
+    name: "Priya Menon",
+    email: testSignupEmail,
+    password: "password123",
+    department: "Support Team",
+    role: "EMPLOYEE",
+  });
+  assert(signupRes.success === true && signupRes.user?.name === "Priya Menon", "Auth", "New user signup succeeded with hashed password", signupRes.user);
+
+  // Test duplicate signup rejection
+  const dupSignupRes = await signup({
+    name: "Priya Menon",
+    email: testSignupEmail,
+    password: "password123",
+    department: "Support Team",
+  });
+  assert(dupSignupRes.success === false, "Auth", "Duplicate signup correctly rejected");
+
+  // Cleanup test user
+  await prisma.user.deleteMany({ where: { email: testSignupEmail } });
 
   // ── FINAL SUMMARY ────────────────────────────────────────────────────────
   console.log("\n=======================================================");

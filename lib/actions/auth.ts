@@ -117,3 +117,92 @@ export async function logout() {
 export async function switchSessionUser(email: string) {
   return await login({ email, password: "password123" });
 }
+
+export async function signup(formData: {
+  name: string;
+  email: string;
+  password?: string;
+  department: string;
+  role?: "EMPLOYEE" | "ADMIN";
+}) {
+  try {
+    const name = formData.name?.trim();
+    const email = formData.email?.trim().toLowerCase();
+    const password = formData.password?.trim() || "password123";
+    const department = formData.department?.trim() || "Product Team";
+    const role = formData.role || "EMPLOYEE";
+
+    if (!name || !email) {
+      return { success: false, error: "Name and email are required." };
+    }
+
+    const existing = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (existing) {
+      return { success: false, error: "An account with this email already exists." };
+    }
+
+    const passwordHash = await bcrypt.hash(password, 10);
+    const initials = name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase();
+
+    const tones = ["#2563EB", "#7C3AED", "#059669", "#D97706", "#DC2626", "#4F46E5"];
+    const avatarTone = tones[Math.floor(Math.random() * tones.length)];
+
+    const newUser = await prisma.user.create({
+      data: {
+        name,
+        email,
+        passwordHash,
+        department,
+        role,
+        initials,
+        avatarTone,
+      },
+    });
+
+    const sessionData: SessionUser = {
+      id: newUser.id,
+      name: newUser.name,
+      email: newUser.email,
+      role: newUser.role as "EMPLOYEE" | "ADMIN",
+      department: newUser.department,
+      initials: newUser.initials,
+      avatarTone: newUser.avatarTone,
+    };
+
+    try {
+      const cookieStore = await cookies();
+      cookieStore.set(SESSION_COOKIE, JSON.stringify(sessionData), {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        maxAge: 60 * 60 * 24 * 7,
+        path: "/",
+      });
+    } catch {}
+
+    // Audit log
+    await prisma.auditLog.create({
+      data: {
+        action: "User signed up",
+        userName: newUser.name,
+        detail: `New ${newUser.role.toLowerCase()} account created for ${newUser.department}`,
+      },
+    });
+
+    try {
+      revalidatePath("/");
+    } catch {}
+
+    return { success: true, user: sessionData };
+  } catch (error: any) {
+    console.error("Signup error:", error);
+    return { success: false, error: error.message || "Failed to create account" };
+  }
+}
