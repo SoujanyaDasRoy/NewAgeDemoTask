@@ -1,0 +1,1568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Access Management \u2013 New Age Portal</title>
+<style>
+  :root{
+    --navy:#0F1B33;
+    --navy-soft:#16233F;
+    --accent:#2F6FED;
+    --accent-dark:#1E4FC7;
+    --bg:#F5F6F8;
+    --border:#E5E7EB;
+    --text:#111827;
+    --muted:#6B7280;
+    --muted-2:#9CA3AF;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    -webkit-font-smoothing:antialiased;
+  }
+  button{font-family:inherit;cursor:pointer;}
+  input,select,textarea{font-family:inherit;}
+
+  /* ---------- layout ---------- */
+  .header{
+    position:sticky; top:0; z-index:30;
+    background:#fff; border-bottom:1px solid var(--border);
+  }
+  .header-inner{
+    width:92%; max-width:1800px; margin:0 auto;
+    height:64px; display:flex; align-items:center; justify-content:space-between; gap:16px;
+  }
+  .brand{ display:flex; align-items:center; gap:10px; }
+  .brand-badge{
+    width:34px; height:34px; border-radius:9px; background:var(--navy);
+    color:#fff; font-weight:700; font-size:13px; display:flex; align-items:center; justify-content:center;
+  }
+  .brand-text-title{font-size:14px; font-weight:700; color:var(--text); line-height:1.15;}
+  .brand-text-sub{font-size:11px; color:var(--muted-2); line-height:1.15;}
+  .header-right{ display:flex; align-items:center; gap:14px; }
+
+  .view-toggle{ display:flex; align-items:center; border:1px solid var(--border); background:#fff; border-radius:9px; padding:3px; }
+  .view-toggle button{
+    border:none; background:transparent; padding:7px 14px; border-radius:6px; font-size:12.5px; font-weight:600; color:#6B7280;
+  }
+  .view-toggle button.active{ background:var(--navy); color:#fff; }
+
+  .icon-btn{
+    position:relative; width:38px; height:38px; border:none; background:transparent; border-radius:9px;
+    display:flex; align-items:center; justify-content:center; color:#64748B;
+  }
+  .icon-btn:hover{ background:#F1F5F9; }
+  .notif-dot{
+    position:absolute; top:5px; right:5px; min-width:16px; height:16px; border-radius:8px; background:#EF4444; color:#fff;
+    font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center; padding:0 3px;
+  }
+
+  .user-chip{ display:flex; align-items:center; gap:9px; padding-left:14px; border-left:1px solid var(--border); }
+  .avatar{ border-radius:999px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; flex-shrink:0; }
+  .user-chip .name{ font-size:12.5px; font-weight:700; color:#1F2937; line-height:1.2; }
+  .user-chip .role{ font-size:10.5px; color:var(--muted-2); line-height:1.2; }
+
+  .main{
+    width:92%; max-width:1800px; margin:0 auto; padding:24px 0 56px;
+    display:flex; flex-direction:column; gap:16px;
+  }
+
+  .welcome h1{ font-size:23px; font-weight:800; margin:0 0 4px; }
+  .welcome p{ font-size:13.5px; color:var(--muted); margin:0; max-width:760px; }
+
+  .grid-2{ display:grid; grid-template-columns: 2fr 1fr; gap:16px; align-items:start; }
+  .grid-3{ display:grid; grid-template-columns: repeat(3, 1fr); gap:16px; align-items:stretch; }
+  .grid-3 > *{ height:100%; }
+  @media (max-width: 1200px){ .grid-3{ grid-template-columns: repeat(2,1fr); } }
+  @media (max-width: 1080px){ .grid-2{ grid-template-columns: 1fr; } }
+  @media (max-width: 640px){ .grid-3{ grid-template-columns: 1fr; } }
+
+  .card{
+    background:#fff; border:1px solid var(--border); border-radius:var(--radius-container); padding:24px;
+  }
+  .card-compact{ padding:16px 24px; }
+  .card-compact .list-row{ padding:12px 16px; }
+  .card-tinted-amber{ border-color:#FDE7B8; background:#FFFCF5; }
+  .card-tinted-orange{ border-color:#FBD9B8; background:#FFFAF5; }
+  .card-tinted-violet{ border-color:#E4DBFB; background:#FBFAFF; }
+
+  .section-head{ display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:16px; gap:12px; }
+  .section-head-left{ display:flex; align-items:center; gap:11px; }
+  .section-icon{ width:34px; height:34px; border-radius:9px; background:#EAF1FF; color:var(--accent); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .section-title{ font-size:16px; font-weight:800; margin:0; color:#111827; }
+  .section-sub{ font-size:12px; color:var(--muted-2); margin:2px 0 0; }
+
+  /* badges */
+  .badge{ display:inline-flex; align-items:center; gap:5px; padding:4px 11px; border-radius:999px; font-size:11.5px; font-weight:600; border:1px solid transparent; white-space:nowrap;}
+  .badge-amber{ background:#FFFBEB; color:#B45309; border-color:#FDE68A; }
+  .badge-blue{ background:#EFF6FF; color:#1D4ED8; border-color:#BFDBFE; }
+  .badge-orange{ background:#FFF7ED; color:#C2410C; border-color:#FED7AA; }
+  .badge-teal{ background:#F0FDFA; color:#0F766E; border-color:#99F6E4; }
+  .badge-green{ background:#F0FDF4; color:#15803D; border-color:#BBF7D0; }
+  .badge-red{ background:#FEF2F2; color:#B91C1C; border-color:#FECACA; }
+  .badge-violet{ background:#F5F3FF; color:#6D28D9; border-color:#DDD6FE; }
+  .badge-gray{ background:#F9FAFB; color:#6B7280; border-color:#E5E7EB; }
+  .badge-indigo{ background:#EEF2FF; color:#4338CA; border-color:#C7D2FE; }
+
+  /* consistent control sizing */
+  :root{ --ctrl-h:40px; --radius-container:12px; --radius-control:9px; }
+
+  /* search */
+  .search-row{ display:flex; align-items:stretch; gap:10px; }
+  .search-input-wrap{ position:relative; flex:1; min-width:0; }
+  .search-input-wrap .search-ico{ position:absolute; left:14px; top:50%; transform:translateY(-50%); color:#9CA3AF; pointer-events:none; display:flex; z-index:1; }
+  .search-input{
+    width:100%; height:var(--ctrl-h); padding:0 16px 0 42px; border-radius:var(--radius-control); border:1px solid var(--border);
+    background:#F8FAFC; font-size:14px; outline:none; transition:.15s; box-sizing:border-box;
+  }
+  .search-input:focus{ background:#fff; border-color:var(--accent); box-shadow:0 0 0 3px rgba(47,111,237,.12); }
+  .browse-btn{
+    height:var(--ctrl-h); padding:0 16px; border-radius:var(--radius-control); border:1px solid var(--border); background:#fff;
+    color:#374151; font-size:13px; font-weight:600; display:inline-flex; align-items:center; justify-content:center; gap:6px;
+    white-space:nowrap; transition:.15s; flex-shrink:0;
+  }
+  .browse-btn:hover{ background:#F9FAFB; border-color:#CBD5E1; }
+  .browse-btn:active{ background:#F3F4F6; }
+
+  .result-row, .list-row{
+    border:1px solid var(--border); border-radius:11px; padding:16px; cursor:pointer; transition:.15s;
+    display:flex; align-items:flex-start; justify-content:space-between; gap:16px; background:#fff;
+  }
+  .result-row:hover, .list-row:hover{ border-color:#CBD5E1; box-shadow:0 2px 10px rgba(15,23,42,.05); }
+  .result-title{ font-size:14px; font-weight:700; color:#111827; }
+  .result-desc{ font-size:13px; color:var(--muted); margin-top:5px; line-height:1.5; }
+  .result-meta{ display:flex; flex-wrap:wrap; gap:16px; margin-top:10px; font-size:12px; color:var(--muted); }
+  .mono{ font-family:ui-monospace,SFMono-Regular,Menlo,monospace; }
+
+  .empty-state{ text-align:center; padding:36px 20px; }
+  .empty-state .circle{ width:46px; height:46px; border-radius:999px; background:#F3F4F6; display:flex; align-items:center; justify-content:center; margin:0 auto 12px; color:#9CA3AF; }
+  .empty-state .title{ font-size:13.5px; font-weight:700; color:#374151; }
+  .empty-state .sub{ font-size:12px; color:#9CA3AF; margin-top:4px; max-width:340px; margin-left:auto; margin-right:auto; }
+
+  /* buttons */
+  .btn{ display:inline-flex; align-items:center; justify-content:center; gap:8px; height:var(--ctrl-h); padding:0 18px; border-radius:var(--radius-control); font-size:13.5px; font-weight:700; border:none; transition:.15s; }
+  .btn:active:not(:disabled){ transform:translateY(1px); }
+  .btn-primary{ background:var(--accent); color:#fff; }
+  .btn-primary:hover:not(:disabled){ background:var(--accent-dark); }
+  .btn-primary:disabled{ background:#B9C4E0; cursor:not-allowed; }
+  .btn-secondary{ background:#fff; color:#374151; border:1px solid #D1D5DB; }
+  .btn-secondary:hover:not(:disabled){ background:#F9FAFB; border-color:#9CA3AF; }
+  .btn-secondary:disabled{ opacity:.45; cursor:not-allowed; }
+  .btn-danger{ background:#fff; color:#DC2626; border:1px solid #FECACA; }
+  .btn-danger:hover:not(:disabled){ background:#FEF2F2; border-color:#FCA5A5; }
+  .btn-danger:disabled{ opacity:.4; cursor:not-allowed; }
+  .btn-block{ width:100%; }
+  .btn-row{ display:flex; align-items:center; gap:10px; }
+
+  /* drawer */
+  .overlay{ position:fixed; inset:0; background:rgba(15,23,42,.32); z-index:50; display:none; }
+  .overlay.show{ display:block; }
+  .drawer{
+    position:fixed; top:0; right:0; height:100%; width:clamp(420px, 38vw, 640px); max-width:100%;
+    background:#fff; box-shadow:-12px 0 32px rgba(15,23,42,.14); z-index:51; overflow-y:auto;
+    display:none;
+  }
+  .drawer.show{ display:block; }
+  .drawer-head{
+    position:sticky; top:0; background:#fff; z-index:2; display:flex; align-items:flex-start; justify-content:space-between;
+    padding:22px 26px; border-bottom:1px solid var(--border);
+  }
+  .drawer-head h3{ font-size:18px; font-weight:800; margin:0; display:inline; }
+  .drawer-head .sub{ font-size:12px; color:var(--muted-2); margin-top:5px; }
+  .drawer-close{ border:none; background:transparent; color:#9CA3AF; padding:4px; }
+  .drawer-close:hover{ color:#4B5563; }
+  .drawer-body{ padding:24px 26px 40px; }
+
+  .modal-overlay{ position:fixed; inset:0; background:rgba(15,23,42,.5); z-index:60; display:none; align-items:center; justify-content:center; padding:16px; }
+  .modal-overlay.show{ display:flex; }
+  .modal-box{ background:#fff; border-radius:var(--radius-container); width:100%; max-width:440px; box-shadow:0 20px 50px rgba(0,0,0,.2); overflow:hidden; }
+  .modal-head{ display:flex; align-items:center; justify-content:space-between; padding:18px 22px; border-bottom:1px solid var(--border); }
+  .modal-head h3{ font-size:15px; font-weight:700; margin:0; }
+  .modal-body{ padding:20px 22px; }
+
+  .field-grid{ display:grid; grid-template-columns:1fr 1fr; gap:16px 24px; }
+  .field label.f-label{ display:block; font-size:11.5px; color:var(--muted-2); margin-bottom:4px; }
+  .field .f-value{ font-size:13.5px; font-weight:600; color:#1F2937; }
+
+  .kv-list{ border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+  .kv-row{ display:flex; align-items:center; justify-content:space-between; padding:11px 16px; font-size:13px; }
+  .kv-row + .kv-row{ border-top:1px solid #F3F4F6; }
+  .kv-row .k{ color:var(--muted-2); }
+  .kv-row .v{ font-weight:600; color:#1F2937; text-align:right; }
+
+  .divider{ border-top:1px solid var(--border); margin:22px 0; }
+
+  textarea, .text-input, select.text-input{
+    width:100%; padding:10px 13px; border-radius:var(--radius-control); border:1px solid var(--border); font-size:13.5px; outline:none; resize:none; font-family:inherit; box-sizing:border-box; transition:.15s;
+  }
+  input.text-input, select.text-input{ height:var(--ctrl-h); padding:0 13px; }
+  textarea:focus, .text-input:focus{ border-color:var(--accent); box-shadow:0 0 0 3px rgba(47,111,237,.12); }
+  .input-error{ border-color:#DC2626 !important; }
+  .input-error:focus{ box-shadow:0 0 0 3px rgba(220,38,38,.12) !important; }
+  .field-error{ font-size:11.5px; color:#DC2626; margin-top:6px; display:flex; align-items:center; gap:5px; }
+  .form-label{ font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:.03em; color:var(--muted-2); margin-bottom:8px; display:block; }
+
+  .choice-card{
+    width:100%; text-align:left; padding:13px 15px; border-radius:10px; border:2px solid var(--border); background:#fff;
+    display:flex; align-items:center; gap:12px; margin-bottom:8px;
+  }
+  .choice-card.selected{ border-color:var(--accent); background:#F5F8FF; }
+  .choice-card .t{ font-size:13.5px; font-weight:700; color:#111827; }
+  .choice-card .d{ font-size:11.5px; color:var(--muted-2); }
+
+  .note-box{ display:flex; gap:8px; font-size:11.5px; color:#6B7280; background:#F9FAFB; border-radius:9px; padding:10px 12px; }
+  .success-box{ display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600; color:#15803D; background:#F0FDF4; border:1px solid #BBF7D0; border-radius:9px; padding:12px 15px; }
+  .warn-box{ display:flex; align-items:flex-start; gap:8px; font-size:13px; color:#374151; background:#F9FAFB; border:1px solid var(--border); border-radius:9px; padding:12px 15px; }
+  .exception-box{ background:#FFFBEB; border:1px solid #FDE68A; border-radius:11px; padding:16px; margin-top:14px; }
+  .exception-box .t1{ font-size:13.5px; font-weight:700; color:#92400E; }
+  .exception-box .t2{ font-size:12px; color:#78350F; margin-top:3px; }
+
+  .timeline{ padding-left:4px; }
+  .t-row{ display:flex; gap:12px; position:relative; padding-bottom:22px; }
+  .t-row:last-child{ padding-bottom:0; }
+  .t-line{ position:absolute; left:9px; top:20px; bottom:0; width:1px; }
+  .t-dot{ width:20px; height:20px; flex-shrink:0; margin-top:1px; z-index:1; }
+  .t-label{ font-size:13.5px; font-weight:700; color:#111827; }
+  .t-label.muted{ color:#9CA3AF; }
+  .t-meta{ font-size:11.5px; color:#6B7280; margin-top:2px; }
+
+  .divider-label{ font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:.03em; color:var(--muted-2); margin-bottom:12px; }
+
+  .activity-row{ padding:11px 0; }
+  .activity-row + .activity-row{ border-top:1px solid #F3F4F6; }
+  .activity-action{ font-size:13px; font-weight:700; color:#1F2937; }
+  .activity-resource{ font-size:12px; color:#6B7280; margin-top:2px; }
+  .activity-meta{ font-size:11.5px; color:#9CA3AF; margin-top:3px; }
+
+  .board-card{ border:1px solid var(--border); border-radius:var(--radius-container); padding:16px; cursor:pointer; background:#fff; transition:.15s; display:flex; flex-direction:column; }
+  .board-card:hover{ border-color:#CBD5E1; box-shadow:0 2px 10px rgba(15,23,42,.05); }
+  .board-card .row1{ display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }
+  .board-card .t{ font-size:13.5px; font-weight:700; color:#111827; line-height:1.35; }
+  .board-card .row1 .badge{ flex-shrink:0; margin-top:1px; }
+  .board-card-body{ flex:1; }
+  .manage-link{ display:flex; align-items:center; gap:5px; font-size:12px; color:var(--accent); font-weight:700; margin-top:14px; padding-top:12px; border-top:1px solid #F3F4F6; }
+
+  .toggle-switch{ position:relative; width:42px; height:24px; border-radius:999px; border:none; flex-shrink:0; transition:.15s; }
+  .toggle-switch:hover{ filter:brightness(0.94); }
+  .toggle-knob{ position:absolute; top:2px; width:20px; height:20px; border-radius:999px; background:#fff; transition:.15s; }
+
+  .notif-panel{ position:absolute; right:0; top:46px; width:340px; background:#fff; border:1px solid var(--border); border-radius:12px; box-shadow:0 14px 34px rgba(15,23,42,.15); z-index:40; display:none; overflow:hidden; }
+  .notif-panel.show{ display:block; }
+  .notif-panel-head{ padding:13px 16px; font-size:13.5px; font-weight:700; border-bottom:1px solid var(--border); }
+  .notif-list{ max-height:320px; overflow-y:auto; }
+  .notif-item{ padding:12px 16px; border-bottom:1px solid #F9FAFB; display:flex; gap:9px; align-items:flex-start; }
+  .notif-item:last-child{ border-bottom:none; }
+  .notif-unread-dot{ width:6px; height:6px; border-radius:999px; background:var(--accent); margin-top:5px; flex-shrink:0; }
+  .notif-unread-dot.read{ background:transparent; }
+  .notif-text{ font-size:12.5px; color:#1F2937; }
+  .notif-sub{ display:flex; align-items:center; gap:8px; margin-top:4px; }
+  .notif-ts{ font-size:10.5px; color:#9CA3AF; }
+  .notif-channel{ font-size:9.5px; font-weight:700; color:#9CA3AF; display:flex; align-items:center; gap:3px; }
+
+  .hidden{ display:none !important; }
+  svg{ display:block; }
+
+  /* toast */
+  .toast-container{ position:fixed; bottom:24px; right:24px; z-index:90; display:flex; flex-direction:column; gap:10px; align-items:flex-end; }
+  .toast{
+    display:flex; align-items:center; gap:10px; background:#111827; color:#fff; padding:12px 16px; border-radius:var(--radius-control);
+    font-size:13px; font-weight:600; box-shadow:0 12px 28px rgba(15,23,42,.25); animation: toastIn .22s ease; max-width:360px;
+  }
+  .toast.leaving{ animation: toastOut .18s ease forwards; }
+  .toast .toast-icon{ display:flex; flex-shrink:0; }
+  .toast.success{ background:#065F46; }
+  .toast.success .toast-icon{ color:#6EE7B7; }
+  .toast.error{ background:#991B1B; }
+  .toast.error .toast-icon{ color:#FCA5A5; }
+  @keyframes toastIn{ from{ opacity:0; transform:translateY(10px) scale(.97); } to{ opacity:1; transform:translateY(0) scale(1); } }
+  @keyframes toastOut{ from{ opacity:1; transform:translateY(0); } to{ opacity:0; transform:translateY(6px); } }
+
+  /* drawer / modal transitions */
+  .drawer.show{ animation: drawerIn .2s ease; }
+  .drawer.closing{ display:block; animation: drawerOut .16s ease forwards; }
+  .overlay.closing{ display:block; animation: overlayOut .16s ease forwards; }
+  @keyframes drawerIn{ from{ transform:translateX(26px); opacity:.5; } to{ transform:translateX(0); opacity:1; } }
+  @keyframes drawerOut{ from{ transform:translateX(0); opacity:1; } to{ transform:translateX(26px); opacity:0; } }
+  @keyframes overlayOut{ from{ opacity:1; } to{ opacity:0; } }
+  .modal-box{ animation: modalIn .18s ease; }
+  .modal-overlay.closing{ animation: overlayOut .15s ease forwards; }
+  .modal-overlay.closing .modal-box{ animation: modalOut .15s ease forwards; }
+  @keyframes modalIn{ from{ opacity:0; transform:scale(.96) translateY(6px); } to{ opacity:1; transform:scale(1) translateY(0); } }
+  @keyframes modalOut{ from{ opacity:1; transform:scale(1); } to{ opacity:0; transform:scale(.97); } }
+</style>
+</head>
+<body>
+
+<div id="app"></div>
+<div id="toast-root" class="toast-container"></div>
+
+<script>
+/* ============================================================================
+   ICONS (minimal inline SVG set, stroke-based, mimics lucide style)
+   ============================================================================ */
+const ICONS = {
+  search: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>`,
+  bell: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>`,
+  chevronRight: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>`,
+  check: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>`,
+  checkCircle: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.801 10A10 10 0 1 1 17 3.335"/><path d="m9 11 3 3L22 4"/></svg>`,
+  circle: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>`,
+  x: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`,
+  clock: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>`,
+  lock: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`,
+  shield: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-8 9-4.5-1.5-8-4-8-9V6l8-3 8 3z"/></svg>`,
+  users: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
+  building: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01M16 6h.01M8 10h.01M16 10h.01M8 14h.01M16 14h.01"/></svg>`,
+  clipboardList: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 12h6M9 16h6M9 8h1"/></svg>`,
+  history: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>`,
+  key: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/></svg>`,
+  message: `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-4-1L3 20l1-4.5A8.38 8.38 0 0 1 3 11.5 8.5 8.5 0 0 1 12 3a8.5 8.5 0 0 1 9 8.5z"/></svg>`,
+  inbox: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>`,
+  clipboardCheck: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/></svg>`,
+  package: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>`,
+  xCircle: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/></svg>`,
+  info: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>`,
+  pencil: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>`,
+  alertTriangle: `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4M12 17h.01"/></svg>`,
+};
+
+/* ============================================================================
+   SEED DATA
+   ============================================================================ */
+const PERSONAS = {
+  employee: { name: "Manvi Mehta", title: "Project Manager", group: "Product Team", initials: "MM", tone: "#2563EB" },
+  admin: { name: "Rahul Sharma", title: "IT Support \u00b7 Access Provider / Board Admin", group: "IT Support", initials: "RS", tone: "#334155" },
+};
+
+const STATUS_CLASS = {
+  "Pending Approval": "badge-amber",
+  "Pending Exception Approval": "badge-amber",
+  "Approved": "badge-blue",
+  "Provisioning": "badge-blue",
+  "Pending Manual Provisioning": "badge-orange",
+  "Access Provisioned": "badge-teal",
+  "Completed": "badge-green",
+  "Rejected": "badge-red",
+  "Pending Governance Review": "badge-violet",
+};
+
+const EMPLOYEES = ["Vanshika Sharma", "Rohit Malhotra", "Ananya Rao", "Kabir Singh", "Priya Menon"];
+
+let state = {
+  view: "employee",
+  catalog: [
+    { id:"acc-1", tool:"Monday.com", name:"Marketing Operations Board", category:"Board",
+      description:"Campaign timelines, content calendar, and creative sign-off tracking for the Marketing team.",
+      accessId:"AC-1042", creator:"Sarah Thomas", group:"Marketing Team", eligibleGroups:["Marketing Team","Product Team"],
+      approver:"Manvi Mehta", backupApprover:"Sarah Thomas", provider:"Rahul Sharma", automation:true, requestType:"Board Access Request" },
+    { id:"acc-2", tool:"Salesforce", name:"Sales Operations", category:"Application",
+      description:"Pipeline, opportunity, and account data for the Sales Operations team.",
+      accessId:"AC-2077", creator:"Neha Kapoor", group:"Sales Team", eligibleGroups:["Sales Team","Product Team"],
+      approver:"Neha Kapoor", backupApprover:"Arjun Mehta", provider:"Rahul Sharma", automation:false, requestType:"Application Access Request" },
+    { id:"acc-3", tool:"Monday.com", name:"Product Roadmap Board", category:"Board",
+      description:"Quarterly roadmap planning and feature prioritization board for the Product team.",
+      accessId:null, creator:"Apoorva Singh", group:"Product Team", eligibleGroups:["Product Team"],
+      approver:"Sandeep Verma", backupApprover:"Apoorva Singh", provider:"Rahul Sharma", automation:false, requestType:"Board Access Request" },
+    { id:"acc-4", tool:"Zendesk", name:"Customer Support Queue", category:"Application",
+      description:"Live customer ticket queue for the Support team.",
+      accessId:"AC-3311", creator:"Varsha Nair", group:"Support Team", eligibleGroups:["Support Team"],
+      approver:"Manvi Mehta", backupApprover:"Christian Fernandes", provider:"Varsha Nair", automation:false, requestType:"Application Access Request" },
+    { id:"acc-5", tool:"Monday.com", name:"Finance Tracker", category:"Board",
+      description:"Vendor invoices, budget tracking, and expense approvals board for Finance.",
+      accessId:"AC-1590", creator:"Nivi Rao", group:"Finance Team", eligibleGroups:["Finance Team"],
+      approver:"Muskan Kohli", backupApprover:"Nivi Rao", provider:"Nivi Rao", automation:true, requestType:"Board Access Request" },
+  ],
+  requests: [
+    { id:"NAR-10469", accessId:"acc-4", accessLabel:"Zendesk \u2013 Customer Support Queue", requester:"Rahul Sharma", beneficiary:"Rahul Sharma", onBehalf:false, isException:false,
+      approver:"Manvi Mehta", provider:"Varsha Nair", automation:false, justification:"Need ticket visibility to debug a provisioning issue reported by Support.",
+      status:"Completed", submitted:"2 Aug 2026", updated:"3 Aug 2026",
+      timeline:[ {label:"Request Submitted", actor:"Rahul Sharma", ts:"2 Aug 2026, 9:40 AM", state:"done"},
+                 {label:"Approved", actor:"Manvi Mehta", ts:"2 Aug 2026, 1:15 PM", state:"done"},
+                 {label:"Access Provisioned", actor:"Varsha Nair", ts:"3 Aug 2026, 10:05 AM", state:"done"},
+                 {label:"Completed", actor:"System", ts:"3 Aug 2026, 10:05 AM", state:"done"} ] },
+    { id:"NAR-10471", accessId:"acc-4", accessLabel:"Zendesk \u2013 Customer Support Queue", requester:"Ananya Rao", beneficiary:"Ananya Rao", onBehalf:false, isException:false,
+      approver:"Manvi Mehta", provider:"Varsha Nair", automation:false, justification:"Joining the Support rotation next week and need queue access.",
+      status:"Pending Approval", submitted:"16 Aug 2026", updated:"16 Aug 2026",
+      timeline:[ {label:"Request Submitted", actor:"Ananya Rao", ts:"16 Aug 2026, 11:20 AM", state:"done"},
+                 {label:"Pending Approval", actor:"Manvi Mehta", ts:"\u2014", state:"current"},
+                 {label:"Pending Manual Provisioning", actor:"", ts:"", state:"pending"},
+                 {label:"Completed", actor:"", ts:"", state:"pending"} ] },
+    { id:"NAR-10475", accessId:"acc-5", accessLabel:"Monday.com \u2013 Finance Tracker", requester:"Manvi Mehta", beneficiary:"Manvi Mehta", onBehalf:false, isException:false,
+      approver:"Muskan Kohli", provider:"Nivi Rao", automation:true, justification:"Tracking marketing budget spend against the Q3 vendor invoices.",
+      status:"Completed", submitted:"10 Aug 2026", updated:"10 Aug 2026",
+      timeline:[ {label:"Request Submitted", actor:"Manvi Mehta", ts:"10 Aug 2026, 9:12 AM", state:"done"},
+                 {label:"Approved", actor:"Muskan Kohli", ts:"10 Aug 2026, 11:40 AM", state:"done"},
+                 {label:"Access Provisioned", actor:"Automated Provisioning", ts:"10 Aug 2026, 11:41 AM", state:"done"},
+                 {label:"Completed", actor:"System", ts:"10 Aug 2026, 11:41 AM", state:"done"} ] },
+    { id:"NAR-10478", accessId:"acc-2", accessLabel:"Salesforce \u2013 Sales Operations", requester:"Manvi Mehta", beneficiary:"Manvi Mehta", onBehalf:false, isException:false,
+      approver:"Neha Kapoor", provider:"Rahul Sharma", automation:false, justification:"Reviewing pipeline coverage for the New Age Portal launch account list.",
+      status:"Pending Manual Provisioning", submitted:"15 Aug 2026", updated:"16 Aug 2026",
+      timeline:[ {label:"Request Submitted", actor:"Manvi Mehta", ts:"15 Aug 2026, 2:05 PM", state:"done"},
+                 {label:"Approved", actor:"Neha Kapoor", ts:"16 Aug 2026, 10:20 AM", state:"done"},
+                 {label:"Pending Manual Provisioning", actor:"Rahul Sharma", ts:"\u2014", state:"current"},
+                 {label:"Completed", actor:"", ts:"", state:"pending"} ] },
+  ],
+  auditLog: [
+    { id:"a1", action:"Access ID created \u2014 AC-1042", user:"Rahul Sharma", ts:"20 Jun 2026, 4:10 PM", detail:"Monday.com \u2013 Marketing Operations Board" },
+    { id:"a2", action:"Backup approver changed", user:"Rahul Sharma", ts:"5 Jul 2026, 11:02 AM", detail:"Monday.com \u2013 Marketing Operations Board" },
+    { id:"a3", action:"Automation enabled", user:"Rahul Sharma", ts:"28 Jul 2026, 3:45 PM", detail:"Monday.com \u2013 Marketing Operations Board" },
+    { id:"a4", action:"Automation enabled", user:"Rahul Sharma", ts:"2 Aug 2026, 1:15 PM", detail:"Monday.com \u2013 Finance Tracker" },
+  ],
+  accessIdQueue: [],
+  notifications: [
+    { id:"n1", role:"employee", text:"Your request NAR-10478 was approved by Neha Kapoor.", ts:"16 Aug, 10:20 AM", channel:"portal", read:true },
+    { id:"n2", role:"employee", text:"Ananya Rao raised a request for Zendesk \u2013 Customer Support Queue awaiting your approval.", ts:"16 Aug, 11:20 AM", channel:"slack", read:false },
+    { id:"n3", role:"admin", text:"NAR-10478 (Salesforce \u2013 Sales Operations) is ready for manual provisioning.", ts:"16 Aug, 10:20 AM", channel:"portal", read:false },
+  ],
+  narCounter: 10481,
+  idqCounter: 0,
+  auditCounter: 4,
+  drawer: null,     // { type, params }
+  modal: null,      // { type, params }
+  notifOpen: false,
+  searchQuery: "",
+  browsing: false,
+};
+
+function currentUser(){ return PERSONAS[state.view]; }
+function findAccess(id){ return state.catalog.find(a => a.id === id); }
+function findRequest(id){ return state.requests.find(r => r.id === id); }
+
+/* ============================================================================
+   ACTIONS
+   ============================================================================ */
+function pushAudit(action, user, detail){
+  state.auditCounter += 1;
+  const ts = "17 Aug 2026, " + new Date().toLocaleTimeString([], {hour:"numeric", minute:"2-digit"});
+  state.auditLog.push({ id:"a"+state.auditCounter, action, user, ts, detail });
+}
+function pushNotification(role, text, channel){
+  state.notifications.push({ id:"n-"+Date.now()+Math.random(), role, text, ts:"Just now", channel: channel||"portal", read:false });
+}
+function markNotificationsRead(role){
+  state.notifications.forEach(n => { if (n.role === role) n.read = true; });
+}
+
+/* ============================================================================
+   TOASTS
+   ============================================================================ */
+function showToast(message, type){
+  const root = document.getElementById("toast-root");
+  if (!root) return;
+  const id = "toast-" + Date.now() + "-" + Math.floor(Math.random()*1000);
+  const el = document.createElement("div");
+  el.className = "toast " + (type || "success");
+  el.id = id;
+  const icon = (type === "error") ? ICONS.xCircle : ICONS.checkCircle;
+  el.innerHTML = '<span class="toast-icon">'+icon+'</span><span>'+esc(message)+'</span>';
+  root.appendChild(el);
+  setTimeout(function(){
+    el.classList.add("leaving");
+    setTimeout(function(){ if (el.parentNode) el.parentNode.removeChild(el); }, 200);
+  }, 2800);
+}
+
+function submitRequest(opts){
+  const access = opts.access, beneficiary = opts.beneficiary, onBehalf = opts.onBehalf, justification = opts.justification;
+  state.narCounter += 1;
+  const id = "NAR-" + state.narCounter;
+  const req = {
+    id, accessId: access.id, accessLabel: access.tool + " \u2013 " + access.name,
+    requester: currentUser().name, beneficiary, onBehalf, isException:false,
+    approver: access.approver, provider: access.provider, automation: access.automation,
+    justification, status:"Pending Approval", submitted:"17 Aug 2026", updated:"17 Aug 2026",
+    timeline:[
+      { label:"Request Submitted", actor: currentUser().name, ts:"17 Aug 2026, 2:10 PM", state:"done" },
+      { label:"Pending Approval", actor: access.approver, ts:"\u2014", state:"current" },
+      { label: access.automation ? "Provisioning" : "Pending Manual Provisioning", actor:"", ts:"", state:"pending" },
+      { label: onBehalf ? "Access Provisioned" : "Completed", actor:"", ts:"", state:"pending" },
+    ],
+  };
+  state.requests.push(req);
+  pushAudit("Request created", currentUser().name, id + " \u2014 " + req.accessLabel);
+  if (access.approver !== currentUser().name){
+    const role = access.approver === PERSONAS.admin.name ? "admin" : "employee";
+    pushNotification(role, "New access request from " + currentUser().name + " awaiting approval.", "slack");
+  }
+  return id;
+}
+
+function submitExceptionRequest(opts){
+  const access = opts.access, reason = opts.reason, justification = opts.justification, requiredUntil = opts.requiredUntil, urgency = opts.urgency;
+  state.narCounter += 1;
+  const id = "NAR-" + state.narCounter;
+  const req = {
+    id, accessId: access.id, accessLabel: access.tool + " \u2013 " + access.name,
+    requester: currentUser().name, beneficiary: currentUser().name, onBehalf:false, isException:true,
+    reason, requiredUntil, urgency,
+    approver: access.approver, provider: access.provider, automation: access.automation,
+    justification, status:"Pending Exception Approval", submitted:"17 Aug 2026", updated:"17 Aug 2026",
+    timeline:[
+      { label:"Exception Request Submitted", actor: currentUser().name, ts:"17 Aug 2026, 2:10 PM", state:"done" },
+      { label:"Pending Exception Approval", actor: access.approver, ts:"\u2014", state:"current" },
+      { label: access.automation ? "Provisioning" : "Pending Manual Provisioning", actor:"", ts:"", state:"pending" },
+      { label:"Completed", actor:"", ts:"", state:"pending" },
+    ],
+  };
+  state.requests.push(req);
+  pushAudit("Exception request created", currentUser().name, id + " \u2014 " + req.accessLabel + " (outside " + access.group + ")");
+  const role = access.approver === PERSONAS.admin.name ? "admin" : "employee";
+  pushNotification(role, "Access exception request from " + currentUser().name + " awaiting your review.", "slack");
+  return id;
+}
+
+function approveRequest(requestId){
+  const r = findRequest(requestId);
+  if (!r) return;
+  const now = "17 Aug 2026, 2:22 PM";
+  const approvedStep = { label:"Approved", actor:r.approver, ts:now, state:"done" };
+  if (r.automation){
+    const finalStatus = r.onBehalf ? "Access Provisioned" : "Completed";
+    r.status = finalStatus; r.updated = "17 Aug 2026";
+    r.timeline = [ r.timeline[0], approvedStep,
+      { label:"Access Automatically Provisioned", actor:"Automated Provisioning", ts:now, state:"done" },
+      r.onBehalf ? { label:"Access Provisioned \u2014 awaiting closure", actor:"", ts:"", state:"current" } : { label:"Completed", actor:"System", ts:now, state:"done" } ];
+  } else {
+    r.status = "Pending Manual Provisioning"; r.updated = "17 Aug 2026";
+    r.timeline = [ r.timeline[0], approvedStep,
+      { label:"Pending Manual Provisioning", actor:r.provider, ts:"\u2014", state:"current" },
+      { label: r.onBehalf ? "Access Provisioned" : "Completed", actor:"", ts:"", state:"pending" } ];
+  }
+  pushAudit("Request approved", r.approver, requestId + " \u2014 " + r.accessLabel);
+  pushNotification("employee", "Your request " + requestId + " was approved by " + r.approver + ".", "portal");
+  if (r.automation) pushNotification("employee", "Access provisioned for " + requestId + " \u2014 " + r.accessLabel + ".", "portal");
+  else pushNotification("admin", requestId + " (" + r.accessLabel + ") is ready for manual provisioning.", "portal");
+}
+
+function rejectRequest(requestId, reason){
+  const r = findRequest(requestId);
+  if (!r) return;
+  r.status = "Rejected"; r.updated = "17 Aug 2026";
+  r.timeline = [ r.timeline[0], { label:"Rejected", actor:r.approver, ts:"17 Aug 2026, 2:22 PM", state:"done" } ];
+  pushAudit("Request rejected", r.approver, requestId + " \u2014 Reason: " + (reason || "Not specified"));
+  pushNotification("employee", "Your request " + requestId + " was rejected by " + r.approver + ".", "portal");
+}
+
+function provisionManually(requestId){
+  const r = findRequest(requestId);
+  if (!r) return;
+  const now = "17 Aug 2026, 3:05 PM";
+  const finalStatus = r.onBehalf ? "Access Provisioned" : "Completed";
+  r.status = finalStatus; r.updated = "17 Aug 2026";
+  r.timeline = r.timeline.map(function(s,i){
+    if (i === 2) return { label:"Access Provisioned", actor:r.provider, ts:now, state:"done" };
+    if (i === 3) return r.onBehalf ? { label:"Access Provisioned \u2014 awaiting closure", actor:"", ts:"", state:"current" } : { label:"Completed", actor:"System", ts:now, state:"done" };
+    return s;
+  });
+  pushAudit("Access provisioned (manual)", currentUser().name, requestId + " \u2014 " + r.accessLabel);
+  pushNotification("employee", "Access has been provisioned for " + requestId + ".", "portal");
+}
+
+function closeRequestAction(requestId){
+  const r = findRequest(requestId);
+  if (!r) return;
+  r.status = "Completed"; r.updated = "17 Aug 2026";
+  r.timeline = r.timeline.slice(0,-1).map(function(s){ return s.state === "current" ? Object.assign({}, s, { label:"Access Provisioned", state:"done" }) : s; });
+  r.timeline.push({ label:"Request Closed", actor: currentUser().name, ts:"17 Aug 2026, 2:35 PM", state:"done" });
+  pushAudit("Request closed", currentUser().name, requestId + " \u2014 closed on behalf of " + r.beneficiary);
+}
+
+function requestAccessIdCreation(accessId){
+  state.idqCounter += 1;
+  const access = findAccess(accessId);
+  const q = { id:"idq-"+state.idqCounter, accessId, status:"Pending Governance Review", requestedBy: currentUser().name, requestedTs:"17 Aug 2026, 1:00 PM" };
+  state.accessIdQueue.push(q);
+  pushAudit("Access ID creation requested", currentUser().name, access.tool + " \u2013 " + access.name);
+  pushNotification("admin", "Access ID creation requested for " + access.tool + " \u2013 " + access.name + ".", "portal");
+  openDrawer("access-id-status", { accessId: accessId });
+}
+
+function approveAccessId(queueId){
+  const q = state.accessIdQueue.find(function(x){ return x.id === queueId; });
+  if (!q) return;
+  q.status = "Access ID Created"; q.approvedTs = "17 Aug 2026, 4:00 PM";
+  const newId = "AC-" + (4000 + Math.floor(Math.random()*900));
+  const access = findAccess(q.accessId);
+  access.accessId = newId;
+  pushAudit("Access ID created", currentUser().name, access.tool + " \u2013 " + access.name + " \u2014 " + newId);
+  pushNotification("employee", "Access ID created for " + access.tool + " \u2013 " + access.name + ". You can continue your request.", "portal");
+}
+
+function toggleAutomation(accessId){
+  const access = findAccess(accessId);
+  const wasOn = access.automation;
+  access.automation = !access.automation;
+  pushAudit(wasOn ? "Automation disabled" : "Automation enabled", currentUser().name, access.tool + " \u2013 " + access.name);
+}
+
+function updateAccessConfig(accessId, changes){
+  const access = findAccess(accessId);
+  const diffs = [];
+  if (access.approver !== changes.approver) diffs.push("Approver: " + access.approver + " \u2192 " + changes.approver);
+  if (access.backupApprover !== changes.backupApprover) diffs.push("Backup approver: " + access.backupApprover + " \u2192 " + changes.backupApprover);
+  if (access.provider !== changes.provider) diffs.push("Access provider: " + access.provider + " \u2192 " + changes.provider);
+  Object.assign(access, changes);
+  pushAudit("Access configuration updated", currentUser().name, access.tool + " \u2013 " + access.name + (diffs.length ? " \u2014 " + diffs.join(", ") : ""));
+}
+
+/* ============================================================================
+   DRAWER / MODAL CONTROL
+   ============================================================================ */
+function openDrawer(type, params){ state.drawer = { type: type, params: params||{} }; state.modal = null; render(); }
+function closeDrawer(onDone){
+  if (!state.drawer) { if (onDone) onDone(); return; }
+  const el = document.querySelector(".drawer");
+  const ov = document.querySelector(".overlay");
+  if (el) { el.classList.remove("show"); el.classList.add("closing"); }
+  if (ov) { ov.classList.remove("show"); ov.classList.add("closing"); }
+  setTimeout(function(){ state.drawer = null; render(); if (onDone) onDone(); }, 160);
+}
+function openModal(type, params){ state.modal = { type: type, params: params||{} }; render(); }
+function closeModal(){
+  if (!state.modal) return;
+  const el = document.querySelector(".modal-overlay");
+  if (el) el.classList.add("closing");
+  setTimeout(function(){ state.modal = null; render(); }, 150);
+}
+/* Closes an open modal (if any) first, then the drawer beneath it \u2014 avoids both
+   independently re-rendering the app mid-animation and racing each other. */
+function closeAll(){
+  if (state.modal){
+    const el = document.querySelector(".modal-overlay");
+    if (el) el.classList.add("closing");
+    setTimeout(function(){ state.modal = null; closeDrawer(); }, 150);
+  } else {
+    closeDrawer();
+  }
+}
+function toggleNotifPanel(role){
+  state.notifOpen = !state.notifOpen;
+  if (state.notifOpen) markNotificationsRead(role);
+  render();
+}
+function setView(v){ state.view = v; state.drawer = null; state.modal = null; state.notifOpen = false; render(); }
+
+/* ============================================================================
+   SMALL HTML HELPERS
+   ============================================================================ */
+function esc(str){ return (str==null?"":String(str)).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+
+/* ============================================================================
+   INLINE FORM VALIDATION HELPERS
+   ============================================================================ */
+function setFieldError(fieldId, msg){
+  const el = document.getElementById(fieldId);
+  if (!el) return;
+  el.classList.add("input-error");
+  let err = document.getElementById(fieldId+"-error");
+  if (!err){
+    err = document.createElement("div");
+    err.id = fieldId+"-error";
+    err.className = "field-error";
+    el.insertAdjacentElement("afterend", err);
+  }
+  err.innerHTML = '<span style="display:flex;">'+ICONS.alertTriangle+'</span>'+esc(msg);
+}
+function clearFieldError(fieldId){
+  const el = document.getElementById(fieldId);
+  if (el) el.classList.remove("input-error");
+  const err = document.getElementById(fieldId+"-error");
+  if (err) err.remove();
+}
+
+function initials(name){ return name.split(" ").map(function(p){return p[0];}).slice(0,2).join(""); }
+function avatarHtml(name, size, tone){
+  size = size || 34;
+  tone = tone || "#475569";
+  return '<div class="avatar" style="width:'+size+'px;height:'+size+'px;background:'+tone+';font-size:'+Math.round(size*0.36)+'px;">'+esc(initials(name))+'</div>';
+}
+function badgeHtml(text, cls){ return '<span class="badge '+cls+'">'+text+'</span>'; }
+function statusBadge(status){ return badgeHtml(esc(status), STATUS_CLASS[status] || "badge-gray"); }
+
+function timelineHtml(steps){
+  return '<div class="timeline">' + steps.map(function(s,i){
+    const isLast = i === steps.length-1;
+    let dot;
+    if (s.state === "done") dot = '<div class="t-dot" style="color:#22C55E;">'+ICONS.checkCircle+'</div>';
+    else if (s.state === "current") dot = '<div class="t-dot" style="display:flex;align-items:center;justify-content:center;border:2px solid var(--accent);border-radius:999px;"><div style="width:8px;height:8px;border-radius:999px;background:var(--accent);"></div></div>';
+    else dot = '<div class="t-dot" style="color:#D1D5DB;">'+ICONS.circle+'</div>';
+    return '<div class="t-row">'
+      + (!isLast ? '<div class="t-line" style="background:'+(s.state==='done' ? '#22C55E' : '#E5E7EB')+';"></div>' : "")
+      + dot
+      + '<div>'
+      + '<div class="t-label '+(s.state==='pending' ? 'muted':'')+'">'+esc(s.label)+'</div>'
+      + ((s.actor || s.ts) ? '<div class="t-meta">'+esc(s.actor)+' '+(s.actor && s.ts ? "\u00b7" : "")+' '+esc(s.ts)+'</div>' : "")
+      + '</div></div>';
+  }).join("") + '</div>';
+}
+
+function emptyStateHtml(iconKey, title, sub){
+  return '<div class="empty-state">'
+    + '<div class="circle">'+ICONS[iconKey]+'</div>'
+    + '<div class="title">'+esc(title)+'</div>'
+    + (sub ? '<div class="sub">'+esc(sub)+'</div>' : "")
+    + '</div>';
+}
+
+function fieldHtml(label, value){
+  return '<div class="field"><label class="f-label">'+esc(label)+'</label><div class="f-value">'+value+'</div></div>';
+}
+
+/* ============================================================================
+   HEADER
+   ============================================================================ */
+function renderHeader(){
+  const u = currentUser();
+  const mineNotifs = state.notifications.filter(function(n){ return n.role === state.view; });
+  const unread = mineNotifs.filter(function(n){ return !n.read; }).length;
+  return '\
+  <div class="header">\
+    <div class="header-inner">\
+      <div class="brand">\
+        <div class="brand-badge">NA</div>\
+        <div>\
+          <div class="brand-text-title">Access Management</div>\
+          <div class="brand-text-sub">New Age Portal</div>\
+        </div>\
+      </div>\
+      <div class="header-right">\
+        <div class="view-toggle">\
+          <button class="'+(state.view==='employee'?'active':'')+'" onclick="setView(\'employee\')">Employee View</button>\
+          <button class="'+(state.view==='admin'?'active':'')+'" onclick="setView(\'admin\')">Board Admin View</button>\
+        </div>\
+        <div style="position:relative;">\
+          <button class="icon-btn" onclick="toggleNotifPanel(\''+state.view+'\')">\
+            '+ICONS.bell+'\
+            '+(unread>0 ? '<span class="notif-dot">'+unread+'</span>' : "")+'\
+          </button>\
+          <div class="notif-panel '+(state.notifOpen ? 'show':'')+'">\
+            <div class="notif-panel-head">Notifications</div>\
+            <div class="notif-list">\
+              '+(mineNotifs.length===0 ? '<div style="padding:28px 16px;text-align:center;font-size:12.5px;color:#9CA3AF;">You\'re all caught up.</div>' :
+                mineNotifs.slice().reverse().map(function(n){ return '\
+                <div class="notif-item">\
+                  <div class="notif-unread-dot '+(n.read?'read':'')+'"></div>\
+                  <div>\
+                    <div class="notif-text">'+esc(n.text)+'</div>\
+                    <div class="notif-sub">\
+                      <span class="notif-ts">'+esc(n.ts)+'</span>\
+                      <span class="notif-channel">'+(n.channel==='slack' ? ICONS.message + ' Slack' : 'Portal')+'</span>\
+                    </div>\
+                  </div>\
+                </div>'; }).join(""))+'\
+            </div>\
+          </div>\
+        </div>\
+        <div class="user-chip">\
+          '+avatarHtml(u.name, 32, u.tone)+'\
+          <div>\
+            <div class="name">'+esc(u.name)+'</div>\
+            <div class="role">'+esc(u.title)+'</div>\
+          </div>\
+        </div>\
+      </div>\
+    </div>\
+  </div>';
+}
+
+/* ============================================================================
+   SEARCH SECTION
+   ============================================================================ */
+function isEligible(access){ return access.eligibleGroups.indexOf(currentUser().group) !== -1; }
+
+function renderSearchSection(){
+  const active = state.searchQuery.trim().length > 0 || state.browsing;
+  let results = state.catalog;
+  if (state.searchQuery.trim()){
+    const q = state.searchQuery.toLowerCase();
+    results = results.filter(function(a){ return a.tool.toLowerCase().indexOf(q)!==-1 || a.name.toLowerCase().indexOf(q)!==-1 || a.group.toLowerCase().indexOf(q)!==-1 || a.category.toLowerCase().indexOf(q)!==-1; });
+  }
+  let html = '\
+  <div class="card">\
+    <div class="section-head">\
+      <div>\
+        <h2 class="section-title">Find access</h2>\
+        <p class="section-sub">Search by tool, board, or team \u2014 you don\'t need to know the exact internal name.</p>\
+      </div>\
+    </div>\
+    <div class="search-row">\
+      <div class="search-input-wrap">\
+        <span class="search-ico">'+ICONS.search+'</span>\
+        <input id="search-input" class="search-input" placeholder="Search for an application, tool, account or board..." value="'+esc(state.searchQuery)+'" oninput="onSearchInput(this.value)" />\
+      </div>\
+      <button class="browse-btn" onclick="toggleBrowse()">'+(state.browsing && !state.searchQuery ? "Hide directory" : "Browse directory")+'</button>\
+    </div>';
+  if (active){
+    html += '<div style="margin-top:16px;display:flex;flex-direction:column;gap:10px;">';
+    html += '<div style="font-size:12px;color:#9CA3AF;">'+results.length+' result'+(results.length!==1?'s':'')+(state.searchQuery?' for "'+esc(state.searchQuery)+'"':' in the directory')+'</div>';
+    if (results.length===0){
+      html += emptyStateHtml('search',"No matching access found","Try a different keyword.");
+    } else {
+      html += results.map(function(a){
+        const eligible = isEligible(a);
+        return '<div class="result-row" onclick="openDrawer(\'access-details\',{accessId:\''+a.id+'\'})">\
+              <div style="flex:1;min-width:0;">\
+                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">\
+                  <span class="result-title">'+esc(a.tool)+' \u2013 '+esc(a.name)+'</span>\
+                  '+badgeHtml(esc(a.category), "badge-gray")+'\
+                </div>\
+                <div class="result-desc">'+esc(a.description)+'</div>\
+                <div class="result-meta">\
+                  <span class="mono">'+(a.accessId ? "Access ID: "+esc(a.accessId) : "Access ID: not yet created")+'</span>\
+                  <span>Approver: <strong style="color:#374151;">'+esc(a.approver)+'</strong></span>\
+                </div>\
+              </div>\
+              '+(eligible ? badgeHtml(ICONS.check+" Eligible","badge-green") : badgeHtml(ICONS.lock+" Not eligible","badge-gray"))+'\
+            </div>';
+      }).join("");
+    }
+    html += '</div>';
+  }
+  html += '</div>';
+  return html;
+}
+function onSearchInput(val){ state.searchQuery = val; renderMainOnly(); focusSearchInput(); }
+function toggleBrowse(){ state.browsing = !state.browsing; render(); }
+function focusSearchInput(){
+  const el = document.getElementById("search-input");
+  if (el){ el.focus(); const v = el.value; el.value=""; el.value=v; }
+}
+
+/* ============================================================================
+   MY REQUESTS SECTION
+   ============================================================================ */
+function renderMyRequestsSection(compact){
+  const mine = state.requests.filter(function(r){ return r.requester === currentUser().name; });
+  let html = '\
+  <div class="card '+(compact ? 'card-compact':'')+'">\
+    <div class="section-head" style="'+(compact?'margin-bottom:12px;':'')+'">\
+      <div class="section-head-left">\
+        <div class="section-icon">'+ICONS.clipboardList+'</div>\
+        <div><h2 class="section-title">My Requests</h2>'+(compact ? '' : '<p class="section-sub">Requests you\'ve raised, for yourself or on behalf of other employees.</p>')+'</div>\
+      </div>\
+    </div>';
+  if (mine.length===0){
+    html += emptyStateHtml('inbox',"No requests yet","Search for access above to raise your first request.");
+  } else {
+    html += '<div style="display:flex;flex-direction:column;gap:8px;">';
+    html += mine.map(function(r){
+      const acc = findAccess(r.accessId);
+      const teamTag = acc ? badgeHtml(esc(acc.category), "badge-gray") : "";
+      return '\
+        <div class="list-row" onclick="openDrawer(\'request-detail\',{requestId:\''+r.id+'\'})">\
+          <div style="min-width:0;">\
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">\
+              <span class="result-title">'+esc(r.accessLabel)+'</span>\
+              '+teamTag+'\
+              '+(r.onBehalf ? badgeHtml("On behalf of "+esc(r.beneficiary),"badge-violet") : "")+'\
+              '+(r.isException ? badgeHtml("Exception","badge-amber") : "")+'\
+            </div>\
+            <div style="font-size:11.5px;color:#9CA3AF;margin-top:4px;" class="mono">'+r.id+' \u00b7 Updated '+esc(r.updated)+'</div>\
+          </div>\
+          '+statusBadge(r.status)+'\
+        </div>'; }).join("");
+    html += '</div>';
+  }
+  html += '</div>';
+  return html;
+}
+
+/* ============================================================================
+   APPROVALS SECTION
+   ============================================================================ */
+function renderApprovalsSection(){
+  const pending = state.requests.filter(function(r){ return r.approver === currentUser().name && (r.status === "Pending Approval" || r.status === "Pending Exception Approval"); });
+  if (pending.length === 0) return "";
+  let html = '\
+  <div class="card card-tinted-amber">\
+    <div class="section-head">\
+      <div class="section-head-left">\
+        <div class="section-icon">'+ICONS.clipboardCheck+'</div>\
+        <div><h2 class="section-title">Approvals Requiring My Action</h2><p class="section-sub">You\'re the configured approver (or backup) for these requests.</p></div>\
+      </div>\
+      '+badgeHtml(pending.length+" pending","badge-amber")+'\
+    </div>\
+    <div style="display:flex;flex-direction:column;gap:8px;">';
+  html += pending.map(function(r){ return '\
+      <div class="list-row" style="background:#fff;border-left:3px solid #F59E0B;" onclick="openDrawer(\'approval-detail\',{requestId:\''+r.id+'\'})">\
+        <div style="display:flex;align-items:center;gap:12px;min-width:0;">\
+          '+avatarHtml(r.requester, 32)+'\
+          <div style="min-width:0;">\
+            <div style="display:flex;align-items:center;gap:8px;">\
+              <span class="result-title">'+esc(r.accessLabel)+'</span>\
+              '+(r.isException ? badgeHtml("Exception request","badge-amber") : "")+'\
+            </div>\
+            <div style="font-size:11.5px;color:#9CA3AF;margin-top:3px;">'+r.id+' \u00b7 '+esc(r.requester)+(r.onBehalf?' for '+esc(r.beneficiary):"")+' \u00b7 '+esc(r.submitted)+'</div>\
+          </div>\
+        </div>\
+        <span style="color:#D1D5DB;">'+ICONS.chevronRight+'</span>\
+      </div>'; }).join("");
+  html += '</div></div>';
+  return html;
+}
+
+/* ============================================================================
+   ADMIN: MY BOARDS
+   ============================================================================ */
+function renderMyBoardsSection(){
+  const mine = state.catalog.filter(function(a){ return a.provider === currentUser().name; });
+  let html = '\
+  <div class="card">\
+    <div class="section-head">\
+      <div class="section-head-left">\
+        <div class="section-icon">'+ICONS.building+'</div>\
+        <div><h2 class="section-title">My Boards / Access</h2><p class="section-sub">Boards and accounts you administer as the access provider.</p></div>\
+      </div>\
+    </div>\
+    <div class="grid-3">';
+  html += mine.map(function(a){ return '\
+      <div class="board-card" onclick="openDrawer(\'board-config\',{accessId:\''+a.id+'\'})">\
+        <div class="board-card-body">\
+          <div class="row1">\
+            <span class="t">'+esc(a.tool)+' \u2013 '+esc(a.name)+'</span>\
+            '+(a.automation ? badgeHtml("Automated","badge-indigo") : badgeHtml("Manual","badge-gray"))+'\
+          </div>\
+          <div style="font-size:11.5px;color:#9CA3AF;margin-top:8px;" class="mono">'+(a.accessId ? "Access ID: "+esc(a.accessId) : "Access ID not yet created")+'</div>\
+          <div style="font-size:12px;color:#6B7280;margin-top:8px;">Approver: <strong style="color:#374151;">'+esc(a.approver)+'</strong></div>\
+        </div>\
+        <div class="manage-link">'+ICONS.pencil+' Manage configuration</div>\
+      </div>'; }).join("");
+  html += '</div></div>';
+  return html;
+}
+
+function renderAdminQueueSection(){
+  const queue = state.requests.filter(function(r){ return r.provider === currentUser().name && r.status === "Pending Manual Provisioning"; });
+  let html = '\
+  <div class="card card-tinted-orange">\
+    <div class="section-head">\
+      <div class="section-head-left">\
+        <div class="section-icon" style="background:#FFF1E0;color:#C2410C;">'+ICONS.package+'</div>\
+        <div><h2 class="section-title">Requests Requiring Admin Action</h2><p class="section-sub">Approved requests that need manual provisioning.</p></div>\
+      </div>\
+      '+(queue.length>0 ? badgeHtml(queue.length+" pending","badge-orange") : "")+'\
+    </div>';
+  if (queue.length===0){
+    html += emptyStateHtml('package',"Nothing pending","Approved requests needing manual provisioning will appear here.");
+  } else {
+    html += '<div style="display:flex;flex-direction:column;gap:8px;">';
+    html += queue.map(function(r){ return '\
+        <div class="list-row" style="background:#fff;border-left:3px solid #F97316;" onclick="openDrawer(\'admin-request-detail\',{requestId:\''+r.id+'\'})">\
+          <div style="min-width:0;">\
+            <div class="result-title">'+esc(r.accessLabel)+'</div>\
+            <div style="font-size:11.5px;color:#9CA3AF;margin-top:3px;" class="mono">'+r.id+' \u00b7 Requester: '+esc(r.requester)+' \u00b7 Approved by '+esc(r.approver)+'</div>\
+          </div>\
+          '+statusBadge(r.status)+'\
+        </div>'; }).join("");
+    html += '</div>';
+  }
+  html += '</div>';
+  return html;
+}
+
+function renderAccessIdGovernanceSection(){
+  const pending = state.accessIdQueue.filter(function(q){ return q.status === "Pending Governance Review"; });
+  if (pending.length === 0) return "";
+  let html = '\
+  <div class="card card-tinted-violet">\
+    <div class="section-head">\
+      <div class="section-head-left">\
+        <div class="section-icon">'+ICONS.key+'</div>\
+        <div><h2 class="section-title">Access ID Requests</h2><p class="section-sub">New-board Access ID creation is governed \u2014 review before it\'s issued.</p></div>\
+      </div>\
+    </div>\
+    <div style="display:flex;flex-direction:column;gap:10px;">';
+  html += pending.map(function(q){
+    const access = findAccess(q.accessId);
+    return '<div style="background:#fff;border:1px solid var(--border);border-radius:11px;padding:16px;">\
+          <div style="display:flex;align-items:center;justify-content:space-between;">\
+            <div>\
+              <div class="result-title">'+esc(access.tool)+' \u2013 '+esc(access.name)+'</div>\
+              <div style="font-size:11.5px;color:#9CA3AF;margin-top:3px;">Requested by '+esc(q.requestedBy)+' \u00b7 '+esc(q.requestedTs)+'</div>\
+            </div>\
+            '+badgeHtml("Pending Review","badge-violet")+'\
+          </div>\
+          <div style="display:flex;align-items:center;gap:7px;margin-top:12px;font-size:11.5px;color:#15803D;background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;padding:8px 11px;width:fit-content;">\
+            '+ICONS.checkCircle+' Duplicate check passed \u2014 no existing Access ID found.\
+          </div>\
+          <button class="btn btn-primary" style="margin-top:14px;" onclick="handleApproveAccessId(\''+q.id+'\')">'+ICONS.check+' Approve &amp; Create Access ID</button>\
+        </div>';
+  }).join("");
+  html += '</div></div>';
+  return html;
+}
+
+function renderRecentActivitySection(){
+  const items = state.auditLog.slice().reverse().slice(0,8);
+  let html = '\
+  <div class="card">\
+    <div class="section-head">\
+      <div class="section-head-left">\
+        <div class="section-icon">'+ICONS.history+'</div>\
+        <div><h2 class="section-title">Recent Activity</h2><p class="section-sub">A traceable record of governed access-management actions.</p></div>\
+      </div>\
+    </div>\
+    <div>';
+  html += items.map(function(a){ return '\
+      <div class="activity-row">\
+        <div class="activity-action">'+esc(a.action)+'</div>\
+        <div class="activity-resource">'+esc(a.detail)+'</div>\
+        <div class="activity-meta">'+esc(a.user)+' \u00b7 '+esc(a.ts)+'</div>\
+      </div>'; }).join("");
+  html += '</div></div>';
+  return html;
+}
+
+/* ============================================================================
+   MAIN PAGE COMPOSITION
+   ============================================================================ */
+function renderWelcome(){
+  const u = currentUser();
+  return '<div class="welcome">\
+    <h1>'+(state.view==='employee' ? "Welcome back, "+esc(u.name.split(" ")[0]) : "Board Admin \u00b7 "+esc(u.name))+'</h1>\
+    <p>'+(state.view==='employee' ? "Search for access, track your requests, and act on anything awaiting your approval \u2014 all in one place." : "Manage the boards you administer, provision access, and review governed configuration changes.")+'</p>\
+  </div>';
+}
+
+function renderMain(){
+  let html = renderWelcome() + renderSearchSection();
+
+  if (state.view === "admin"){
+    // Compact My Requests (full width) + Approvals only if applicable (avoids an empty second column)
+    html += renderMyRequestsSection(true);
+    const approvalsHtml = renderApprovalsSection();
+    if (approvalsHtml) html += approvalsHtml;
+
+    // My Boards / Access is the primary section of the admin dashboard
+    html += renderMyBoardsSection();
+    html += renderAdminQueueSection();
+    html += renderAccessIdGovernanceSection();
+    html += renderRecentActivitySection();
+  } else {
+    html += '<div class="grid-2">\
+        <div style="display:flex;flex-direction:column;gap:16px;">'+renderMyRequestsSection(false)+'</div>\
+        <div style="display:flex;flex-direction:column;gap:16px;">'+renderApprovalsSection()+'</div>\
+      </div>';
+  }
+  return html;
+}
+
+/* ============================================================================
+   DRAWERS
+   ============================================================================ */
+function drawerShellOpen(title, sub, badge){
+  return '<div class="drawer-head">\
+    <div><h3>'+title+'</h3>'+(badge?' '+badge:"")+(sub?'<div class="sub">'+sub+'</div>':"")+'</div>\
+    <button class="drawer-close" onclick="closeDrawer()">'+ICONS.x+'</button>\
+  </div><div class="drawer-body">';
+}
+
+function renderAccessDetailsDrawer(accessId){
+  const a = findAccess(accessId);
+  if (!a) return "";
+  const eligible = isEligible(a);
+  const pendingIdReq = state.accessIdQueue.find(function(q){ return q.accessId === a.id && q.status === "Pending Governance Review"; });
+  let body = '<p style="font-size:13.5px;color:#6B7280;line-height:1.6;">'+esc(a.description)+'</p>\
+    <div style="margin-top:22px;padding-top:20px;border-top:1px solid var(--border);">\
+    <div class="divider-label">Access Details</div>\
+    <div class="field-grid">\
+      '+fieldHtml("Access ID", a.accessId ? '<span class="mono">'+esc(a.accessId)+'</span>' : '<span style="color:#D97706;">Not available</span>')+'\
+      '+fieldHtml("Request type", esc(a.requestType))+'\
+      '+fieldHtml("Eligibility group", esc(a.group))+'\
+      '+fieldHtml("Board / account creator", esc(a.creator))+'\
+      '+fieldHtml("Approver", esc(a.approver))+'\
+      '+fieldHtml("Backup approver", esc(a.backupApprover))+'\
+      '+fieldHtml("Access provider / admin", esc(a.provider))+'\
+      '+fieldHtml("Provisioning", a.automation ? "Automated on approval" : "Manual, by access provider")+'\
+    </div>\
+    </div>\
+    <div style="margin-top:22px;padding-top:20px;border-top:1px solid var(--border);">';
+
+  if (eligible){
+    body += '<div class="success-box">'+ICONS.checkCircle+' You\'re eligible for this access.</div>';
+    if (a.accessId){
+      body += '<button class="btn btn-primary btn-block" style="margin-top:18px;" onclick="openDrawer(\'request-form\',{accessId:\''+a.id+'\'})">Request Access</button>';
+    } else {
+      body += '<button class="btn btn-primary btn-block" style="margin-top:18px;" disabled>Access ID required first</button>';
+      body += pendingIdReq
+        ? '<button class="btn btn-secondary btn-block" style="margin-top:10px;" onclick="openDrawer(\'access-id-status\',{accessId:\''+a.id+'\'})">'+ICONS.clock+' Access ID Creation Pending \u2014 View Status</button>'
+        : '<button class="btn btn-secondary btn-block" style="margin-top:10px;" onclick="handleRequestAccessId(\''+a.id+'\')">'+ICONS.key+' Request Access ID Creation</button>';
+      body += '<p style="font-size:11.5px;color:#9CA3AF;margin-top:10px;">This board doesn\'t have an Access ID yet. We\'ll route a governed request to the Board Admin to create one.</p>';
+    }
+  } else {
+    body += '\
+      <div class="warn-box">\
+        <span style="margin-top:2px;">'+ICONS.lock+'</span>\
+        <div>\
+          <div style="font-weight:700;color:#374151;">You\'re not currently eligible for this access</div>\
+          <div style="color:#6B7280;margin-top:2px;">This access is normally restricted to the '+esc(a.group)+'.</div>\
+        </div>\
+      </div>\
+      <div class="exception-box">\
+        <div class="t1">Need this access for your project?</div>\
+        <div class="t2">You can submit an exception request for review by the designated approver.</div>\
+        <button class="btn btn-primary btn-block" style="margin-top:14px;background:#B45309;" onmouseover="this.style.background=\'#92400E\'" onmouseout="this.style.background=\'#B45309\'" onclick="openDrawer(\'exception-form\',{accessId:\''+a.id+'\'})">'+ICONS.alertTriangle+' Request Access Exception</button>\
+      </div>';
+  }
+  body += '</div>';
+  return drawerShellOpen(esc(a.name), esc(a.tool)+' \u00b7 '+esc(a.category)) + body + '</div>';
+}
+
+function renderAccessIdStatusDrawer(accessId){
+  const a = findAccess(accessId);
+  const q = state.accessIdQueue.find(function(x){ return x.accessId === accessId; });
+  if (!a || !q) return "";
+  const created = q.status === "Access ID Created";
+  const steps = [
+    { label:"Access ID Creation Requested", actor: currentUser().name, ts:q.requestedTs, state:"done" },
+    { label:"Board Admin Review (governed)", actor: created ? "Rahul Sharma" : "Pending review", ts: created ? q.approvedTs : "\u2014", state: created ? "done":"current" },
+    { label:"Access ID Created", actor: created ? "System":"", ts: created ? q.approvedTs:"", state: created ? "done":"pending" },
+    { label:"Continue Access Request", actor:"", ts:"", state: created ? "current":"pending" },
+  ];
+  let body = '<p style="font-size:13.5px;color:#6B7280;">Access ID creation is a governed step reviewed by the Board Admin before it\'s issued.</p>\
+    <div style="margin-top:22px;padding-top:20px;border-top:1px solid var(--border);">'+timelineHtml(steps)+'</div>';
+  if (created){
+    body += '<div style="margin-top:22px;display:flex;align-items:center;justify-content:space-between;gap:12px;background:#F0FDF4;border:1px solid #BBF7D0;border-radius:9px;padding:14px 16px;">\
+      <div style="font-size:13px;font-weight:600;color:#15803D;">Access ID '+esc(a.accessId)+' created.</div>\
+      <button class="btn btn-primary" onclick="openDrawer(\'request-form\',{accessId:\''+a.id+'\'})">Continue</button>\
+    </div>';
+  } else {
+    body += '<div style="margin-top:22px;font-size:13px;color:#9CA3AF;display:flex;align-items:center;gap:8px;">'+ICONS.clock+' Waiting on the Board Admin. You\'ll be notified once it\'s created.</div>';
+  }
+  return drawerShellOpen(esc(a.tool)+' \u2013 '+esc(a.name), "Access ID status", statusBadge(created ? "Completed" : "Pending Governance Review")) + body + '</div>';
+}
+
+function renderRequestFormDrawer(accessId, submittedId){
+  const a = findAccess(accessId);
+  if (!a) return "";
+  if (submittedId){
+    let body = '<div style="text-align:center;padding:14px 0;">\
+      <div style="width:56px;height:56px;border-radius:999px;background:#F0FDF4;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;color:#22C55E;">'+ICONS.checkCircle+'</div>\
+      <h3 style="font-size:17px;font-weight:800;margin:0;">Access request submitted</h3>\
+      <p style="font-size:13px;color:#6B7280;margin-top:5px;">We\'ll notify you as it moves through approval.</p>\
+      <div class="kv-list" style="margin-top:22px;text-align:left;">\
+        <div class="kv-row"><span class="k">Request ID</span><span class="v mono">'+esc(submittedId)+'</span></div>\
+        <div class="kv-row"><span class="k">Status</span><span class="v">'+statusBadge("Pending Approval")+'</span></div>\
+        <div class="kv-row"><span class="k">Approver</span><span class="v">'+esc(a.approver)+'</span></div>\
+        <div class="kv-row"><span class="k">Requested access</span><span class="v">'+esc(a.tool)+' \u2013 '+esc(a.name)+'</span></div>\
+      </div>\
+      <button class="btn btn-primary btn-block" style="margin-top:22px;" onclick="closeDrawer()">Done</button>\
+    </div>';
+    return drawerShellOpen("Request submitted") + body + '</div>';
+  }
+  let body = '\
+    <div>\
+      <span class="form-label">Who is this for?</span>\
+      <button type="button" class="choice-card selected" id="choice-self" onclick="selectBeneficiaryType(\'self\')">\
+        '+avatarHtml(currentUser().name, 32, "#2563EB")+'\
+        <div><div class="t">Myself \u2014 '+esc(currentUser().name)+'</div><div class="d">Request access for your own account</div></div>\
+      </button>\
+      <button type="button" class="choice-card" id="choice-other" onclick="selectBeneficiaryType(\'other\')">\
+        <div style="width:32px;height:32px;border-radius:999px;background:#E5E7EB;display:flex;align-items:center;justify-content:center;color:#6B7280;flex-shrink:0;">'+ICONS.users+'</div>\
+        <div><div class="t">Someone else</div><div class="d">Raise this on behalf of another employee</div></div>\
+      </button>\
+      <div id="beneficiary-select-wrap" class="hidden" style="margin-top:6px;">\
+        <select id="beneficiary-select" class="text-input" onchange="clearFieldError(\'beneficiary-select\')">\
+          <option value="">Select employee\u2026</option>\
+          '+EMPLOYEES.map(function(e){ return '<option value="'+esc(e)+'">'+esc(e)+'</option>'; }).join("")+'\
+        </select>\
+        <div class="note-box" style="margin-top:10px;">\
+          <span style="margin-top:1px;">'+ICONS.info+'</span>\
+          <span>You\'ll remain the requester of record and can close this request once access is provisioned, even if the beneficiary is unavailable.</span>\
+        </div>\
+      </div>\
+    </div>\
+    <div style="margin-top:22px;">\
+      <span class="form-label">Access summary</span>\
+      <div class="kv-list">\
+        <div class="kv-row"><span class="k">Request type</span><span class="v">'+esc(a.requestType)+'</span></div>\
+        <div class="kv-row"><span class="k">Approver</span><span class="v">'+esc(a.approver)+'</span></div>\
+        <div class="kv-row"><span class="k">Backup approver</span><span class="v">'+esc(a.backupApprover)+'</span></div>\
+        <div class="kv-row"><span class="k">Provisioning</span><span class="v">'+(a.automation ? "Automatic on approval" : "Manual, by "+esc(a.provider))+'</span></div>\
+      </div>\
+      <p style="font-size:11.5px;color:#9CA3AF;margin-top:8px;">Request type and approver are determined automatically.</p>\
+    </div>\
+    <div style="margin-top:22px;">\
+      <span class="form-label">Business justification</span>\
+      <textarea id="justification-input" rows="4" placeholder="Briefly explain why this access is needed..." oninput="clearFieldError(\'justification-input\')"></textarea>\
+    </div>\
+    <div class="btn-row" style="margin-top:22px;">\
+      <button class="btn btn-secondary" style="flex:1;" onclick="closeDrawer()">Cancel</button>\
+      <button class="btn btn-primary" style="flex:1;" onclick="handleSubmitRequest(\''+a.id+'\')">'+ICONS.check+' Submit Request</button>\
+    </div>';
+  return drawerShellOpen("Request Access", esc(a.tool)+' \u2013 '+esc(a.name)) + body + '</div>';
+}
+let _beneficiaryType = "self";
+function selectBeneficiaryType(type){
+  _beneficiaryType = type;
+  document.getElementById("choice-self").classList.toggle("selected", type==="self");
+  document.getElementById("choice-other").classList.toggle("selected", type==="other");
+  document.getElementById("beneficiary-select-wrap").classList.toggle("hidden", type!=="other");
+}
+function handleSubmitRequest(accessId){
+  const a = findAccess(accessId);
+  clearFieldError("beneficiary-select");
+  clearFieldError("justification-input");
+  const justificationEl = document.getElementById("justification-input");
+  const justification = justificationEl ? justificationEl.value : "";
+  let beneficiary = currentUser().name;
+  let onBehalf = false;
+  let hasError = false;
+  if (_beneficiaryType === "other"){
+    const benEl = document.getElementById("beneficiary-select");
+    beneficiary = benEl ? benEl.value : "";
+    onBehalf = true;
+    if (!beneficiary){ setFieldError("beneficiary-select", "Please select an employee."); hasError = true; }
+  }
+  if (!justification.trim()){ setFieldError("justification-input", "Please add a short business justification."); hasError = true; }
+  if (hasError) return;
+  const id = submitRequest({ access:a, beneficiary:beneficiary, onBehalf:onBehalf, justification:justification });
+  _beneficiaryType = "self";
+  state.drawer = { type:"request-form", params:{ accessId: accessId, submittedId:id } };
+  render();
+  showToast("Access request "+id+" submitted", "success");
+}
+
+function renderExceptionFormDrawer(accessId){
+  const a = findAccess(accessId);
+  if (!a) return "";
+  let body = '\
+    <div class="warn-box" style="margin-bottom:20px;">\
+      <span style="margin-top:2px;">'+ICONS.alertTriangle+'</span>\
+      <div>You\'re requesting access outside your normal eligibility group (<strong>'+esc(a.group)+'</strong>). This is submitted as an exception for review.</div>\
+    </div>\
+    <div>\
+      <span class="form-label">Access</span>\
+      <div class="kv-list"><div class="kv-row"><span class="k">'+esc(a.tool)+' \u2013 '+esc(a.name)+'</span><span class="v">'+esc(a.category)+'</span></div></div>\
+    </div>\
+    <div style="margin-top:18px;">\
+      <span class="form-label">Reason for access</span>\
+      <input id="exc-reason" class="text-input" placeholder="e.g. Cross-functional project support" oninput="clearFieldError(\'exc-reason\')" />\
+    </div>\
+    <div style="margin-top:18px;">\
+      <span class="form-label">Project / business justification</span>\
+      <textarea id="exc-justification" rows="4" placeholder="Explain the project or business need driving this request..." oninput="clearFieldError(\'exc-justification\')"></textarea>\
+    </div>\
+    <div class="field-grid" style="margin-top:18px;">\
+      <div>\
+        <span class="form-label">Required until</span>\
+        <input id="exc-until" type="date" class="text-input" />\
+      </div>\
+      <div>\
+        <span class="form-label">Urgency</span>\
+        <select id="exc-urgency" class="text-input">\
+          <option value="Low">Low</option>\
+          <option value="Medium" selected>Medium</option>\
+          <option value="High">High</option>\
+          <option value="Urgent">Urgent</option>\
+        </select>\
+      </div>\
+    </div>\
+    <div style="margin-top:20px;">\
+      <span class="form-label">Review</span>\
+      <div class="kv-list">\
+        <div class="kv-row"><span class="k">Will be reviewed by</span><span class="v">'+esc(a.approver)+'</span></div>\
+        <div class="kv-row"><span class="k">Backup approver</span><span class="v">'+esc(a.backupApprover)+'</span></div>\
+      </div>\
+    </div>\
+    <div class="btn-row" style="margin-top:22px;">\
+      <button class="btn btn-secondary" style="flex:1;" onclick="closeDrawer()">Cancel</button>\
+      <button class="btn btn-primary" style="flex:1;background:#B45309;" onmouseover="this.style.background=\'#92400E\'" onmouseout="this.style.background=\'#B45309\'" onclick="handleSubmitException(\''+a.id+'\')">Submit Request</button>\
+    </div>';
+  return drawerShellOpen("Request Access Exception", esc(a.tool)+' \u2013 '+esc(a.name)) + body + '</div>';
+}
+function handleSubmitException(accessId){
+  const a = findAccess(accessId);
+  clearFieldError("exc-reason");
+  clearFieldError("exc-justification");
+  const reason = (document.getElementById("exc-reason")||{}).value || "";
+  const justification = (document.getElementById("exc-justification")||{}).value || "";
+  const requiredUntil = (document.getElementById("exc-until")||{}).value || "";
+  const urgency = (document.getElementById("exc-urgency")||{}).value || "Medium";
+  let hasError = false;
+  if (!reason.trim()){ setFieldError("exc-reason", "Please provide a reason for this access."); hasError = true; }
+  if (!justification.trim()){ setFieldError("exc-justification", "Please provide a project or business justification."); hasError = true; }
+  if (hasError) return;
+  const id = submitExceptionRequest({ access:a, reason:reason, justification:justification, requiredUntil:requiredUntil, urgency:urgency });
+  closeDrawer(function(){ openExceptionConfirmModal(id, a); });
+}
+function openExceptionConfirmModal(id, a){
+  openModal("exception-confirm", { id: id, accessLabel: a.tool+" \u2013 "+a.name, approver: a.approver });
+}
+
+function renderRequestDetailDrawer(requestId){
+  const r = findRequest(requestId);
+  if (!r) return "";
+  const canClose = r.onBehalf && r.status === "Access Provisioned" && r.requester === currentUser().name;
+  let body = '<div class="divider-label">Request Details</div><div class="field-grid">\
+      '+fieldHtml("Requester", esc(r.requester))+'\
+      '+fieldHtml("Beneficiary", esc(r.beneficiary))+'\
+      '+fieldHtml("Approver", esc(r.approver))+'\
+      '+fieldHtml("Access provider", esc(r.provider))+'\
+      '+fieldHtml("Submitted", esc(r.submitted))+'\
+      '+fieldHtml("Last updated", esc(r.updated))+'\
+    </div>';
+  if (r.isException){
+    body += '<div class="field-grid" style="margin-top:18px;">\
+      '+fieldHtml("Reason", esc(r.reason||"\u2014"))+'\
+      '+fieldHtml("Required until", esc(r.requiredUntil||"\u2014"))+'\
+      '+fieldHtml("Urgency", esc(r.urgency||"\u2014"))+'\
+    </div>';
+  }
+  if (r.justification){
+    body += '<div style="margin-top:22px;padding-top:20px;border-top:1px solid var(--border);">\
+      <div class="divider-label" style="margin-bottom:8px;">Business Justification</div>\
+      <div style="font-size:13.5px;color:#374151;line-height:1.6;">'+esc(r.justification)+'</div>\
+    </div>';
+  }
+  body += '<div style="margin-top:22px;padding-top:20px;border-top:1px solid var(--border);">\
+      <div class="divider-label">Timeline</div>'+timelineHtml(r.timeline)+'\
+    </div>';
+  if (r.status === "Access Provisioned"){
+    body += '<div style="margin-top:22px;background:#F0FDFA;border:1px solid #99F6E4;border-radius:9px;padding:16px;">\
+      <div style="font-size:13.5px;font-weight:700;color:#0F766E;">Access Provisioned</div>\
+      <div style="font-size:12px;color:#0D6E68;margin-top:3px;">'+(r.onBehalf ? esc(r.beneficiary)+" has been granted access. Since this was raised on their behalf, you can close it without waiting on them." : "Access has been granted.")+'</div>\
+      '+(canClose ? '<button class="btn btn-primary" style="margin-top:12px;" onclick="openModal(\'close-request\',{requestId:\''+r.id+'\'})">Close Request</button>' : "")+'\
+    </div>';
+  }
+  return drawerShellOpen(esc(r.accessLabel), esc(r.id), statusBadge(r.status)) + body + '</div>';
+}
+
+function renderApprovalDetailDrawer(requestId){
+  const r = findRequest(requestId);
+  if (!r) return "";
+  const a = findAccess(r.accessId);
+  let body = '<div class="divider-label">Request Details</div><div class="field-grid">\
+      '+fieldHtml("Requester", esc(r.requester))+'\
+      '+fieldHtml("Beneficiary", esc(r.beneficiary))+'\
+      '+fieldHtml("Eligibility group", esc(a ? a.group : "\u2014"))+'\
+      '+fieldHtml("Beneficiary eligible?", r.isException ? '<span style="color:#B45309;font-weight:700;">Exception \u2014 outside normal eligibility</span>' : '<span style="color:#15803D;font-weight:700;">Confirmed eligible</span>')+'\
+      '+fieldHtml("Backup approver", esc(a ? a.backupApprover : "\u2014"))+'\
+      '+fieldHtml("Access provider", esc(r.provider))+'\
+      '+fieldHtml("Provisioning", a && a.automation ? "Automatic on approval" : "Manual, by provider")+'\
+      '+fieldHtml("Requested", esc(r.submitted))+'\
+    </div>';
+  if (r.isException){
+    body += '<div class="field-grid" style="margin-top:18px;">\
+      '+fieldHtml("Reason", esc(r.reason||"\u2014"))+'\
+      '+fieldHtml("Required until", esc(r.requiredUntil||"\u2014"))+'\
+      '+fieldHtml("Urgency", esc(r.urgency||"\u2014"))+'\
+    </div>';
+  }
+  if (r.justification){
+    body += '<div style="margin-top:20px;padding-top:20px;border-top:1px solid var(--border);">\
+      <div class="divider-label" style="margin-bottom:8px;">Business Justification</div>\
+      <div style="font-size:13.5px;color:#374151;line-height:1.6;">'+esc(r.justification)+'</div>\
+    </div>';
+  }
+  body += '<div style="margin-top:22px;padding-top:20px;border-top:1px solid var(--border);">\
+      <div class="divider-label">Timeline</div>'+timelineHtml(r.timeline)+'\
+    </div>';
+  if ((r.status === "Pending Approval" || r.status === "Pending Exception Approval") && currentUser().name === r.approver){
+    body += '<div class="btn-row" style="margin-top:22px;padding-top:22px;border-top:1px solid var(--border);">\
+      <button class="btn btn-primary" onclick="handleApprove(\''+r.id+'\')">'+ICONS.check+' Approve</button>\
+      <button class="btn btn-danger" onclick="openModal(\'reject\',{requestId:\''+r.id+'\'})">'+ICONS.xCircle+' Reject</button>\
+    </div>';
+  }
+  return drawerShellOpen(esc(r.accessLabel), r.id+" \u00b7 Awaiting your approval", statusBadge(r.status)) + body + '</div>';
+}
+function handleApprove(requestId){ approveRequest(requestId); closeDrawer(); showToast("Request "+requestId+" approved", "success"); }
+
+function renderBoardConfigDrawer(accessId){
+  const a = findAccess(accessId);
+  if (!a) return "";
+  const body = '\
+    <div class="note-box" style="margin-bottom:20px;">'+ICONS.shield+'<span>Changes here are governed and recorded in the audit trail.</span></div>\
+    <div id="board-config-view">\
+      <div class="field-grid">\
+        '+fieldHtml("Access ID", a.accessId ? '<span class="mono">'+esc(a.accessId)+'</span>' : '<span style="color:#D97706;">Not created</span>')+'\
+        '+fieldHtml("Board / account creator", esc(a.creator))+'\
+        '+fieldHtml("Approver", esc(a.approver))+'\
+        '+fieldHtml("Backup approver", esc(a.backupApprover))+'\
+        '+fieldHtml("Access provider / admin", esc(a.provider))+'\
+        '+fieldHtml("Eligibility group", esc(a.group))+'\
+      </div>\
+      <div style="margin-top:22px;padding-top:20px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">\
+        <div>\
+          <div style="font-size:13.5px;font-weight:700;color:#1F2937;">Automated provisioning</div>\
+          <div style="font-size:11.5px;color:#9CA3AF;margin-top:3px;">'+(a.automation ? "Enabled \u2014 access is granted automatically on approval." : "Disabled \u2014 requests route to manual provisioning.")+'</div>\
+        </div>\
+        <button class="toggle-switch" style="background:'+(a.automation ? 'var(--accent)':'#D1D5DB')+';" onclick="handleToggleAutomation(\''+a.id+'\')">\
+          <span class="toggle-knob" style="left:'+(a.automation ? '20px':'2px')+';"></span>\
+        </button>\
+      </div>\
+      <button class="btn btn-secondary btn-block" style="margin-top:22px;" onclick="showBoardEditForm()">'+ICONS.pencil+' Edit Approver / Provider</button>\
+    </div>\
+    <div id="board-config-edit" class="hidden">\
+      <div>\
+        <span class="form-label">Approver</span>\
+        <input id="edit-approver" class="text-input" value="'+esc(a.approver)+'" />\
+      </div>\
+      <div style="margin-top:16px;">\
+        <span class="form-label">Backup approver</span>\
+        <input id="edit-backup" class="text-input" value="'+esc(a.backupApprover)+'" />\
+      </div>\
+      <div style="margin-top:16px;">\
+        <span class="form-label">Access provider / admin</span>\
+        <input id="edit-provider" class="text-input" value="'+esc(a.provider)+'" />\
+      </div>\
+      <div class="btn-row" style="margin-top:22px;">\
+        <button class="btn btn-secondary" style="flex:1;" onclick="hideBoardEditForm()">Cancel</button>\
+        <button class="btn btn-primary" style="flex:1;" onclick="handleSaveBoardConfig(\''+a.id+'\')">Save Changes</button>\
+      </div>\
+    </div>';
+  return drawerShellOpen(esc(a.name), esc(a.tool)+' \u00b7 Access configuration') + body + '</div>';
+}
+function showBoardEditForm(){
+  document.getElementById("board-config-view").classList.add("hidden");
+  document.getElementById("board-config-edit").classList.remove("hidden");
+}
+function hideBoardEditForm(){
+  document.getElementById("board-config-view").classList.remove("hidden");
+  document.getElementById("board-config-edit").classList.add("hidden");
+}
+function handleToggleAutomation(accessId){ toggleAutomation(accessId); state.drawer = { type:"board-config", params:{ accessId: accessId } }; render(); const a=findAccess(accessId); showToast(a.automation ? "Automation enabled" : "Automation disabled", "success"); }
+function handleSaveBoardConfig(accessId){
+  const approver = document.getElementById("edit-approver").value;
+  const backupApprover = document.getElementById("edit-backup").value;
+  const provider = document.getElementById("edit-provider").value;
+  updateAccessConfig(accessId, { approver: approver, backupApprover: backupApprover, provider: provider });
+  closeDrawer();
+  showToast("Configuration updated", "success");
+}
+
+function renderAdminRequestDetailDrawer(requestId){
+  const r = findRequest(requestId);
+  if (!r) return "";
+  let body = '<div class="divider-label">Request Details</div><div class="field-grid">\
+      '+fieldHtml("Requester", esc(r.requester))+'\
+      '+fieldHtml("Beneficiary", esc(r.beneficiary))+'\
+      '+fieldHtml("Approved by", esc(r.approver))+'\
+      '+fieldHtml("Submitted", esc(r.submitted))+'\
+    </div>';
+  if (r.justification){
+    body += '<div style="margin-top:20px;padding-top:20px;border-top:1px solid var(--border);">\
+      <div class="divider-label" style="margin-bottom:8px;">Reason / Details</div>\
+      <div style="font-size:13.5px;color:#374151;line-height:1.6;">'+esc(r.justification)+'</div>\
+    </div>';
+  }
+  body += '<div style="margin-top:22px;padding-top:20px;border-top:1px solid var(--border);">\
+      <div class="divider-label">Timeline</div>'+timelineHtml(r.timeline)+'\
+    </div>';
+  if (r.status === "Pending Manual Provisioning"){
+    body += '<div style="margin-top:22px;padding-top:22px;border-top:1px solid var(--border);">\
+      <button class="btn btn-primary btn-block" onclick="handleProvision(\''+r.id+'\')">'+ICONS.check+' Provision Access</button>\
+      <p style="font-size:11.5px;color:#9CA3AF;margin-top:10px;text-align:center;">This marks the request Completed and notifies the requester.</p>\
+    </div>';
+  }
+  return drawerShellOpen(esc(r.accessLabel), r.id, statusBadge(r.status)) + body + '</div>';
+}
+function handleProvision(requestId){ provisionManually(requestId); closeDrawer(); showToast("Access provisioned for "+requestId, "success"); }
+
+function handleRequestAccessId(accessId){ requestAccessIdCreation(accessId); showToast("Access ID creation requested", "success"); }
+function handleApproveAccessId(queueId){ approveAccessId(queueId); render(); showToast("Access ID created", "success"); }
+
+function renderDrawer(){
+  if (!state.drawer) return "";
+  const type = state.drawer.type, params = state.drawer.params;
+  switch(type){
+    case "access-details": return renderAccessDetailsDrawer(params.accessId);
+    case "access-id-status": return renderAccessIdStatusDrawer(params.accessId);
+    case "request-form": return renderRequestFormDrawer(params.accessId, params.submittedId);
+    case "exception-form": return renderExceptionFormDrawer(params.accessId);
+    case "request-detail": return renderRequestDetailDrawer(params.requestId);
+    case "approval-detail": return renderApprovalDetailDrawer(params.requestId);
+    case "board-config": return renderBoardConfigDrawer(params.accessId);
+    case "admin-request-detail": return renderAdminRequestDetailDrawer(params.requestId);
+    default: return "";
+  }
+}
+
+/* ============================================================================
+   MODALS
+   ============================================================================ */
+function renderModal(){
+  if (!state.modal) return "";
+  const type = state.modal.type, params = state.modal.params;
+  if (type === "close-request"){
+    return '<div class="modal-overlay show"><div class="modal-box">\
+      <div class="modal-head"><h3>Close request</h3><button class="drawer-close" onclick="closeModal()">'+ICONS.x+'</button></div>\
+      <div class="modal-body">\
+        <p style="font-size:13.5px;color:#4B5563;">Access has been successfully provisioned. Are you sure you want to close this request?</p>\
+        <div class="btn-row" style="margin-top:20px;">\
+          <button class="btn btn-secondary" style="flex:1;" onclick="closeModal()">Cancel</button>\
+          <button class="btn btn-primary" style="flex:1;" onclick="handleCloseRequest(\''+params.requestId+'\')">Confirm Closure</button>\
+        </div>\
+      </div>\
+    </div></div>';
+  }
+  if (type === "reject"){
+    return '<div class="modal-overlay show"><div class="modal-box">\
+      <div class="modal-head"><h3>Reject request</h3><button class="drawer-close" onclick="closeModal()">'+ICONS.x+'</button></div>\
+      <div class="modal-body">\
+        <p style="font-size:13px;color:#4B5563;margin-bottom:10px;">Please provide a reason. This will be shared with the requester.</p>\
+        <textarea id="reject-reason" rows="3" placeholder="Reason for rejection..." oninput="clearFieldError(\'reject-reason\')"></textarea>\
+        <div class="btn-row" style="margin-top:20px;">\
+          <button class="btn btn-secondary" style="flex:1;" onclick="closeModal()">Cancel</button>\
+          <button class="btn btn-danger" style="flex:1;" onclick="handleReject(\''+params.requestId+'\')">Confirm Rejection</button>\
+        </div>\
+      </div>\
+    </div></div>';
+  }
+  if (type === "exception-confirm"){
+    return '<div class="modal-overlay show"><div class="modal-box">\
+      <div class="modal-head"><h3>Exception request submitted</h3><button class="drawer-close" onclick="closeModal()">'+ICONS.x+'</button></div>\
+      <div class="modal-body">\
+        <div class="success-box">'+ICONS.checkCircle+' Your request has been sent for review.</div>\
+        <div class="kv-list" style="margin-top:16px;">\
+          <div class="kv-row"><span class="k">Request ID</span><span class="v mono">'+esc(params.id)+'</span></div>\
+          <div class="kv-row"><span class="k">Status</span><span class="v">'+statusBadge("Pending Exception Approval")+'</span></div>\
+          <div class="kv-row"><span class="k">Access</span><span class="v">'+esc(params.accessLabel)+'</span></div>\
+          <div class="kv-row"><span class="k">Reviewer</span><span class="v">'+esc(params.approver)+'</span></div>\
+        </div>\
+        <button class="btn btn-primary btn-block" style="margin-top:20px;" onclick="closeModal()">Done</button>\
+      </div>\
+    </div></div>';
+  }
+  return "";
+}
+function handleCloseRequest(requestId){
+  closeRequestAction(requestId);
+  closeAll();
+  showToast("Request "+requestId+" closed", "success");
+}
+function handleReject(requestId){
+  clearFieldError("reject-reason");
+  const reasonEl = document.getElementById("reject-reason");
+  const reason = reasonEl ? reasonEl.value : "";
+  if (!reason.trim()){ setFieldError("reject-reason", "Please provide a rejection reason."); return; }
+  rejectRequest(requestId, reason);
+  closeAll();
+  showToast("Request "+requestId+" rejected", "error");
+}
+
+/* ============================================================================
+   ROOT RENDER
+   ============================================================================ */
+function render(){
+  document.getElementById("app").innerHTML =
+    renderHeader()
+    + '<div class="main">'+renderMain()+'</div>'
+    + '<div class="overlay '+(state.drawer ? 'show':'')+'" onclick="closeDrawer()"></div>'
+    + '<div class="drawer '+(state.drawer ? 'show':'')+'">'+renderDrawer()+'</div>'
+    + renderModal();
+}
+/* re-render only the main content area (keeps header/notif state), used while typing in search */
+function renderMainOnly(){
+  const mainEl = document.querySelector(".main");
+  if (mainEl) mainEl.innerHTML = renderMain();
+}
+
+render();
+</script>
+</body>
+</html>
