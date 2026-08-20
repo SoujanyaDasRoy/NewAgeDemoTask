@@ -23,10 +23,13 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
     const cookieStore = await cookies();
     const sessionCookie = cookieStore.get(SESSION_COOKIE);
     if (!sessionCookie?.value) {
-      // Default to Manvi Mehta if no session set
-      const defaultUser = await prisma.user.findUnique({
-        where: { email: "manvi@newage.com" },
+      // Default to Master Admin if no session set
+      let defaultUser = await prisma.user.findUnique({
+        where: { email: "admin@newage.com" },
       });
+      if (!defaultUser) {
+        defaultUser = await prisma.user.findFirst();
+      }
       if (defaultUser) {
         return {
           id: defaultUser.id,

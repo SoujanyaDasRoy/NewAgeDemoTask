@@ -10,7 +10,7 @@ export default function LoginPage() {
   const [tab, setTab] = useState<"login" | "signup">("login");
 
   // Login form state
-  const [email, setEmail] = useState("manvi@newage.com");
+  const [email, setEmail] = useState("admin@newage.com");
   const [password, setPassword] = useState("password123");
 
   // Signup form state
@@ -253,99 +253,60 @@ export default function LoginPage() {
                     marginBottom: "10px",
                   }}
                 >
-                  ⚡ Evaluator Quick Sign-In (1-Click)
+                  ⚡ Master Account (1-Click Sign-In)
                 </div>
 
                 <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                   <button
                     type="button"
-                    onClick={() => handleQuickLogin("manvi@newage.com")}
+                    onClick={() => handleQuickLogin("admin@newage.com")}
                     disabled={loading}
                     style={{
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "space-between",
-                      padding: "10px 14px",
-                      borderRadius: "9px",
-                      border: "1px solid #BFDBFE",
-                      background: "#EFF6FF",
+                      padding: "12px 14px",
+                      borderRadius: "10px",
+                      border: "1px solid #0F1B33",
+                      background: "#0F1B33",
+                      color: "#fff",
                       cursor: "pointer",
                       textAlign: "left",
+                      boxShadow: "0 4px 12px rgba(15, 27, 51, 0.2)",
                     }}
                   >
                     <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                       <div
                         style={{
-                          width: "30px",
-                          height: "30px",
+                          width: "32px",
+                          height: "32px",
                           borderRadius: "50%",
-                          background: "#2563EB",
+                          background: "#2F6FED",
                           color: "#fff",
-                          fontWeight: 700,
-                          fontSize: "11px",
+                          fontWeight: 800,
+                          fontSize: "12px",
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
                         }}
                       >
-                        MM
+                        MA
                       </div>
                       <div>
-                        <div style={{ fontSize: "13px", fontWeight: 700, color: "#1E3A8A" }}>
-                          Manvi Mehta
+                        <div style={{ fontSize: "13.5px", fontWeight: 800, color: "#fff" }}>
+                          Master Admin
                         </div>
-                        <div style={{ fontSize: "11px", color: "#3B82F6" }}>
-                          Employee · Product Team
+                        <div style={{ fontSize: "11px", color: "#94A3B8" }}>
+                          admin@newage.com · Full Access (Employee + Admin)
                         </div>
                       </div>
                     </div>
-                    <ArrowRight size={15} style={{ color: "#2563EB" }} />
+                    <ArrowRight size={16} style={{ color: "#2F6FED" }} />
                   </button>
+                </div>
 
-                  <button
-                    type="button"
-                    onClick={() => handleQuickLogin("rahul@newage.com")}
-                    disabled={loading}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      padding: "10px 14px",
-                      borderRadius: "9px",
-                      border: "1px solid #E2E8F0",
-                      background: "#F8FAFC",
-                      cursor: "pointer",
-                      textAlign: "left",
-                    }}
-                  >
-                    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                      <div
-                        style={{
-                          width: "30px",
-                          height: "30px",
-                          borderRadius: "50%",
-                          background: "#334155",
-                          color: "#fff",
-                          fontWeight: 700,
-                          fontSize: "11px",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}
-                      >
-                        RS
-                      </div>
-                      <div>
-                        <div style={{ fontSize: "13px", fontWeight: 700, color: "#0F172A" }}>
-                          Rahul Sharma
-                        </div>
-                        <div style={{ fontSize: "11px", color: "#64748B" }}>
-                          Board Admin · IT Support
-                        </div>
-                      </div>
-                    </div>
-                    <ArrowRight size={15} style={{ color: "#475569" }} />
-                  </button>
+                <div style={{ fontSize: "11.5px", color: "#6B7280", marginTop: "10px", textAlign: "center" }}>
+                  💡 Need a fresh employee user? Click <strong>Sign Up</strong> above.
                 </div>
               </div>
 

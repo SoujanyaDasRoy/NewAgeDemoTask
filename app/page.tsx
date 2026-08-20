@@ -57,20 +57,20 @@ import { getAuditLogs } from "@/lib/actions/audit";
 // ── PERSONAS ────────────────────────────────────────────────────────────────
 const PERSONAS = {
   employee: {
-    name: "Manvi Mehta",
+    name: "Master Admin",
     role: "Employee",
     dept: "Product Team",
-    email: "manvi@newage.com",
-    initials: "MM",
-    avatarTone: "#2563EB",
+    email: "admin@newage.com",
+    initials: "MA",
+    avatarTone: "#0F1B33",
   },
   admin: {
-    name: "Rahul Sharma",
-    role: "IT Admin",
+    name: "Master Admin",
+    role: "Master Admin",
     dept: "IT Support",
-    email: "rahul@newage.com",
-    initials: "RS",
-    avatarTone: "#334155",
+    email: "admin@newage.com",
+    initials: "MA",
+    avatarTone: "#0F1B33",
   },
 };
 
@@ -332,8 +332,6 @@ export default function PortalPage() {
   // ── RENDER ────────────────────────────────────────────────────────────────
   const handleSwitchView = async (newView: View) => {
     setView(newView);
-    const targetEmail = newView === "employee" ? "manvi@newage.com" : "rahul@newage.com";
-    await switchSessionUser(targetEmail);
   };
 
   return (
@@ -352,19 +350,19 @@ export default function PortalPage() {
 
           {/* Right side */}
           <div className="header-right">
-            {/* Persona switcher */}
+            {/* View switcher */}
             <div className="view-toggle">
               <button
                 className={view === "employee" ? "active" : ""}
                 onClick={() => handleSwitchView("employee")}
               >
-                Employee View (Manvi Mehta)
+                Employee View
               </button>
               <button
                 className={view === "admin" ? "active" : ""}
                 onClick={() => handleSwitchView("admin")}
               >
-                Board Admin View (Rahul Sharma)
+                Board Admin View
               </button>
             </div>
 
