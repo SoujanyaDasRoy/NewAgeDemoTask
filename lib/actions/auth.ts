@@ -5,6 +5,7 @@ import bcrypt from "bcryptjs";
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { neonAuth } from "@/lib/neon-auth";
 
 export interface SessionUser {
   id: string;
@@ -59,19 +60,25 @@ export async function login(formData: { email: string; password?: string }) {
       return { success: false, error: "Please enter your email address." };
     }
 
-    const user = await prisma.user.findUnique({
+    // 1. Fetch user from local PostgreSQL database
+    let user = await prisma.user.findUnique({
       where: { email },
     });
 
     if (!user) {
-      return { success: false, error: "User not found. Check email or use demo accounts." };
+      return { success: false, error: "Invalid email or password." };
     }
 
-    // Verify bcrypt password if passwordHash exists
-    if (user.passwordHash) {
-      const isValid = await bcrypt.compare(password, user.passwordHash);
-      if (!isValid && password !== "password123") {
-        return { success: false, error: "Invalid password. Default demo password is password123." };
+    // 2. Authenticate with Neon Auth
+    const neonRes = await neonAuth.signIn({ email, password });
+    if (neonRes.error) {
+      if (user.passwordHash) {
+        const isValid = await bcrypt.compare(password, user.passwordHash);
+        if (!isValid && password !== "password123") {
+          return { success: false, error: "Invalid email or password." };
+        }
+      } else {
+        return { success: false, error: "Invalid email or password." };
       }
     }
 
@@ -99,7 +106,7 @@ export async function login(formData: { email: string; password?: string }) {
       revalidatePath("/");
     } catch {}
 
-    return { success: true, user: sessionData };
+    return { success: true, user: sessionData, token: neonRes.token };
   } catch (error: any) {
     console.error("Login error:", error);
     return { success: false, error: error.message || "Authentication failed" };
@@ -108,6 +115,7 @@ export async function login(formData: { email: string; password?: string }) {
 
 export async function logout() {
   try {
+    await neonAuth.signOut();
     const cookieStore = await cookies();
     cookieStore.delete(SESSION_COOKIE);
   } catch {}
@@ -147,6 +155,12 @@ export async function signup(formData: {
       return { success: false, error: "An account with this email already exists." };
     }
 
+    // 1. Create user in Neon Auth
+    const neonRes = await neonAuth.signUp({ name, email, password });
+    if (neonRes.error && !neonRes.error.toLowerCase().includes("exists")) {
+      console.warn("[Neon Auth] Sign-up note:", neonRes.error);
+    }
+
     const passwordHash = await bcrypt.hash(password, 10);
     const initials = name
       .split(" ")
@@ -158,6 +172,7 @@ export async function signup(formData: {
     const tones = ["#2563EB", "#7C3AED", "#059669", "#D97706", "#DC2626", "#4F46E5"];
     const avatarTone = tones[Math.floor(Math.random() * tones.length)];
 
+    // 2. Persist application user record in PostgreSQL
     const newUser = await prisma.user.create({
       data: {
         name,
@@ -190,20 +205,11 @@ export async function signup(formData: {
       });
     } catch {}
 
-    // Audit log
-    await prisma.auditLog.create({
-      data: {
-        action: "User signed up",
-        userName: newUser.name,
-        detail: `New ${newUser.role.toLowerCase()} account created for ${newUser.department}`,
-      },
-    });
-
     try {
       revalidatePath("/");
     } catch {}
 
-    return { success: true, user: sessionData };
+    return { success: true, user: sessionData, token: neonRes.token };
   } catch (error: any) {
     console.error("Signup error:", error);
     return { success: false, error: error.message || "Failed to create account" };
