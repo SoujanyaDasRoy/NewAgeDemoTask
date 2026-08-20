@@ -596,21 +596,8 @@ export default function PortalPage() {
               />
               <button
                 type="button"
+                className="search-kbd-btn"
                 onClick={() => setCmdPaletteOpen(true)}
-                style={{
-                  border: "1px solid #E2E8F0",
-                  background: "#F8FAFC",
-                  borderRadius: "6px",
-                  padding: "3px 8px",
-                  fontSize: "11px",
-                  fontWeight: 600,
-                  color: "#64748B",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "4px",
-                  cursor: "pointer",
-                  marginRight: "6px",
-                }}
                 title="Open Spotlight Search (⌘K / Ctrl+K)"
               >
                 ⌘K
