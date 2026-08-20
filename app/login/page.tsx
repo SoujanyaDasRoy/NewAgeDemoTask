@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { login, signup } from "@/lib/actions/auth";
-import { Shield, ArrowRight, CheckCircle2, Lock, UserPlus, LogIn, AlertCircle } from "lucide-react";
+import { ArrowRight, Lock, CheckCircle2, AlertCircle, Sparkles } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -38,7 +38,7 @@ export default function LoginPage() {
       router.push("/");
       router.refresh();
     } else {
-      setError(res.error || "Login failed");
+      setError(res.error || "Invalid email or password");
     }
   };
 
@@ -64,80 +64,90 @@ export default function LoginPage() {
         router.refresh();
       }, 800);
     } else {
-      setError(res.error || "Sign up failed");
+      setError(res.error || "Failed to create account");
     }
-  };
-
-  const handleQuickLogin = (quickEmail: string) => {
-    setEmail(quickEmail);
-    setPassword("password123");
-    handleLogin(undefined, quickEmail);
   };
 
   return (
     <div
       style={{
         minHeight: "100vh",
-        background: "linear-gradient(135deg, #0F1B33 0%, #16233F 50%, #1E293B 100%)",
+        background: "#F8FAFC",
         display: "flex",
+        flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
         padding: "24px",
-        fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+        fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
       }}
     >
       <div
         style={{
           width: "100%",
-          maxWidth: "480px",
-          background: "#fff",
+          maxWidth: "420px",
+          background: "#FFFFFF",
           borderRadius: "16px",
-          boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.35)",
+          border: "1px solid #E2E8F0",
+          boxShadow: "0 10px 25px -5px rgba(15, 27, 51, 0.06), 0 8px 10px -6px rgba(15, 27, 51, 0.04)",
           overflow: "hidden",
         }}
       >
-        {/* Header */}
+        {/* Brand Header */}
         <div
           style={{
-            padding: "28px 32px 20px",
+            padding: "32px 32px 24px",
             textAlign: "center",
             borderBottom: "1px solid #F1F5F9",
           }}
         >
           <div
             style={{
-              width: "48px",
-              height: "48px",
-              borderRadius: "12px",
+              width: "44px",
+              height: "44px",
+              borderRadius: "10px",
               background: "#0F1B33",
-              color: "#fff",
+              color: "#FFFFFF",
               fontWeight: 800,
-              fontSize: "18px",
+              fontSize: "16px",
+              letterSpacing: "0.02em",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              margin: "0 auto 14px",
-              boxShadow: "0 4px 12px rgba(15, 27, 51, 0.25)",
+              margin: "0 auto 12px",
             }}
           >
             NA
           </div>
-          <h1 style={{ fontSize: "20px", fontWeight: 800, color: "#111827", margin: 0 }}>
-            New Age Access Portal
+          <h1
+            style={{
+              fontSize: "20px",
+              fontWeight: 700,
+              color: "#0F1B33",
+              margin: 0,
+              letterSpacing: "-0.01em",
+            }}
+          >
+            Access Management
           </h1>
-          <p style={{ fontSize: "13px", color: "#6B7280", margin: "4px 0 0" }}>
-            Access Management & Governance System
+          <p
+            style={{
+              fontSize: "13px",
+              color: "#64748B",
+              margin: "4px 0 0",
+            }}
+          >
+            New Age Portal
           </p>
 
-          {/* Tab Switcher */}
+          {/* Clean Segmented Tab Switcher */}
           <div
             style={{
               display: "flex",
               background: "#F1F5F9",
-              borderRadius: "9px",
-              padding: "4px",
+              borderRadius: "8px",
+              padding: "3px",
               marginTop: "20px",
-              gap: "4px",
+              gap: "2px",
             }}
           >
             <button
@@ -148,23 +158,19 @@ export default function LoginPage() {
               }}
               style={{
                 flex: 1,
-                padding: "8px 0",
+                padding: "7px 0",
                 border: "none",
-                borderRadius: "7px",
-                background: tab === "login" ? "#fff" : "transparent",
+                borderRadius: "6px",
+                background: tab === "login" ? "#FFFFFF" : "transparent",
                 color: tab === "login" ? "#0F1B33" : "#64748B",
-                fontWeight: 700,
+                fontWeight: 600,
                 fontSize: "13px",
                 cursor: "pointer",
-                boxShadow: tab === "login" ? "0 1px 3px rgba(0,0,0,0.1)" : "none",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "6px",
-                transition: "all 0.15s",
+                boxShadow: tab === "login" ? "0 1px 2px rgba(0,0,0,0.05)" : "none",
+                transition: "all 0.15s ease",
               }}
             >
-              <LogIn size={14} /> Sign In
+              Sign In
             </button>
             <button
               type="button"
@@ -174,45 +180,41 @@ export default function LoginPage() {
               }}
               style={{
                 flex: 1,
-                padding: "8px 0",
+                padding: "7px 0",
                 border: "none",
-                borderRadius: "7px",
-                background: tab === "signup" ? "#fff" : "transparent",
+                borderRadius: "6px",
+                background: tab === "signup" ? "#FFFFFF" : "transparent",
                 color: tab === "signup" ? "#0F1B33" : "#64748B",
-                fontWeight: 700,
+                fontWeight: 600,
                 fontSize: "13px",
                 cursor: "pointer",
-                boxShadow: tab === "signup" ? "0 1px 3px rgba(0,0,0,0.1)" : "none",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "6px",
-                transition: "all 0.15s",
+                boxShadow: tab === "signup" ? "0 1px 2px rgba(0,0,0,0.05)" : "none",
+                transition: "all 0.15s ease",
               }}
             >
-              <UserPlus size={14} /> Sign Up
+              Create Account
             </button>
           </div>
         </div>
 
-        {/* Body */}
-        <div style={{ padding: "26px 32px" }}>
+        {/* Content Body */}
+        <div style={{ padding: "28px 32px 32px" }}>
           {error && (
             <div
               style={{
-                marginBottom: "18px",
-                padding: "12px 14px",
-                borderRadius: "9px",
+                marginBottom: "20px",
+                padding: "10px 14px",
+                borderRadius: "8px",
                 background: "#FEF2F2",
-                border: "1px solid #FECACA",
+                border: "1px solid #FEE2E2",
                 display: "flex",
                 alignItems: "center",
-                gap: "10px",
+                gap: "8px",
                 fontSize: "13px",
-                color: "#B91C1C",
+                color: "#DC2626",
               }}
             >
-              <AlertCircle size={16} style={{ flexShrink: 0 }} />
+              <AlertCircle size={15} style={{ flexShrink: 0 }} />
               <span>{error}</span>
             </div>
           )}
@@ -220,125 +222,106 @@ export default function LoginPage() {
           {successMsg && (
             <div
               style={{
-                marginBottom: "18px",
-                padding: "12px 14px",
-                borderRadius: "9px",
+                marginBottom: "20px",
+                padding: "10px 14px",
+                borderRadius: "8px",
                 background: "#F0FDF4",
-                border: "1px solid #BBF7D0",
+                border: "1px solid #DCFCE7",
                 display: "flex",
                 alignItems: "center",
-                gap: "10px",
+                gap: "8px",
                 fontSize: "13px",
-                color: "#15803D",
-                fontWeight: 600,
+                color: "#16A34A",
+                fontWeight: 500,
               }}
             >
-              <CheckCircle2 size={16} style={{ flexShrink: 0 }} />
+              <CheckCircle2 size={15} style={{ flexShrink: 0 }} />
               <span>{successMsg}</span>
             </div>
           )}
 
-          {/* TAB 1: LOGIN */}
+          {/* TAB 1: SIGN IN */}
           {tab === "login" && (
-            <>
-              {/* Quick Demo Login Chips */}
-              <div style={{ marginBottom: "20px" }}>
-                <div
-                  style={{
-                    fontSize: "11px",
-                    fontWeight: 700,
-                    color: "#6B7280",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.05em",
-                    marginBottom: "10px",
-                  }}
-                >
-                  ⚡ Master Account (1-Click Sign-In)
-                </div>
-
-                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                  <button
-                    type="button"
-                    onClick={() => handleQuickLogin("admin@newage.com")}
-                    disabled={loading}
+            <div>
+              {/* 1-Click Master Sign-In */}
+              <button
+                type="button"
+                onClick={() => handleLogin(undefined, "admin@newage.com")}
+                disabled={loading}
+                style={{
+                  width: "100%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  padding: "12px 14px",
+                  borderRadius: "10px",
+                  border: "1px solid #E2E8F0",
+                  background: "#FAFAFA",
+                  color: "#0F1B33",
+                  cursor: "pointer",
+                  textAlign: "left",
+                  transition: "all 0.15s ease",
+                  marginBottom: "20px",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                  <div
                     style={{
+                      width: "32px",
+                      height: "32px",
+                      borderRadius: "50%",
+                      background: "#0F1B33",
+                      color: "#FFFFFF",
+                      fontWeight: 700,
+                      fontSize: "11px",
                       display: "flex",
                       alignItems: "center",
-                      justifyContent: "space-between",
-                      padding: "12px 14px",
-                      borderRadius: "10px",
-                      border: "1px solid #0F1B33",
-                      background: "#0F1B33",
-                      color: "#fff",
-                      cursor: "pointer",
-                      textAlign: "left",
-                      boxShadow: "0 4px 12px rgba(15, 27, 51, 0.2)",
+                      justifyContent: "center",
                     }}
                   >
-                    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                      <div
-                        style={{
-                          width: "32px",
-                          height: "32px",
-                          borderRadius: "50%",
-                          background: "#2F6FED",
-                          color: "#fff",
-                          fontWeight: 800,
-                          fontSize: "12px",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}
-                      >
-                        MA
-                      </div>
-                      <div>
-                        <div style={{ fontSize: "13.5px", fontWeight: 800, color: "#fff" }}>
-                          Master Admin
-                        </div>
-                        <div style={{ fontSize: "11px", color: "#94A3B8" }}>
-                          admin@newage.com · Full Access (Employee + Admin)
-                        </div>
-                      </div>
+                    MA
+                  </div>
+                  <div>
+                    <div style={{ fontSize: "13px", fontWeight: 700, color: "#0F1B33", display: "flex", alignItems: "center", gap: "5px" }}>
+                      Master Admin <Sparkles size={12} color="#D97706" />
                     </div>
-                    <ArrowRight size={16} style={{ color: "#2F6FED" }} />
-                  </button>
+                    <div style={{ fontSize: "11.5px", color: "#64748B" }}>
+                      1-click instant sign-in
+                    </div>
+                  </div>
                 </div>
-
-                <div style={{ fontSize: "11.5px", color: "#6B7280", marginTop: "10px", textAlign: "center" }}>
-                  💡 Need a fresh employee user? Click <strong>Sign Up</strong> above.
-                </div>
-              </div>
+                <ArrowRight size={15} color="#94A3B8" />
+              </button>
 
               <div
                 style={{
                   display: "flex",
                   alignItems: "center",
                   gap: "12px",
-                  margin: "18px 0",
-                  color: "#9CA3AF",
+                  marginBottom: "20px",
+                  color: "#94A3B8",
                   fontSize: "12px",
                 }}
               >
-                <div style={{ flex: 1, height: "1px", background: "#E5E7EB" }} />
-                <span>or sign in with email</span>
-                <div style={{ flex: 1, height: "1px", background: "#E5E7EB" }} />
+                <div style={{ flex: 1, height: "1px", background: "#E2E8F0" }} />
+                <span>or continue with email</span>
+                <div style={{ flex: 1, height: "1px", background: "#E2E8F0" }} />
               </div>
 
-              {/* Manual Credentials Form */}
+              {/* Login Form */}
               <form onSubmit={(e) => handleLogin(e)}>
-                <div style={{ marginBottom: "14px" }}>
+                <div style={{ marginBottom: "16px" }}>
                   <label
                     htmlFor="login-email"
                     style={{
                       display: "block",
                       fontSize: "12.5px",
-                      fontWeight: 700,
-                      color: "#374151",
+                      fontWeight: 600,
+                      color: "#334155",
                       marginBottom: "6px",
                     }}
                   >
-                    Work Email
+                    Email
                   </label>
                   <input
                     id="login-email"
@@ -349,25 +332,27 @@ export default function LoginPage() {
                     placeholder="name@newage.com"
                     style={{
                       width: "100%",
-                      height: "40px",
+                      height: "38px",
                       padding: "0 12px",
-                      borderRadius: "9px",
-                      border: "1px solid #E5E7EB",
+                      borderRadius: "8px",
+                      border: "1px solid #CBD5E1",
                       fontSize: "13.5px",
+                      color: "#0F1B33",
                       outline: "none",
                       boxSizing: "border-box",
+                      transition: "border-color 0.15s ease",
                     }}
                   />
                 </div>
 
-                <div style={{ marginBottom: "20px" }}>
+                <div style={{ marginBottom: "22px" }}>
                   <label
                     htmlFor="login-password"
                     style={{
                       display: "block",
                       fontSize: "12.5px",
-                      fontWeight: 700,
-                      color: "#374151",
+                      fontWeight: 600,
+                      color: "#334155",
                       marginBottom: "6px",
                     }}
                   >
@@ -382,13 +367,15 @@ export default function LoginPage() {
                     placeholder="••••••••"
                     style={{
                       width: "100%",
-                      height: "40px",
+                      height: "38px",
                       padding: "0 12px",
-                      borderRadius: "9px",
-                      border: "1px solid #E5E7EB",
+                      borderRadius: "8px",
+                      border: "1px solid #CBD5E1",
                       fontSize: "13.5px",
+                      color: "#0F1B33",
                       outline: "none",
                       boxSizing: "border-box",
+                      transition: "border-color 0.15s ease",
                     }}
                   />
                 </div>
@@ -398,25 +385,25 @@ export default function LoginPage() {
                   disabled={loading}
                   style={{
                     width: "100%",
-                    height: "42px",
-                    borderRadius: "9px",
+                    height: "40px",
+                    borderRadius: "8px",
                     border: "none",
-                    background: "#2F6FED",
-                    color: "#fff",
+                    background: "#0F1B33",
+                    color: "#FFFFFF",
                     fontSize: "13.5px",
-                    fontWeight: 700,
+                    fontWeight: 600,
                     cursor: loading ? "not-allowed" : "pointer",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    gap: "8px",
-                    boxShadow: "0 4px 12px rgba(47, 111, 237, 0.25)",
+                    gap: "6px",
+                    transition: "background 0.15s ease",
                   }}
                 >
-                  {loading ? "Signing in..." : "Sign In to Portal"}
+                  {loading ? "Signing in..." : "Sign In"}
                 </button>
               </form>
-            </>
+            </div>
           )}
 
           {/* TAB 2: SIGN UP */}
@@ -428,8 +415,8 @@ export default function LoginPage() {
                   style={{
                     display: "block",
                     fontSize: "12.5px",
-                    fontWeight: 700,
-                    color: "#374151",
+                    fontWeight: 600,
+                    color: "#334155",
                     marginBottom: "5px",
                   }}
                 >
@@ -447,8 +434,9 @@ export default function LoginPage() {
                     height: "38px",
                     padding: "0 12px",
                     borderRadius: "8px",
-                    border: "1px solid #E5E7EB",
-                    fontSize: "13px",
+                    border: "1px solid #CBD5E1",
+                    fontSize: "13.5px",
+                    color: "#0F1B33",
                     outline: "none",
                     boxSizing: "border-box",
                   }}
@@ -461,8 +449,8 @@ export default function LoginPage() {
                   style={{
                     display: "block",
                     fontSize: "12.5px",
-                    fontWeight: 700,
-                    color: "#374151",
+                    fontWeight: 600,
+                    color: "#334155",
                     marginBottom: "5px",
                   }}
                 >
@@ -480,8 +468,9 @@ export default function LoginPage() {
                     height: "38px",
                     padding: "0 12px",
                     borderRadius: "8px",
-                    border: "1px solid #E5E7EB",
-                    fontSize: "13px",
+                    border: "1px solid #CBD5E1",
+                    fontSize: "13.5px",
+                    color: "#0F1B33",
                     outline: "none",
                     boxSizing: "border-box",
                   }}
@@ -492,7 +481,7 @@ export default function LoginPage() {
                 style={{
                   display: "grid",
                   gridTemplateColumns: "1fr 1fr",
-                  gap: "12px",
+                  gap: "10px",
                   marginBottom: "14px",
                 }}
               >
@@ -502,8 +491,8 @@ export default function LoginPage() {
                     style={{
                       display: "block",
                       fontSize: "12.5px",
-                      fontWeight: 700,
-                      color: "#374151",
+                      fontWeight: 600,
+                      color: "#334155",
                       marginBottom: "5px",
                     }}
                   >
@@ -516,12 +505,13 @@ export default function LoginPage() {
                     style={{
                       width: "100%",
                       height: "38px",
-                      padding: "0 10px",
+                      padding: "0 8px",
                       borderRadius: "8px",
-                      border: "1px solid #E5E7EB",
+                      border: "1px solid #CBD5E1",
                       fontSize: "13px",
+                      color: "#0F1B33",
                       outline: "none",
-                      background: "#fff",
+                      background: "#FFFFFF",
                       boxSizing: "border-box",
                     }}
                   >
@@ -540,8 +530,8 @@ export default function LoginPage() {
                     style={{
                       display: "block",
                       fontSize: "12.5px",
-                      fontWeight: 700,
-                      color: "#374151",
+                      fontWeight: 600,
+                      color: "#334155",
                       marginBottom: "5px",
                     }}
                   >
@@ -554,12 +544,13 @@ export default function LoginPage() {
                     style={{
                       width: "100%",
                       height: "38px",
-                      padding: "0 10px",
+                      padding: "0 8px",
                       borderRadius: "8px",
-                      border: "1px solid #E5E7EB",
+                      border: "1px solid #CBD5E1",
                       fontSize: "13px",
+                      color: "#0F1B33",
                       outline: "none",
-                      background: "#fff",
+                      background: "#FFFFFF",
                       boxSizing: "border-box",
                     }}
                   >
@@ -569,14 +560,14 @@ export default function LoginPage() {
                 </div>
               </div>
 
-              <div style={{ marginBottom: "20px" }}>
+              <div style={{ marginBottom: "22px" }}>
                 <label
                   htmlFor="signup-password"
                   style={{
                     display: "block",
                     fontSize: "12.5px",
-                    fontWeight: 700,
-                    color: "#374151",
+                    fontWeight: 600,
+                    color: "#334155",
                     marginBottom: "5px",
                   }}
                 >
@@ -594,8 +585,9 @@ export default function LoginPage() {
                     height: "38px",
                     padding: "0 12px",
                     borderRadius: "8px",
-                    border: "1px solid #E5E7EB",
-                    fontSize: "13px",
+                    border: "1px solid #CBD5E1",
+                    fontSize: "13.5px",
+                    color: "#0F1B33",
                     outline: "none",
                     boxSizing: "border-box",
                   }}
@@ -607,38 +599,39 @@ export default function LoginPage() {
                 disabled={loading}
                 style={{
                   width: "100%",
-                  height: "42px",
-                  borderRadius: "9px",
+                  height: "40px",
+                  borderRadius: "8px",
                   border: "none",
                   background: "#0F1B33",
-                  color: "#fff",
+                  color: "#FFFFFF",
                   fontSize: "13.5px",
-                  fontWeight: 700,
+                  fontWeight: 600,
                   cursor: loading ? "not-allowed" : "pointer",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  gap: "8px",
-                  boxShadow: "0 4px 12px rgba(15, 27, 51, 0.25)",
+                  gap: "6px",
                 }}
               >
-                <UserPlus size={16} /> {loading ? "Creating Account..." : "Create Account & Sign In"}
+                {loading ? "Creating Account..." : "Create Account & Sign In"}
               </button>
             </form>
           )}
 
-          {/* Footer note */}
+          {/* Subtle footer info */}
           <div
             style={{
-              marginTop: "20px",
-              paddingTop: "16px",
-              borderTop: "1px solid #F1F5F9",
+              marginTop: "24px",
               textAlign: "center",
-              fontSize: "11.5px",
-              color: "#9CA3AF",
+              fontSize: "12px",
+              color: "#94A3B8",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "4px",
             }}
           >
-            🔒 Protected by bcrypt password hashing & secure HTTP-only cookies
+            <Lock size={12} /> Powered by Neon Auth & PostgreSQL
           </div>
         </div>
       </div>
