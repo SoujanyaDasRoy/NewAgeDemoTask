@@ -126,14 +126,14 @@ export default function LoginPage() {
           </div>
           <h1
             style={{
-              fontSize: "19px",
-              fontWeight: 600,
+              fontSize: "20px",
+              fontWeight: 700,
               color: "#0F1B33",
               margin: 0,
               letterSpacing: "-0.01em",
             }}
           >
-            Access Management
+            New Age
           </h1>
           <p
             style={{
@@ -142,7 +142,7 @@ export default function LoginPage() {
               margin: "4px 0 0",
             }}
           >
-            New Age Portal
+            Access Management Portal
           </p>
 
           {/* Segmented Tab Switcher */}
@@ -340,6 +340,35 @@ export default function LoginPage() {
               >
                 {loading ? "Signing in..." : "Sign In"}
               </button>
+
+              <div
+                style={{
+                  marginTop: "16px",
+                  textAlign: "center",
+                  fontSize: "12.5px",
+                  color: "#64748B",
+                }}
+              >
+                First time here?{" "}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTab("signup");
+                    setError("");
+                  }}
+                  style={{
+                    border: "none",
+                    background: "transparent",
+                    color: "#2F6FED",
+                    fontWeight: 600,
+                    cursor: "pointer",
+                    padding: 0,
+                    textDecoration: "underline",
+                  }}
+                >
+                  Create Account
+                </button>
+              </div>
             </form>
           )}
 

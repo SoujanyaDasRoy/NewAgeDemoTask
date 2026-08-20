@@ -48,7 +48,10 @@ export async function login(formData: { email: string; password?: string }) {
     });
 
     if (!user) {
-      return { success: false, error: "Invalid email or password." };
+      return {
+        success: false,
+        error: "No account found with this email. Please click 'Create Account' above to register.",
+      };
     }
 
     // 2. Authenticate with Neon Auth

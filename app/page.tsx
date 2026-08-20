@@ -394,8 +394,8 @@ export default function PortalPage() {
           <div className="brand">
             <div className="brand-badge">NA</div>
             <div>
-              <div className="brand-text-title">Access Management</div>
-              <div className="brand-text-sub">New Age Portal</div>
+              <div className="brand-text-title">New Age</div>
+              <div className="brand-text-sub">Access Management Portal</div>
             </div>
           </div>
 
