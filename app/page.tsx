@@ -28,6 +28,9 @@ import {
 import StatusBadge from "@/components/StatusBadge";
 import Timeline from "@/components/Timeline";
 import ServiceLogo from "@/components/ServiceLogo";
+import CommandPalette from "@/components/CommandPalette";
+import RequestMiniStepper from "@/components/RequestMiniStepper";
+import SkeletonLoader from "@/components/SkeletonLoader";
 import AccessDetailsDrawer from "@/components/drawers/AccessDetailsDrawer";
 import RequestFormDrawer from "@/components/drawers/RequestFormDrawer";
 import ExceptionFormDrawer from "@/components/drawers/ExceptionFormDrawer";
@@ -96,6 +99,8 @@ export default function PortalPage() {
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [notifOpen, setNotifOpen] = useState(false);
   const [toasts, setToasts] = useState<Toast[]>([]);
+  const [cmdPaletteOpen, setCmdPaletteOpen] = useState(false);
+  const [requestFilter, setRequestFilter] = useState<"ALL" | "PENDING" | "APPROVED" | "COMPLETED" | "EXCEPTIONS">("ALL");
 
   // Active drawers
   const [accessDetailsItem, setAccessDetailsItem] = useState<any>(null);
@@ -153,7 +158,11 @@ export default function PortalPage() {
   // ── KEYBOARD SHORTCUTS & ACCESSIBILITY ──────────────────────────────────
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setCmdPaletteOpen((prev) => !prev);
+      } else if (e.key === "Escape") {
+        setCmdPaletteOpen(false);
         setAccessDetailsItem(null);
         setRequestFormItem(null);
         setExceptionFormItem(null);
@@ -348,34 +357,36 @@ export default function PortalPage() {
   };
 
   if (loadingUser || !currentUser) {
-    return (
-      <div
-        style={{
-          minHeight: "100vh",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          background: "#F8FAFC",
-          color: "#64748B",
-          fontSize: "14px",
-          fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-        }}
-      >
-        Loading Portal...
-      </div>
-    );
+    return <SkeletonLoader />;
   }
 
   const isRoleAdmin = currentUser.role === "ADMIN";
 
-  // Filter requests based on user
-  const myRequests = requests.filter(
+  // Filter requests based on user & filter tab
+  const allMyRequests = requests.filter(
     (r) =>
       r.requesterId === currentUser.id ||
       r.requester?.email === currentUser.email ||
       r.beneficiaryName === currentUser.name ||
       isRoleAdmin
   );
+
+  const myRequests = allMyRequests.filter((r) => {
+    if (requestFilter === "ALL") return true;
+    if (requestFilter === "PENDING") {
+      return ["PENDING_APPROVAL", "PENDING_EXCEPTION_APPROVAL"].includes(r.status);
+    }
+    if (requestFilter === "APPROVED") {
+      return ["APPROVED", "PENDING_MANUAL_PROVISIONING", "PROVISIONING", "ACCESS_PROVISIONED"].includes(r.status);
+    }
+    if (requestFilter === "COMPLETED") {
+      return r.status === "COMPLETED";
+    }
+    if (requestFilter === "EXCEPTIONS") {
+      return r.isException;
+    }
+    return true;
+  });
 
   const pendingApprovals = requests.filter(
     (r) =>
@@ -403,11 +414,12 @@ export default function PortalPage() {
 
           {/* Right side */}
           <div className="header-right">
-            {/* Role Badge */}
+            {/* Role Badge with Live Pulse Dot */}
             <span
               className={isRoleAdmin ? "badge badge-blue" : "badge badge-gray"}
-              style={{ fontWeight: 600, fontSize: "12px" }}
+              style={{ fontWeight: 600, fontSize: "12px", display: "inline-flex", alignItems: "center", gap: "6px" }}
             >
+              <span className="live-pulse-dot" />
               {isRoleAdmin ? "Board Admin" : "Employee"}
             </span>
 
@@ -559,7 +571,7 @@ export default function PortalPage() {
           )}
         </div>
 
-        {/* SEARCH CARD */}
+        {/* SEARCH CARD WITH SPOTLIGHT SHORTCUT */}
         <div className="card">
           <div className="section-head" style={{ borderBottom: "none", paddingBottom: "4px" }}>
             <div>
@@ -582,6 +594,27 @@ export default function PortalPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
+              <button
+                type="button"
+                onClick={() => setCmdPaletteOpen(true)}
+                style={{
+                  border: "1px solid #E2E8F0",
+                  background: "#F8FAFC",
+                  borderRadius: "6px",
+                  padding: "3px 8px",
+                  fontSize: "11px",
+                  fontWeight: 600,
+                  color: "#64748B",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "4px",
+                  cursor: "pointer",
+                  marginRight: "6px",
+                }}
+                title="Open Spotlight Search (⌘K / Ctrl+K)"
+              >
+                ⌘K
+              </button>
             </div>
             <button
               className="btn btn-secondary"
@@ -703,14 +736,50 @@ export default function PortalPage() {
                   </div>
                 </div>
 
+                {/* Filter Pills */}
+                <div className="filter-pills-row">
+                  <button
+                    className={`filter-pill ${requestFilter === "ALL" ? "active" : ""}`}
+                    onClick={() => setRequestFilter("ALL")}
+                  >
+                    All ({allMyRequests.length})
+                  </button>
+                  <button
+                    className={`filter-pill ${requestFilter === "PENDING" ? "active" : ""}`}
+                    onClick={() => setRequestFilter("PENDING")}
+                  >
+                    Pending ({allMyRequests.filter((r) => ["PENDING_APPROVAL", "PENDING_EXCEPTION_APPROVAL"].includes(r.status)).length})
+                  </button>
+                  <button
+                    className={`filter-pill ${requestFilter === "APPROVED" ? "active" : ""}`}
+                    onClick={() => setRequestFilter("APPROVED")}
+                  >
+                    In-Progress ({allMyRequests.filter((r) => ["APPROVED", "PENDING_MANUAL_PROVISIONING", "PROVISIONING", "ACCESS_PROVISIONED"].includes(r.status)).length})
+                  </button>
+                  <button
+                    className={`filter-pill ${requestFilter === "COMPLETED" ? "active" : ""}`}
+                    onClick={() => setRequestFilter("COMPLETED")}
+                  >
+                    Completed ({allMyRequests.filter((r) => r.status === "COMPLETED").length})
+                  </button>
+                  <button
+                    className={`filter-pill ${requestFilter === "EXCEPTIONS" ? "active" : ""}`}
+                    onClick={() => setRequestFilter("EXCEPTIONS")}
+                  >
+                    Exceptions ({allMyRequests.filter((r) => r.isException).length})
+                  </button>
+                </div>
+
                 {myRequests.length === 0 ? (
                   <div className="empty-state">
                     <div className="circle">
                       <Package size={20} />
                     </div>
-                    <div className="title">No requests yet</div>
+                    <div className="title">No requests found</div>
                     <div className="sub">
-                      Search for a board or tool above to request access.
+                      {requestFilter === "ALL"
+                        ? "Search for a board or tool above to request access."
+                        : `No requests currently in '${requestFilter.toLowerCase()}' status.`}
                     </div>
                   </div>
                 ) : (
@@ -747,13 +816,25 @@ export default function PortalPage() {
                               <span className="badge badge-amber">Exception</span>
                             )}
                           </div>
-                          <div style={{ fontSize: "12px", color: "#64748B", marginTop: "4px" }}>
-                            <span className="mono">{req.id}</span> · Updated{" "}
-                            {new Date(req.updatedAt || req.createdAt).toLocaleDateString("en-GB", {
-                              day: "numeric",
-                              month: "short",
-                              year: "numeric",
-                            })}
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "space-between",
+                              flexWrap: "wrap",
+                              gap: "12px",
+                              marginTop: "6px",
+                            }}
+                          >
+                            <div style={{ fontSize: "12px", color: "#64748B" }}>
+                              <span className="mono">{req.id}</span> · Updated{" "}
+                              {new Date(req.updatedAt || req.createdAt).toLocaleDateString("en-GB", {
+                                day: "numeric",
+                                month: "short",
+                                year: "numeric",
+                              })}
+                            </div>
+                            <RequestMiniStepper status={req.status} />
                           </div>
                         </div>
                         {/* Quick-decision for on-behalf provisioned */}
@@ -765,6 +846,7 @@ export default function PortalPage() {
                               height: "30px",
                               padding: "0 12px",
                               background: "#0F1B33",
+                              marginLeft: "12px",
                             }}
                             onClick={(e) => {
                               e.stopPropagation();
@@ -870,7 +952,24 @@ export default function PortalPage() {
                             })}
                           </div>
                         </div>
-                        <ChevronRight size={16} style={{ color: "#9CA3AF", flexShrink: 0 }} />
+
+                        {/* Inline Quick Action Buttons */}
+                        <div className="quick-action-wrap" onClick={(e) => e.stopPropagation()}>
+                          <button
+                            className="quick-action-btn quick-action-approve"
+                            title="1-Click Approve"
+                            onClick={() => handleApprove(req.id)}
+                          >
+                            ✓ Approve
+                          </button>
+                          <button
+                            className="quick-action-btn quick-action-reject"
+                            title="Reject"
+                            onClick={() => setApprovalRequest(req)}
+                          >
+                            ✕ Reject
+                          </button>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -980,14 +1079,50 @@ export default function PortalPage() {
                 </div>
               </div>
 
+              {/* Filter Pills */}
+              <div className="filter-pills-row">
+                <button
+                  className={`filter-pill ${requestFilter === "ALL" ? "active" : ""}`}
+                  onClick={() => setRequestFilter("ALL")}
+                >
+                  All ({allMyRequests.length})
+                </button>
+                <button
+                  className={`filter-pill ${requestFilter === "PENDING" ? "active" : ""}`}
+                  onClick={() => setRequestFilter("PENDING")}
+                >
+                  Pending ({allMyRequests.filter((r) => ["PENDING_APPROVAL", "PENDING_EXCEPTION_APPROVAL"].includes(r.status)).length})
+                </button>
+                <button
+                  className={`filter-pill ${requestFilter === "APPROVED" ? "active" : ""}`}
+                  onClick={() => setRequestFilter("APPROVED")}
+                >
+                  In-Progress ({allMyRequests.filter((r) => ["APPROVED", "PENDING_MANUAL_PROVISIONING", "PROVISIONING", "ACCESS_PROVISIONED"].includes(r.status)).length})
+                </button>
+                <button
+                  className={`filter-pill ${requestFilter === "COMPLETED" ? "active" : ""}`}
+                  onClick={() => setRequestFilter("COMPLETED")}
+                >
+                  Completed ({allMyRequests.filter((r) => r.status === "COMPLETED").length})
+                </button>
+                <button
+                  className={`filter-pill ${requestFilter === "EXCEPTIONS" ? "active" : ""}`}
+                  onClick={() => setRequestFilter("EXCEPTIONS")}
+                >
+                  Exceptions ({allMyRequests.filter((r) => r.isException).length})
+                </button>
+              </div>
+
               {myRequests.length === 0 ? (
                 <div className="empty-state">
                   <div className="circle">
                     <Package size={20} />
                   </div>
-                  <div className="title">No requests yet</div>
+                  <div className="title">No requests found</div>
                   <div className="sub">
-                    Search for a board or tool above to request access.
+                    {requestFilter === "ALL"
+                      ? "Search for a board or tool above to request access."
+                      : `No requests currently in '${requestFilter.toLowerCase()}' status.`}
                   </div>
                 </div>
               ) : (
@@ -1024,13 +1159,25 @@ export default function PortalPage() {
                             <span className="badge badge-amber">Exception</span>
                           )}
                         </div>
-                        <div style={{ fontSize: "12px", color: "#64748B", marginTop: "4px" }}>
-                          <span className="mono">{req.id}</span> · Updated{" "}
-                          {new Date(req.updatedAt || req.createdAt).toLocaleDateString("en-GB", {
-                            day: "numeric",
-                            month: "short",
-                            year: "numeric",
-                          })}
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            flexWrap: "wrap",
+                            gap: "12px",
+                            marginTop: "6px",
+                          }}
+                        >
+                          <div style={{ fontSize: "12px", color: "#64748B" }}>
+                            <span className="mono">{req.id}</span> · Updated{" "}
+                            {new Date(req.updatedAt || req.createdAt).toLocaleDateString("en-GB", {
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                            })}
+                          </div>
+                          <RequestMiniStepper status={req.status} />
                         </div>
                       </div>
                     </div>
@@ -1541,6 +1688,17 @@ export default function PortalPage() {
           isAdmin={isRoleAdmin}
         />
       )}
+
+      {/* COMMAND PALETTE SPOTLIGHT MODAL (⌘K / Ctrl+K) */}
+      <CommandPalette
+        isOpen={cmdPaletteOpen}
+        onClose={() => setCmdPaletteOpen(false)}
+        catalog={catalog}
+        requests={requests}
+        onSelectItem={(item) => setAccessDetailsItem(item)}
+        onSelectRequest={(req) => setSelectedRequest(req)}
+        isAdmin={isRoleAdmin}
+      />
 
       {/* TOAST CONTAINER */}
       <div className="toast-container" role="status" aria-live="polite">
