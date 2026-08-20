@@ -19,6 +19,7 @@ import {
 } from "../lib/actions/access-id";
 import { getNotifications, markNotificationsRead } from "../lib/actions/notifications";
 import { getAuditLogs } from "../lib/actions/audit";
+import { login, switchSessionUser } from "../lib/actions/auth";
 
 interface TestResult {
   suite: string;
@@ -230,6 +231,20 @@ async function runTestSuite() {
 
   const auditLogs = await getAuditLogs(10);
   assert(auditLogs.length >= 5, "Audit Logs", "Audit logs captured chronological events", { count: auditLogs.length });
+
+  // ── TEST SUITE 11: Authentication & Credential Verification ──────────────
+  console.log("\n📁 SUITE 11: Authentication & Credentials");
+  const loginValidRes = await login({ email: "manvi@newage.com", password: "password123" });
+  assert(loginValidRes.success === true && loginValidRes.user?.name === "Manvi Mehta", "Auth", "Login with valid credentials succeeded", loginValidRes.user);
+
+  const loginAdminRes = await login({ email: "rahul@newage.com", password: "password123" });
+  assert(loginAdminRes.success === true && loginAdminRes.user?.role === "ADMIN", "Auth", "Admin login succeeded with ADMIN role", loginAdminRes.user);
+
+  const loginInvalidRes = await login({ email: "unknown@newage.com", password: "wrongpassword" });
+  assert(loginInvalidRes.success === false, "Auth", "Login with invalid user correctly rejected");
+
+  const switchRes = await switchSessionUser("manvi@newage.com");
+  assert(switchRes.success === true, "Auth", "Session switch succeeded");
 
   // ── FINAL SUMMARY ────────────────────────────────────────────────────────
   console.log("\n=======================================================");

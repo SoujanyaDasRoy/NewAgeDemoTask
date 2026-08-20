@@ -17,6 +17,7 @@ import {
   Plus,
   ExternalLink,
   AlignJustify,
+  LogOut,
 } from "lucide-react";
 
 import StatusBadge from "@/components/StatusBadge";
@@ -31,6 +32,7 @@ import BoardConfigDrawer from "@/components/drawers/BoardConfigDrawer";
 import AccessIdStatusDrawer from "@/components/drawers/AccessIdStatusDrawer";
 import SlackNotifCard from "@/components/SlackNotifCard";
 
+import { getCurrentUser, logout, switchSessionUser } from "@/lib/actions/auth";
 import { getCatalog } from "@/lib/actions/catalog";
 import { updateAccessConfig, toggleAutomation } from "@/lib/actions/catalog";
 import {
@@ -309,6 +311,12 @@ export default function PortalPage() {
   };
 
   // ── RENDER ────────────────────────────────────────────────────────────────
+  const handleSwitchView = async (newView: View) => {
+    setView(newView);
+    const targetEmail = newView === "employee" ? "manvi@newage.com" : "rahul@newage.com";
+    await switchSessionUser(targetEmail);
+  };
+
   return (
     <>
       {/* HEADER */}
@@ -329,13 +337,13 @@ export default function PortalPage() {
             <div className="view-toggle">
               <button
                 className={view === "employee" ? "active" : ""}
-                onClick={() => setView("employee")}
+                onClick={() => handleSwitchView("employee")}
               >
                 Employee View (Manvi Mehta)
               </button>
               <button
                 className={view === "admin" ? "active" : ""}
-                onClick={() => setView("admin")}
+                onClick={() => handleSwitchView("admin")}
               >
                 Board Admin View (Rahul Sharma)
               </button>
@@ -446,6 +454,14 @@ export default function PortalPage() {
                 <div className="name">{persona.name}</div>
                 <div className="role">{persona.dept}</div>
               </div>
+              <button
+                onClick={() => logout()}
+                title="Sign Out"
+                className="icon-btn"
+                style={{ width: "30px", height: "30px", marginLeft: "6px", color: "#9CA3AF" }}
+              >
+                <LogOut size={15} />
+              </button>
             </div>
           </div>
         </div>
