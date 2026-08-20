@@ -132,20 +132,6 @@ export async function signup(formData: {
       return { success: false, error: "Name and email are required." };
     }
 
-    const existing = await prisma.user.findUnique({
-      where: { email },
-    });
-
-    if (existing) {
-      return { success: false, error: "An account with this email already exists." };
-    }
-
-    // 1. Create user in Neon Auth
-    const neonRes = await neonAuth.signUp({ name, email, password });
-    if (neonRes.error && !neonRes.error.toLowerCase().includes("exists")) {
-      console.warn("[Neon Auth] Sign-up note:", neonRes.error);
-    }
-
     const passwordHash = await bcrypt.hash(password, 10);
     const initials = name
       .split(" ")
@@ -154,24 +140,51 @@ export async function signup(formData: {
       .slice(0, 2)
       .toUpperCase();
 
-    const tones = ["#2563EB", "#7C3AED", "#059669", "#D97706", "#DC2626", "#4F46E5"];
+    const tones = ["#0F1B33", "#2563EB", "#7C3AED", "#059669", "#D97706", "#DC2626", "#4F46E5"];
     const avatarTone = tones[Math.floor(Math.random() * tones.length)];
 
-    const userCount = await prisma.user.count();
-    const finalRole: "EMPLOYEE" | "ADMIN" = userCount === 0 ? "ADMIN" : (role || "EMPLOYEE");
+    let newUser: any;
+    let neonToken: string | undefined;
 
-    // 2. Persist application user record in PostgreSQL
-    const newUser = await prisma.user.create({
-      data: {
-        name,
-        email,
-        passwordHash,
-        department,
-        role: finalRole,
-        initials,
-        avatarTone,
-      },
+    const existing = await prisma.user.findUnique({
+      where: { email },
     });
+
+    if (existing) {
+      // If user already exists in DB, update password & details, and sign in!
+      newUser = await prisma.user.update({
+        where: { email },
+        data: {
+          name,
+          passwordHash,
+          department,
+          initials,
+        },
+      });
+    } else {
+      // 1. Create user in Neon Auth
+      const neonRes = await neonAuth.signUp({ name, email, password });
+      if (neonRes.error && !neonRes.error.toLowerCase().includes("exists")) {
+        console.warn("[Neon Auth] Sign-up note:", neonRes.error);
+      }
+      neonToken = neonRes.token;
+
+      const userCount = await prisma.user.count();
+      const finalRole: "EMPLOYEE" | "ADMIN" = userCount === 0 ? "ADMIN" : (role || "EMPLOYEE");
+
+      // 2. Persist application user record in PostgreSQL
+      newUser = await prisma.user.create({
+        data: {
+          name,
+          email,
+          passwordHash,
+          department,
+          role: finalRole,
+          initials,
+          avatarTone,
+        },
+      });
+    }
 
     const sessionData: SessionUser = {
       id: newUser.id,
@@ -197,7 +210,7 @@ export async function signup(formData: {
       revalidatePath("/");
     } catch {}
 
-    return { success: true, user: sessionData, token: neonRes.token };
+    return { success: true, user: sessionData, token: neonToken };
   } catch (error: any) {
     console.error("Signup error:", error);
     return { success: false, error: error.message || "Failed to create account" };
