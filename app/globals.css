@@ -562,51 +562,91 @@ textarea:focus-visible {
 
 /* Board cards */
 .board-card {
-  border: 1px solid var(--border);
-  border-radius: 11px;
-  background: #fff;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  background: #FFFFFF;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   overflow: hidden;
+  box-shadow: 0 1px 3px rgba(15, 27, 51, 0.04);
 }
 
 .board-card:hover {
   border-color: #CBD5E1;
-  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
-  transform: translateY(-1px);
+  box-shadow: 0 6px 16px -2px rgba(15, 27, 51, 0.08), 0 2px 6px -1px rgba(15, 27, 51, 0.04);
+  transform: translateY(-2px);
 }
 
 .board-card-body {
-  padding: 16px;
+  padding: 18px 20px;
 }
 
-.board-card .row1 {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.board-card .row1 .t {
-  font-size: 13.5px;
-  font-weight: 700;
-  color: #111827;
-  line-height: 1.35;
-}
-
-.manage-link {
-  padding: 10px 16px;
-  background: #F8FAFC;
-  border-top: 1px solid var(--border);
-  font-size: 12px;
+.board-tool-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: #F1F5F9;
+  color: #475569;
+  font-size: 11.5px;
   font-weight: 600;
-  color: var(--accent);
+  letter-spacing: 0.01em;
+}
+
+.board-title-primary {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: #0F1B33;
+  line-height: 1.35;
+  margin: 10px 0 12px;
+}
+
+.board-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 10px;
+  border-radius: 8px;
+  background: #F8FAFC;
+  border: 1px solid #F1F5F9;
+  font-size: 12px;
+  color: #64748B;
+  margin-top: 6px;
+}
+
+.board-meta-label {
   display: flex;
   align-items: center;
   gap: 6px;
+  color: #64748B;
+  font-weight: 500;
+}
+
+.board-meta-value {
+  font-weight: 600;
+  color: #0F1B33;
+}
+
+.manage-link {
+  padding: 11px 20px;
+  background: #F8FAFC;
+  border-top: 1px solid #E2E8F0;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #2563EB;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.15s ease;
+}
+
+.board-card:hover .manage-link {
+  background: #EFF6FF;
+  color: #1D4ED8;
 }
 
 /* Activity log */
