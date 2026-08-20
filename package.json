@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "seed": "tsx prisma/seed.ts",
-    "test": "tsx scripts/test-all-features.ts"
+    "test": "tsx scripts/test-all-features.ts",
+    "studio": "prisma studio --schema prisma/schema.prisma"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
