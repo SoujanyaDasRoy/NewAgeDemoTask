@@ -22,10 +22,12 @@ import {
   Users,
   Shield,
   Trash2,
+  User,
 } from "lucide-react";
 
 import StatusBadge from "@/components/StatusBadge";
 import Timeline from "@/components/Timeline";
+import ServiceLogo from "@/components/ServiceLogo";
 import AccessDetailsDrawer from "@/components/drawers/AccessDetailsDrawer";
 import RequestFormDrawer from "@/components/drawers/RequestFormDrawer";
 import ExceptionFormDrawer from "@/components/drawers/ExceptionFormDrawer";
@@ -627,9 +629,15 @@ export default function PortalPage() {
                           flexWrap: "wrap",
                         }}
                       >
-                        <span className="result-title">
-                          {item.tool} – {item.name}
-                        </span>
+                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                          <ServiceLogo tool={item.tool} size={18} />
+                          <span className="result-title">
+                            {item.name}
+                          </span>
+                          <span className="board-tool-chip" style={{ fontSize: "11px" }}>
+                            {item.tool}
+                          </span>
+                        </div>
                         <span className="badge badge-gray" style={{ fontSize: "11px" }}>
                           {item.category === "APPLICATION" ? "Application" : "Board"}
                         </span>
@@ -879,7 +887,7 @@ export default function PortalPage() {
                   </div>
                   <div>
                     <div className="section-title">My Boards</div>
-                    <div className="section-sub">Boards you have access to</div>
+                    <div className="section-sub">Boards and applications you have access to</div>
                   </div>
                 </div>
               </div>
@@ -891,11 +899,14 @@ export default function PortalPage() {
                     onClick={() => setAccessDetailsItem(item)}
                   >
                     <div className="board-card-body">
-                      {/* Top Row: Tool Chip + Automation Status Badge */}
+                      {/* Top Row: Service Logo + Tool Name + Automation Pill */}
                       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                        <span className="board-tool-chip">
-                          {item.tool}
-                        </span>
+                        <div style={{ display: "flex", alignItems: "center", gap: "7px" }}>
+                          <ServiceLogo tool={item.tool} size={18} />
+                          <span style={{ fontSize: "12px", fontWeight: 600, color: "#475569" }}>
+                            {item.tool}
+                          </span>
+                        </div>
                         {item.automation ? (
                           <span className="badge badge-blue">
                             <Zap size={11} /> Automated
@@ -910,30 +921,30 @@ export default function PortalPage() {
                         {item.name}
                       </div>
 
-                      {/* Eligibility & Access ID */}
-                      <div className="board-meta-row">
-                        <span className="board-meta-label">
-                          Eligibility
-                        </span>
-                        <span className="board-meta-value">
-                          {item.isEligible ? (
-                            <span style={{ color: "#15803D", fontWeight: 600 }}>✓ Eligible</span>
-                          ) : (
-                            <span style={{ color: "#B45309", fontWeight: 600 }}>Exception Req.</span>
-                          )}
-                        </span>
-                      </div>
-
-                      {item.accessId && (
-                        <div className="board-meta-row">
-                          <span className="board-meta-label">
-                            <Key size={12} /> Access ID
-                          </span>
-                          <span className="board-meta-value mono">
-                            {item.accessId}
-                          </span>
+                      {/* 2-Column Key Metadata Grid */}
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginTop: "14px" }}>
+                        <div style={{ background: "#F8FAFC", padding: "8px 10px", borderRadius: "8px", border: "1px solid #F1F5F9" }}>
+                          <div style={{ fontSize: "11px", color: "#64748B", fontWeight: 500 }}>
+                            Eligibility
+                          </div>
+                          <div style={{ fontSize: "12px", fontWeight: 600, marginTop: "3px" }}>
+                            {item.isEligible ? (
+                              <span style={{ color: "#15803D" }}>✓ Eligible</span>
+                            ) : (
+                              <span style={{ color: "#B45309" }}>Exception Req.</span>
+                            )}
+                          </div>
                         </div>
-                      )}
+
+                        <div style={{ background: "#F8FAFC", padding: "8px 10px", borderRadius: "8px", border: "1px solid #F1F5F9" }}>
+                          <div style={{ fontSize: "11px", color: "#64748B", fontWeight: 500, display: "flex", alignItems: "center", gap: "4px" }}>
+                            <Key size={11} /> Access ID
+                          </div>
+                          <div style={{ fontSize: "12.5px", fontWeight: 600, color: "#0F1B33", marginTop: "3px" }} className="mono">
+                            {item.accessId || <span style={{ color: "#94A3B8" }}>—</span>}
+                          </div>
+                        </div>
+                      </div>
                     </div>
 
                     {/* Action Footer */}
@@ -1047,11 +1058,14 @@ export default function PortalPage() {
                 {catalog.slice(0, 3).map((item) => (
                   <div key={item.id} className="board-card" onClick={() => setBoardConfigItem(item)}>
                     <div className="board-card-body">
-                      {/* Top Row: Tool Chip + Automation Status Badge */}
+                      {/* Top Row: Service Logo + Tool Name + Automation Pill */}
                       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                        <span className="board-tool-chip">
-                          {item.tool}
-                        </span>
+                        <div style={{ display: "flex", alignItems: "center", gap: "7px" }}>
+                          <ServiceLogo tool={item.tool} size={18} />
+                          <span style={{ fontSize: "12px", fontWeight: 600, color: "#475569" }}>
+                            {item.tool}
+                          </span>
+                        </div>
                         {item.automation ? (
                           <span className="badge badge-blue">
                             <Zap size={11} /> Automated
@@ -1066,27 +1080,40 @@ export default function PortalPage() {
                         {item.name}
                       </div>
 
-                      {/* Structured Metadata Box */}
-                      <div className="board-meta-row">
-                        <span className="board-meta-label">
-                          <Key size={12} /> Access ID
-                        </span>
-                        <span className="board-meta-value">
-                          {item.accessId ? (
-                            <span className="mono" style={{ color: "#0F1B33" }}>{item.accessId}</span>
-                          ) : (
-                            <span style={{ color: "#D97706", fontSize: "11px", fontWeight: 600 }}>Needs Issue</span>
-                          )}
-                        </span>
-                      </div>
+                      {/* 2-Column Key Metadata Grid */}
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginTop: "14px" }}>
+                        <div style={{ background: "#F8FAFC", padding: "8px 10px", borderRadius: "8px", border: "1px solid #F1F5F9" }}>
+                          <div style={{ fontSize: "11px", color: "#64748B", fontWeight: 500, display: "flex", alignItems: "center", gap: "4px" }}>
+                            <Key size={11} /> Access ID
+                          </div>
+                          <div style={{ fontSize: "12.5px", fontWeight: 600, color: "#0F1B33", marginTop: "3px" }} className="mono">
+                            {item.accessId ? (
+                              item.accessId
+                            ) : (
+                              <span style={{ color: "#D97706", fontSize: "11px" }}>Needs Issue</span>
+                            )}
+                          </div>
+                        </div>
 
-                      <div className="board-meta-row">
-                        <span className="board-meta-label">
-                          Approver
-                        </span>
-                        <span className="board-meta-value" style={{ color: "#334155" }}>
-                          {item.approver}
-                        </span>
+                        <div style={{ background: "#F8FAFC", padding: "8px 10px", borderRadius: "8px", border: "1px solid #F1F5F9" }}>
+                          <div style={{ fontSize: "11px", color: "#64748B", fontWeight: 500, display: "flex", alignItems: "center", gap: "4px" }}>
+                            <User size={11} /> Approver
+                          </div>
+                          <div
+                            style={{
+                              fontSize: "12.5px",
+                              fontWeight: 600,
+                              color: "#0F1B33",
+                              marginTop: "3px",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              whiteSpace: "nowrap",
+                            }}
+                            title={item.approver}
+                          >
+                            {item.approver}
+                          </div>
+                        </div>
                       </div>
                     </div>
 
