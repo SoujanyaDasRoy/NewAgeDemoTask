@@ -23,10 +23,11 @@ export async function markNotificationsRead(role: "employee" | "admin") {
       where: { role, read: false },
       data: { read: true },
     });
-    revalidatePath("/");
+    try { revalidatePath("/"); } catch {}
     return { success: true };
   } catch (error) {
     console.error("Failed to mark notifications read:", error);
     return { success: false };
   }
 }
+

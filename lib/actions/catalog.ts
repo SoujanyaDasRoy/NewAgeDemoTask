@@ -82,7 +82,7 @@ export async function updateAccessConfig(
       },
     });
 
-    revalidatePath("/");
+    try { revalidatePath("/"); } catch {}
     return { success: true };
   } catch (error: any) {
     console.error("Failed to update config:", error);
@@ -114,10 +114,11 @@ export async function toggleAutomation(accessId: string, actingUserName: string)
       },
     });
 
-    revalidatePath("/");
+    try { revalidatePath("/"); } catch {}
     return { success: true, automation: newAutomation };
   } catch (error: any) {
     console.error("Failed to toggle automation:", error);
     return { success: false, error: error.message };
   }
 }
+

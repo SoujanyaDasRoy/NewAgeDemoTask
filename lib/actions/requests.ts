@@ -144,7 +144,7 @@ export async function submitRequest(opts: {
       });
     }
 
-    revalidatePath("/");
+    try { revalidatePath("/"); } catch {}
     return { success: true, requestId };
   } catch (error: any) {
     console.error("Failed to submit request:", error);
@@ -264,7 +264,7 @@ export async function submitExceptionRequest(opts: {
       },
     });
 
-    revalidatePath("/");
+    try { revalidatePath("/"); } catch {}
     return { success: true, requestId };
   } catch (error: any) {
     console.error("Failed to submit exception request:", error);
@@ -408,7 +408,7 @@ export async function approveRequest(requestId: string, actingUserName: string) 
       },
     });
 
-    revalidatePath("/");
+    try { revalidatePath("/"); } catch {}
     return { success: true };
   } catch (error: any) {
     console.error("Failed to approve request:", error);
@@ -486,7 +486,7 @@ export async function rejectRequest(
       },
     });
 
-    revalidatePath("/");
+    try { revalidatePath("/"); } catch {}
     return { success: true };
   } catch (error: any) {
     console.error("Failed to reject request:", error);
@@ -574,7 +574,7 @@ export async function provisionManually(requestId: string, actingUserName: strin
       },
     });
 
-    revalidatePath("/");
+    try { revalidatePath("/"); } catch {}
     return { success: true };
   } catch (error: any) {
     console.error("Failed to provision manually:", error);
@@ -635,7 +635,7 @@ export async function closeRequestAction(requestId: string, actingUserName: stri
       },
     });
 
-    revalidatePath("/");
+    try { revalidatePath("/"); } catch {}
     return { success: true };
   } catch (error: any) {
     console.error("Failed to close request:", error);
@@ -673,7 +673,7 @@ export async function autoExpireRequests() {
       });
     }
 
-    if (expired.length > 0) revalidatePath("/");
+    if (expired.length > 0) try { revalidatePath("/"); } catch {}
     return { expiredCount: expired.length };
   } catch (error: any) {
     console.error("Failed to auto-expire requests:", error);
@@ -742,10 +742,11 @@ export async function requestExtension(
       },
     });
 
-    revalidatePath("/");
+    try { revalidatePath("/"); } catch {}
     return { success: true, newDate: newDateStr };
   } catch (error: any) {
     console.error("Failed to request extension:", error);
     return { success: false, error: error.message };
   }
 }
+

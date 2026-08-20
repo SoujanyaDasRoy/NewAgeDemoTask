@@ -91,7 +91,7 @@ export async function requestAccessIdCreation(accessItemId: string, actingUserNa
       },
     });
 
-    revalidatePath("/");
+    try { revalidatePath("/"); } catch {}
     return { success: true, queueId: newQueueItem.id };
   } catch (error: any) {
     console.error("Failed to request Access ID:", error);
@@ -144,10 +144,11 @@ export async function approveAccessId(queueId: string, actingUserName: string) {
       },
     });
 
-    revalidatePath("/");
+    try { revalidatePath("/"); } catch {}
     return { success: true, accessId: newAccessIdCode };
   } catch (error: any) {
     console.error("Failed to approve Access ID:", error);
     return { success: false, error: error.message };
   }
 }
+
