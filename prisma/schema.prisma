@@ -1,0 +1,151 @@
+// This is your Prisma schema file
+// Learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  EMPLOYEE
+  ADMIN
+}
+
+enum AccessCategory {
+  BOARD
+  APPLICATION
+}
+
+enum Urgency {
+  STANDARD
+  URGENT
+  CRITICAL
+}
+
+enum RequestStatus {
+  PENDING_APPROVAL
+  PENDING_EXCEPTION_APPROVAL
+  APPROVED
+  PROVISIONING
+  PENDING_MANUAL_PROVISIONING
+  ACCESS_PROVISIONED
+  COMPLETED
+  REJECTED
+  EXPIRED
+}
+
+enum StepState {
+  DONE
+  CURRENT
+  PENDING
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String?
+  role         Role     @default(EMPLOYEE)
+  department   String
+  initials     String
+  avatarTone   String   @default("#2563EB")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  requests      AccessRequest[] @relation("Requester")
+  auditLogs     AuditLog[]
+  notifications Notification[]
+}
+
+model AccessItem {
+  id             String         @id @default(cuid())
+  tool           String
+  name           String
+  category       AccessCategory @default(BOARD)
+  description    String
+  accessId       String?
+  creator        String
+  group          String
+  eligibleGroups String // JSON array string
+  approver       String
+  backupApprover String
+  provider       String
+  automation     Boolean        @default(false)
+  requestType    String         @default("Board Access Request")
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  requests     AccessRequest[]
+  idQueueItems AccessIdQueue[]
+}
+
+model AccessRequest {
+  id              String        @id
+  accessItemId    String
+  accessItem      AccessItem    @relation(fields: [accessItemId], references: [id])
+  accessLabel     String
+  requesterId     String
+  requester       User          @relation("Requester", fields: [requesterId], references: [id])
+  beneficiaryName String
+  onBehalf        Boolean       @default(false)
+  isException     Boolean       @default(false)
+  exceptionReason String?
+  requiredUntil   String?
+  urgency         Urgency       @default(STANDARD)
+  justification   String
+  status          RequestStatus @default(PENDING_APPROVAL)
+  approverName    String
+  providerName    String
+  automation      Boolean       @default(false)
+  rejectionReason String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  timeline TimelineStep[]
+}
+
+model TimelineStep {
+  id         String        @id @default(cuid())
+  requestId  String
+  request    AccessRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  label      String
+  actor      String
+  timestamp  String
+  state      StepState
+  orderIndex Int
+}
+
+model AccessIdQueue {
+  id           String     @id @default(cuid())
+  accessItemId String
+  accessItem   AccessItem @relation(fields: [accessItemId], references: [id])
+  status       String     @default("Pending Governance Review")
+  requestedBy  String
+  requestedTs  DateTime   @default(now())
+  approvedTs   DateTime?
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  action    String
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  userName  String
+  detail    String
+  createdAt DateTime @default(now())
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  role      String
+  text      String
+  channel   String   @default("portal")
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
