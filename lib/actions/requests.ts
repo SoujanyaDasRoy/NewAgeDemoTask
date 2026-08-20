@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { sendSlackNotification } from "@/lib/slack";
 
 export async function getRequests(filters?: {
   requesterName?: string;
@@ -144,6 +145,19 @@ export async function submitRequest(opts: {
       });
     }
 
+    // Live Slack webhook notification (if SLACK_WEBHOOK_URL is configured in .env)
+    sendSlackNotification({
+      requestId,
+      accessLabel: `${access.tool} – ${access.name}`,
+      requesterName: opts.requesterName,
+      beneficiaryName: opts.beneficiary,
+      isException: false,
+      justification: opts.justification,
+      approverName: access.approver,
+      automation: access.automation,
+      status: "Pending Approval",
+    }).catch((e) => console.error("[Slack] Async notification error:", e));
+
     try { revalidatePath("/"); } catch {}
     return { success: true, requestId };
   } catch (error: any) {
@@ -263,6 +277,20 @@ export async function submitExceptionRequest(opts: {
         channel: "slack",
       },
     });
+
+    // Live Slack webhook notification (if SLACK_WEBHOOK_URL is configured in .env)
+    sendSlackNotification({
+      requestId,
+      accessLabel: `${access.tool} – ${access.name}`,
+      requesterName: opts.requesterName,
+      beneficiaryName: opts.requesterName,
+      isException: true,
+      urgency: opts.urgency,
+      justification: `[${opts.reason}] ${opts.justification}`,
+      approverName: access.approver,
+      automation: access.automation,
+      status: "Pending Exception Approval",
+    }).catch((e) => console.error("[Slack] Async notification error:", e));
 
     try { revalidatePath("/"); } catch {}
     return { success: true, requestId };
