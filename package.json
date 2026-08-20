@@ -9,7 +9,8 @@
     "lint": "eslint",
     "seed": "tsx prisma/seed.ts",
     "test": "tsx scripts/test-all-features.ts",
-    "studio": "prisma studio --schema prisma/schema.prisma"
+    "studio": "prisma studio --schema prisma/schema.prisma",
+    "postinstall": "prisma generate"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
