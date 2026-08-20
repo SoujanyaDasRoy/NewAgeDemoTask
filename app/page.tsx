@@ -142,6 +142,25 @@ export default function PortalPage() {
     setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 4000);
   };
 
+  // ── KEYBOARD SHORTCUTS & ACCESSIBILITY ──────────────────────────────────
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setAccessDetailsItem(null);
+        setRequestFormItem(null);
+        setExceptionFormItem(null);
+        setSelectedRequest(null);
+        setApprovalRequest(null);
+        setAdminProvisionRequest(null);
+        setBoardConfigItem(null);
+        setAccessIdItem(null);
+        setNotifOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   // ── SEARCH ───────────────────────────────────────────────────────────────
   useEffect(() => {
     if (!searchQuery.trim()) {
@@ -512,13 +531,38 @@ export default function PortalPage() {
           </div>
 
           {/* Search Results */}
-          {(searchQuery.trim() ? searchResults : catalog).length > 0 && (
+          {searchQuery.trim() && searchResults.length === 0 ? (
+            <div className="empty-state" style={{ padding: "32px 20px" }}>
+              <div className="circle">
+                <Search size={22} />
+              </div>
+              <div className="title">No matching tools or boards</div>
+              <div className="sub">
+                No results found matching &ldquo;{searchQuery}&rdquo;. Try another tool or keyword.
+              </div>
+              <button
+                className="btn btn-secondary"
+                style={{ marginTop: "14px", height: "34px", fontSize: "12.5px" }}
+                onClick={() => setSearchQuery("")}
+              >
+                Clear Search
+              </button>
+            </div>
+          ) : (
             <div style={{ marginTop: "16px", display: "flex", flexDirection: "column", gap: "8px" }}>
               {(searchQuery.trim() ? searchResults : catalog).map((item) => (
                 <div
                   key={item.id}
                   className="result-row"
                   onClick={() => setAccessDetailsItem(item)}
+                  tabIndex={0}
+                  role="button"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      setAccessDetailsItem(item);
+                    }
+                  }}
                 >
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
@@ -552,6 +596,7 @@ export default function PortalPage() {
                   <button
                     className="btn btn-secondary"
                     style={{ fontSize: "12px", height: "32px", padding: "0 12px", flexShrink: 0 }}
+                    aria-label={`View details for ${item.name}`}
                     onClick={(e) => {
                       e.stopPropagation();
                       setAccessDetailsItem(item);

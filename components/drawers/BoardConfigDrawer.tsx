@@ -58,8 +58,13 @@ export default function BoardConfigDrawer({
 
   return (
     <>
-      <div className={`overlay ${isOpen ? "show" : ""}`} onClick={onClose} />
-      <div className={`drawer ${isOpen ? "show" : ""}`}>
+      <div className={`overlay ${isOpen ? "show" : ""}`} onClick={onClose} aria-hidden="true" />
+      <div
+        className={`drawer ${isOpen ? "show" : ""}`}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Manage Access Configuration Drawer"
+      >
         <div className="drawer-head">
           <div>
             <h3>Manage Access Configuration</h3>
@@ -67,7 +72,7 @@ export default function BoardConfigDrawer({
               {accessItem.tool} – {accessItem.name}
             </div>
           </div>
-          <button className="drawer-close" onClick={onClose}>
+          <button className="drawer-close" onClick={onClose} aria-label="Close drawer">
             <X size={18} />
           </button>
         </div>

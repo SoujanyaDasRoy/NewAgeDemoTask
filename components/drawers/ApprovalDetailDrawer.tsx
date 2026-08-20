@@ -55,8 +55,13 @@ export default function ApprovalDetailDrawer({
 
   return (
     <>
-      <div className={`overlay ${isOpen ? "show" : ""}`} onClick={onClose} />
-      <div className={`drawer ${isOpen ? "show" : ""}`}>
+      <div className={`overlay ${isOpen ? "show" : ""}`} onClick={onClose} aria-hidden="true" />
+      <div
+        className={`drawer ${isOpen ? "show" : ""}`}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Approval Review Drawer"
+      >
         <div className="drawer-head">
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
@@ -67,7 +72,7 @@ export default function ApprovalDetailDrawer({
               {request.accessLabel} · <span className="mono">{request.id}</span>
             </div>
           </div>
-          <button className="drawer-close" onClick={onClose}>
+          <button className="drawer-close" onClick={onClose} aria-label="Close drawer">
             <X size={18} />
           </button>
         </div>
@@ -159,7 +164,13 @@ export default function ApprovalDetailDrawer({
       {/* Reject Modal */}
       {rejectModalOpen && (
         <div className="modal-overlay" onClick={() => setRejectModalOpen(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="modal-content"
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Reject Access Request Modal"
+          >
             <div style={{ padding: "20px 24px", borderBottom: "1px solid var(--border)" }}>
               <h3 style={{ fontSize: "16px", fontWeight: 800, margin: 0, color: "#111827" }}>
                 Reject Access Request

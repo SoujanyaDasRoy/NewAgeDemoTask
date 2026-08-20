@@ -73,8 +73,13 @@ export default function RequestFormDrawer({
 
   return (
     <>
-      <div className={`overlay ${isOpen ? "show" : ""}`} onClick={handleResetAndClose} />
-      <div className={`drawer ${isOpen ? "show" : ""}`}>
+      <div className={`overlay ${isOpen ? "show" : ""}`} onClick={handleResetAndClose} aria-hidden="true" />
+      <div
+        className={`drawer ${isOpen ? "show" : ""}`}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Request Access Form"
+      >
         <div className="drawer-head">
           <div>
             <h3>{submittedId ? "Request Submitted" : "Request Access"}</h3>
@@ -82,7 +87,7 @@ export default function RequestFormDrawer({
               {accessItem.tool} – {accessItem.name}
             </div>
           </div>
-          <button className="drawer-close" onClick={handleResetAndClose}>
+          <button className="drawer-close" onClick={handleResetAndClose} aria-label="Close drawer">
             <X size={18} />
           </button>
         </div>

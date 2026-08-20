@@ -31,8 +31,13 @@ export default function AdminRequestDetailDrawer({
 
   return (
     <>
-      <div className={`overlay ${isOpen ? "show" : ""}`} onClick={onClose} />
-      <div className={`drawer ${isOpen ? "show" : ""}`}>
+      <div className={`overlay ${isOpen ? "show" : ""}`} onClick={onClose} aria-hidden="true" />
+      <div
+        className={`drawer ${isOpen ? "show" : ""}`}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Manual Provisioning Task Drawer"
+      >
         <div className="drawer-head">
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
@@ -43,7 +48,7 @@ export default function AdminRequestDetailDrawer({
               {request.accessLabel} · <span className="mono">{request.id}</span>
             </div>
           </div>
-          <button className="drawer-close" onClick={onClose}>
+          <button className="drawer-close" onClick={onClose} aria-label="Close drawer">
             <X size={18} />
           </button>
         </div>

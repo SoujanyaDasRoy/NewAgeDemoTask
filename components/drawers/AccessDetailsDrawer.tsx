@@ -33,8 +33,13 @@ export default function AccessDetailsDrawer({
 
   return (
     <>
-      <div className={`overlay ${isOpen ? "show" : ""}`} onClick={onClose} />
-      <div className={`drawer ${isOpen ? "show" : ""}`}>
+      <div className={`overlay ${isOpen ? "show" : ""}`} onClick={onClose} aria-hidden="true" />
+      <div
+        className={`drawer ${isOpen ? "show" : ""}`}
+        role="dialog"
+        aria-modal="true"
+        aria-label={`${accessItem.name} Details`}
+      >
         <div className="drawer-head">
           <div>
             <h3>{accessItem.name}</h3>
@@ -42,7 +47,7 @@ export default function AccessDetailsDrawer({
               {accessItem.tool} · {accessItem.category}
             </div>
           </div>
-          <button className="drawer-close" onClick={onClose}>
+          <button className="drawer-close" onClick={onClose} aria-label="Close drawer">
             <X size={18} />
           </button>
         </div>

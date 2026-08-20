@@ -368,6 +368,7 @@ export default function LoginPage() {
               <form onSubmit={(e) => handleLogin(e)}>
                 <div style={{ marginBottom: "14px" }}>
                   <label
+                    htmlFor="login-email"
                     style={{
                       display: "block",
                       fontSize: "12.5px",
@@ -379,6 +380,7 @@ export default function LoginPage() {
                     Work Email
                   </label>
                   <input
+                    id="login-email"
                     type="email"
                     required
                     value={email}
@@ -399,6 +401,7 @@ export default function LoginPage() {
 
                 <div style={{ marginBottom: "20px" }}>
                   <label
+                    htmlFor="login-password"
                     style={{
                       display: "block",
                       fontSize: "12.5px",
@@ -410,6 +413,7 @@ export default function LoginPage() {
                     Password
                   </label>
                   <input
+                    id="login-password"
                     type="password"
                     required
                     value={password}
@@ -459,6 +463,7 @@ export default function LoginPage() {
             <form onSubmit={handleSignup}>
               <div style={{ marginBottom: "14px" }}>
                 <label
+                  htmlFor="signup-name"
                   style={{
                     display: "block",
                     fontSize: "12.5px",
@@ -470,6 +475,7 @@ export default function LoginPage() {
                   Full Name
                 </label>
                 <input
+                  id="signup-name"
                   type="text"
                   required
                   value={signupName}
@@ -490,6 +496,7 @@ export default function LoginPage() {
 
               <div style={{ marginBottom: "14px" }}>
                 <label
+                  htmlFor="signup-email"
                   style={{
                     display: "block",
                     fontSize: "12.5px",
@@ -501,6 +508,7 @@ export default function LoginPage() {
                   Work Email
                 </label>
                 <input
+                  id="signup-email"
                   type="email"
                   required
                   value={signupEmail}
@@ -529,6 +537,7 @@ export default function LoginPage() {
               >
                 <div>
                   <label
+                    htmlFor="signup-department"
                     style={{
                       display: "block",
                       fontSize: "12.5px",
@@ -540,6 +549,7 @@ export default function LoginPage() {
                     Department
                   </label>
                   <select
+                    id="signup-department"
                     value={signupDepartment}
                     onChange={(e) => setSignupDepartment(e.target.value)}
                     style={{
@@ -565,6 +575,7 @@ export default function LoginPage() {
 
                 <div>
                   <label
+                    htmlFor="signup-role"
                     style={{
                       display: "block",
                       fontSize: "12.5px",
@@ -576,6 +587,7 @@ export default function LoginPage() {
                     Role
                   </label>
                   <select
+                    id="signup-role"
                     value={signupRole}
                     onChange={(e) => setSignupRole(e.target.value as any)}
                     style={{
@@ -598,6 +610,7 @@ export default function LoginPage() {
 
               <div style={{ marginBottom: "20px" }}>
                 <label
+                  htmlFor="signup-password"
                   style={{
                     display: "block",
                     fontSize: "12.5px",
@@ -609,6 +622,7 @@ export default function LoginPage() {
                   Password
                 </label>
                 <input
+                  id="signup-password"
                   type="password"
                   required
                   value={signupPassword}
