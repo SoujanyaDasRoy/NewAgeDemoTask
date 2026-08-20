@@ -46,6 +46,13 @@ async function runTestSuite() {
   console.log("🧪 STARTING FULL END-TO-END FEATURE TEST SUITE");
   console.log("=======================================================\n");
 
+  // Ensure fresh test baseline
+  await prisma.timelineStep.deleteMany({});
+  await prisma.accessRequest.deleteMany({});
+  await prisma.accessIdQueue.deleteMany({});
+  await prisma.accessItem.update({ where: { id: "acc-3" }, data: { accessId: null } });
+  await prisma.accessItem.update({ where: { id: "acc-2" }, data: { automation: false } });
+
   // ── TEST SUITE 1: Access Catalog & Dynamic Eligibility ───────────────────
   console.log("📁 SUITE 1: Access Catalog & Dynamic Eligibility");
   const catalogProduct = await getCatalog("Product Team");
@@ -234,16 +241,16 @@ async function runTestSuite() {
 
   // ── TEST SUITE 11: Authentication & Credential Verification ──────────────
   console.log("\n📁 SUITE 11: Authentication & Credentials");
-  const loginValidRes = await login({ email: "manvi@newage.com", password: "password123" });
-  assert(loginValidRes.success === true && loginValidRes.user?.name === "Manvi Mehta", "Auth", "Login with valid credentials succeeded", loginValidRes.user);
+  const loginValidRes = await login({ email: "admin@newage.com", password: "password123" });
+  assert(loginValidRes.success === true && loginValidRes.user?.name === "Master Admin", "Auth", "Login with valid credentials succeeded", loginValidRes.user);
 
-  const loginAdminRes = await login({ email: "rahul@newage.com", password: "password123" });
+  const loginAdminRes = await login({ email: "admin@newage.com", password: "password123" });
   assert(loginAdminRes.success === true && loginAdminRes.user?.role === "ADMIN", "Auth", "Admin login succeeded with ADMIN role", loginAdminRes.user);
 
   const loginInvalidRes = await login({ email: "unknown@newage.com", password: "wrongpassword" });
   assert(loginInvalidRes.success === false, "Auth", "Login with invalid user correctly rejected");
 
-  const switchRes = await switchSessionUser("manvi@newage.com");
+  const switchRes = await switchSessionUser("admin@newage.com");
   assert(switchRes.success === true, "Auth", "Session switch succeeded");
 
   // Test Signup
