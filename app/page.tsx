@@ -416,18 +416,6 @@ export default function PortalPage() {
             </div>
           </div>
 
-          {/* Center Quick Search Button */}
-          <button
-            type="button"
-            className="header-quick-search"
-            onClick={() => setCmdPaletteOpen(true)}
-            title="Open Spotlight Command Search (⌘K / Ctrl+K)"
-          >
-            <Search size={13} />
-            <span>Search tools, boards, requests...</span>
-            <kbd>⌘K</kbd>
-          </button>
-
           {/* Right side */}
           <div className="header-right">
             {/* Pending Actions Quick Pill (if any) */}
