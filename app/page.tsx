@@ -56,6 +56,7 @@ import {
   deleteUser,
   SessionUser,
 } from "@/lib/actions/auth";
+import { getDashboardData } from "@/lib/actions/dashboard";
 import { getCatalog } from "@/lib/actions/catalog";
 import { updateAccessConfig, toggleAutomation } from "@/lib/actions/catalog";
 import {
@@ -145,36 +146,21 @@ function PortalDashboard() {
     window.history.pushState({}, "", url.toString());
   }, []);
 
-  // ── DATA LOADING ──────────────────────────────────────────────────────────
+  // ── HIGH-SPEED CONSOLIDATED DATA LOADING ─────────────────────────────────
   const loadData = useCallback(async () => {
-    // 1. Verify user session
-    const user = await getCurrentUser();
-    if (!user) {
+    const data = await getDashboardData();
+    if (!data.authenticated || !data.currentUser) {
       router.push("/login");
       return;
     }
-    setCurrentUser(user);
+    setCurrentUser(data.currentUser);
+    setCatalog(data.catalog);
+    setRequests(data.requests);
+    setAccessIdQueue(data.accessIdQueue);
+    setNotifications(data.notifications);
+    setAuditLogs(data.auditLogs);
+    setAllUsers(data.allUsers);
     setLoadingUser(false);
-
-    // 2. Auto-expire any requests whose requiredUntil date has passed
-    await autoExpireRequests();
-
-    const isAdm = user.role === "ADMIN";
-    const [cat, reqs, idQueue, notifs, logs, usersList] = await Promise.all([
-      getCatalog(user.department),
-      getRequests(),
-      getAccessIdQueue(),
-      getNotifications(isAdm ? "admin" : "employee"),
-      getAuditLogs(8),
-      isAdm ? getAllUsers() : Promise.resolve([]),
-    ]);
-
-    setCatalog(cat);
-    setRequests(reqs);
-    setAccessIdQueue(idQueue);
-    setNotifications(notifs);
-    setAuditLogs(logs);
-    if (usersList) setAllUsers(usersList);
   }, [router]);
 
   useEffect(() => {
