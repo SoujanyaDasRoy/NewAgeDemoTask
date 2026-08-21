@@ -33,6 +33,17 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
   }
 }
 
+/**
+ * Server-side role guard. Returns the current user if ADMIN, otherwise null.
+ * Use at the top of any privileged server action so authorization is enforced
+ * regardless of what the UI hides.
+ */
+export async function requireAdmin(): Promise<SessionUser | null> {
+  const user = await getCurrentUser();
+  if (!user || user.role !== "ADMIN") return null;
+  return user;
+}
+
 export async function login(formData: { email: string; password?: string }) {
   try {
     const email = formData.email?.trim().toLowerCase();
@@ -289,6 +300,13 @@ export async function updateUserRole(
   newDepartment?: string
 ) {
   try {
+    const admin = await requireAdmin();
+    if (!admin) {
+      return { success: false, error: "Admin role required to update user roles." };
+    }
+    if (admin.id === userId && newRole !== "ADMIN") {
+      return { success: false, error: "You cannot demote your own admin account." };
+    }
     const updated = await prisma.user.update({
       where: { id: userId },
       data: {
@@ -311,6 +329,13 @@ export async function updateUserRole(
  */
 export async function deleteUser(userId: string) {
   try {
+    const admin = await requireAdmin();
+    if (!admin) {
+      return { success: false, error: "Admin role required to delete users." };
+    }
+    if (admin.id === userId) {
+      return { success: false, error: "You cannot delete your own account from here." };
+    }
     await prisma.user.delete({
       where: { id: userId },
     });

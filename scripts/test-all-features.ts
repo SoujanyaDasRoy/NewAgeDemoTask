@@ -230,10 +230,10 @@ async function runTestSuite() {
 
   // ── TEST SUITE 10: Notifications & Audit Log ─────────────────────────────
   console.log("\n📁 SUITE 10: Notifications & Audit Log Trail");
-  const notifs = await getNotifications("employee");
-  assert(notifs.length > 0, "Notifications", "Fetched employee notifications", { count: notifs.length });
+  const notifs = await getNotifications();
+  assert(notifs.length > 0, "Notifications", "Fetched notifications for current user", { count: notifs.length });
 
-  const markReadRes = await markNotificationsRead("employee");
+  const markReadRes = await markNotificationsRead();
   assert(markReadRes.success === true, "Notifications", "Marked notifications as read");
 
   const auditLogs = await getAuditLogs(10);

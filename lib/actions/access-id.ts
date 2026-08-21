@@ -2,6 +2,29 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { requireAdmin, getCurrentUser } from "./auth";
+import { randomUUID } from "crypto";
+
+/**
+ * Generate the next sequential AC-XXXX code by scanning existing codes and
+ * picking max+1. Safe because AC-XXXX is stored as a unique field and we
+ * rely on the DB to reject any collision (unique index).
+ */
+async function nextAccessCode(): Promise<string> {
+  const existing = await prisma.accessItem.findMany({
+    where: { accessId: { not: null } },
+    select: { accessId: true },
+  });
+  let max = 4000;
+  for (const row of existing) {
+    const m = row.accessId?.match(/^AC-(\d+)$/);
+    if (m) {
+      const n = parseInt(m[1], 10);
+      if (n > max) max = n;
+    }
+  }
+  return `AC-${max + 1}`;
+}
 
 export async function getAccessIdQueue() {
   try {
@@ -62,7 +85,9 @@ export async function requestAccessIdCreation(accessItemId: string, actingUserNa
     }
 
     const count = await prisma.accessIdQueue.count();
-    const queueId = `idq-${count + 1}`;
+    // Use count + 1 with a random suffix to dodge concurrent collisions.
+    // Real production would use a DB sequence or autoincrement column.
+    const queueId = `idq-${count + 1}-${Math.random().toString(36).slice(2, 6)}`;
 
     const newQueueItem = await prisma.accessIdQueue.create({
       data: {
@@ -101,6 +126,10 @@ export async function requestAccessIdCreation(accessItemId: string, actingUserNa
 
 export async function approveAccessId(queueId: string, actingUserName: string) {
   try {
+    const admin = await requireAdmin();
+    if (!admin) {
+      return { success: false, error: "Admin role required to approve Access ID." };
+    }
     const queueItem = await prisma.accessIdQueue.findUnique({
       where: { id: queueId },
       include: { accessItem: true },
@@ -108,8 +137,9 @@ export async function approveAccessId(queueId: string, actingUserName: string) {
 
     if (!queueItem) throw new Error("Queue item not found");
 
-    // Generate unique Access ID, e.g. AC-4000 to AC-4999
-    const newAccessIdCode = `AC-${Math.floor(4000 + Math.random() * 900)}`;
+    // Generate unique Access ID serially. DB unique constraint catches
+    // collisions if two admins approve in the same tick.
+    const newAccessIdCode = await nextAccessCode();
 
     await prisma.accessIdQueue.update({
       where: { id: queueId },

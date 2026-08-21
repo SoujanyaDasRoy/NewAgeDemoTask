@@ -2,6 +2,8 @@
 
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser, SessionUser } from "./auth";
+import { autoExpireRequests } from "./requests";
+import { getNotifications } from "./notifications";
 
 export interface DashboardDataPayload {
   authenticated: boolean;
@@ -32,6 +34,15 @@ export async function getDashboardData(): Promise<DashboardDataPayload> {
 
     const isAdm = user.role === "ADMIN";
     const userDepartment = user.department || "Product Team";
+
+    // Side-effect: opportunistically expire any past-due access requests
+    // every time the dashboard loads. Safe to run concurrently — all writes
+    // are wrapped in a transaction inside autoExpireRequests.
+    try {
+      await autoExpireRequests();
+    } catch (e) {
+      console.error("[Dashboard] autoExpireRequests failed:", e);
+    }
 
     // Run all database fetches in parallel directly on the server
     const [rawCatalog, requests, idQueue, notifications, auditLogs, allUsers] =
@@ -77,17 +88,8 @@ export async function getDashboardData(): Promise<DashboardDataPayload> {
           orderBy: { requestedTs: "desc" },
         }),
 
-        // 4. Notifications
-        prisma.notification.findMany({
-          where: {
-            OR: [
-              { role: isAdm ? "admin" : "employee" },
-              { userId: user.id },
-            ],
-          },
-          orderBy: { createdAt: "desc" },
-          take: 30,
-        }),
+        // 4. Notifications scoped to current user (per-user + role broadcast)
+        getNotifications(),
 
         // 5. Audit logs
         prisma.auditLog.findMany({

@@ -699,7 +699,7 @@ function PortalDashboard() {
                   <span
                     style={{ fontSize: "11px", color: "var(--muted)", cursor: "pointer", fontWeight: 500 }}
                     onClick={async () => {
-                      await markNotificationsRead(isRoleAdmin ? "admin" : "employee");
+                      await markNotificationsRead();
                       await loadData();
                     }}
                   >

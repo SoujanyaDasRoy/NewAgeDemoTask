@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { requireAdmin } from "./auth";
 
 export async function getCatalog(userDepartment: string = "Product Team") {
   try {
@@ -47,6 +48,10 @@ export async function updateAccessConfig(
   actingUserName: string = "Admin"
 ) {
   try {
+    const admin = await requireAdmin();
+    if (!admin) {
+      return { success: false, error: "Admin role required to update access configuration." };
+    }
     const access = await prisma.accessItem.findUnique({
       where: { id: accessId },
     });
@@ -92,6 +97,10 @@ export async function updateAccessConfig(
 
 export async function toggleAutomation(accessId: string, actingUserName: string = "Admin") {
   try {
+    const admin = await requireAdmin();
+    if (!admin) {
+      return { success: false, error: "Admin role required to toggle automation." };
+    }
     const access = await prisma.accessItem.findUnique({
       where: { id: accessId },
     });

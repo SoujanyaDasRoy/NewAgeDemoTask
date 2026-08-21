@@ -3,6 +3,17 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { sendSlackNotification } from "@/lib/slack";
+import { requireAdmin, getCurrentUser } from "./auth";
+import { randomUUID } from "crypto";
+
+/**
+ * Generate a NAR-XXXXX request ID using a 4-byte random suffix. Avoids the
+ * count+1 race that produced duplicate primary keys under concurrent submits.
+ */
+function newRequestId(): string {
+  const suffix = randomUUID().replace(/-/g, "").slice(0, 6).toUpperCase();
+  return `NAR-${suffix}`;
+}
 
 export async function getRequests(filters?: {
   requesterName?: string;
@@ -73,9 +84,9 @@ export async function submitRequest(opts: {
         });
       }
 
-      // Generate NAR ID atomically
-      const count = await tx.accessRequest.count();
-      const requestId = `NAR-${10480 + count + 1}`;
+      // Generate NAR ID atomically using a UUID-derived suffix to avoid the
+      // count+1 race condition when two submits happen concurrently.
+      const requestId = newRequestId();
 
       const nowFormatted = new Date().toLocaleDateString("en-GB", {
         day: "numeric",
@@ -154,6 +165,15 @@ export async function submitRequest(opts: {
           },
         });
       }
+      // Confirmation notification to requester (per-user, so only they see it)
+      await tx.notification.create({
+        data: {
+          userId: requester.id,
+          role: "employee",
+          text: `Request ${requestId} for ${access.tool} – ${access.name} submitted for approval.`,
+          channel: "portal",
+        },
+      });
 
       return { requestId, access };
     });
@@ -222,8 +242,7 @@ export async function submitExceptionRequest(opts: {
         });
       }
 
-      const count = await tx.accessRequest.count();
-      const requestId = `NAR-${10480 + count + 1}`;
+      const requestId = newRequestId();
 
       const nowFormatted = new Date().toLocaleDateString("en-GB", {
         day: "numeric",
@@ -303,6 +322,15 @@ export async function submitExceptionRequest(opts: {
           channel: "slack",
         },
       });
+      // Confirmation notification to requester (per-user)
+      await tx.notification.create({
+        data: {
+          userId: requester.id,
+          role: "employee",
+          text: `Exception request ${requestId} for ${access.tool} – ${access.name} submitted for review.`,
+          channel: "portal",
+        },
+      });
 
       return { requestId, access };
     });
@@ -336,6 +364,10 @@ export async function submitExceptionRequest(opts: {
  */
 export async function approveRequest(requestId: string, actingUserName: string) {
   try {
+    const current = await getCurrentUser();
+    if (!current) {
+      return { success: false, error: "Not authenticated." };
+    }
     const outcome = await prisma.$transaction(async (tx) => {
       const r = await tx.accessRequest.findUnique({
         where: { id: requestId },
@@ -344,6 +376,10 @@ export async function approveRequest(requestId: string, actingUserName: string) 
           accessItem: true,
         },
       });
+      if (!r) throw new Error(`Request ${requestId} not found`);
+      if (current.role !== "ADMIN" && r.approverName !== current.name) {
+        throw new Error("Only the assigned approver or an admin can approve this request.");
+      }
 
       if (!r) throw new Error(`Request ${requestId} not found`);
 
@@ -402,9 +438,10 @@ export async function approveRequest(requestId: string, actingUserName: string) 
           ],
         });
 
-        // Notification
+        // Notification to requester
         await tx.notification.create({
           data: {
+            userId: r.requesterId,
             role: "employee",
             text: `Access automatically provisioned for ${requestId} — ${r.accessLabel}.`,
             channel: "portal",
@@ -663,27 +700,16 @@ export async function batchApproveRequests(
  */
 export async function rejectRequest(
   requestId: string,
-  arg2: string,
-  arg3?: string
+  reason: string,
+  actingUserName: string
 ) {
-  // Support both (requestId, reason, actingUserName) and (requestId, actingUserName, reason)
-  let reason = "Not specified";
-  let actingUserName = "Approver";
-
-  if (arg3 !== undefined) {
-    // If 3 arguments provided: let's determine which is user vs reason
-    if (arg2 && !arg2.includes(" ") && arg3.includes(" ")) {
-      actingUserName = arg2;
-      reason = arg3;
-    } else {
-      reason = arg2;
-      actingUserName = arg3;
-    }
-  } else {
-    reason = arg2 || "Not specified";
-  }
-
   try {
+    const current = await getCurrentUser();
+    if (!current) {
+      return { success: false, error: "Not authenticated." };
+    }
+    const finalReason = (reason || "Not specified").trim();
+    const finalActor = (actingUserName || "Approver").trim();
     await prisma.$transaction(async (tx) => {
       const r = await tx.accessRequest.findUnique({
         where: { id: requestId },
@@ -691,6 +717,9 @@ export async function rejectRequest(
       });
 
       if (!r) throw new Error(`Request ${requestId} not found`);
+      if (current.role !== "ADMIN" && r.approverName !== current.name) {
+        throw new Error("Only the assigned approver or an admin can reject this request.");
+      }
 
       const nowFormatted = new Date().toLocaleDateString("en-GB", {
         day: "numeric",
@@ -704,7 +733,7 @@ export async function rejectRequest(
         where: { id: requestId },
         data: {
           status: "REJECTED",
-          rejectionReason: reason || "Not specified",
+          rejectionReason: finalReason,
         },
       });
 
@@ -722,8 +751,8 @@ export async function rejectRequest(
           },
           {
             requestId,
-            label: `Rejected: ${reason || "Not specified"}`,
-            actor: actingUserName || r.approverName,
+            label: `Rejected: ${finalReason}`,
+            actor: finalActor || r.approverName,
             timestamp: nowFormatted,
             state: "DONE",
             orderIndex: 1,
@@ -735,16 +764,17 @@ export async function rejectRequest(
       await tx.auditLog.create({
         data: {
           action: "Request rejected",
-          userName: actingUserName || r.approverName,
-          detail: `${requestId} — Reason: ${reason || "Not specified"}`,
+          userName: finalActor || r.approverName,
+          detail: `${requestId} — Reason: ${finalReason}`,
         },
       });
 
       // Notification
       await tx.notification.create({
         data: {
+          userId: r.requesterId,
           role: "employee",
-          text: `Your request ${requestId} was rejected by ${actingUserName || r.approverName}.`,
+          text: `Your request ${requestId} was rejected by ${finalActor || r.approverName}.`,
           channel: "portal",
         },
       });
@@ -766,6 +796,10 @@ export async function rejectRequest(
  */
 export async function provisionManually(requestId: string, actingUserName: string) {
   try {
+    const admin = await requireAdmin();
+    if (!admin) {
+      return { success: false, error: "Admin role required to provision access." };
+    }
     const outcome = await prisma.$transaction(async (tx) => {
       const r = await tx.accessRequest.findUnique({
         where: { id: requestId },
@@ -836,9 +870,10 @@ export async function provisionManually(requestId: string, actingUserName: strin
         },
       });
 
-      // Notification
+      // Notification to requester
       await tx.notification.create({
         data: {
+          userId: r.requesterId,
           role: "employee",
           text: `Access has been manually provisioned for ${requestId} (${r.accessLabel}).`,
           channel: "portal",
