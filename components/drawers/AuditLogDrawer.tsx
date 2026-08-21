@@ -129,21 +129,21 @@ export default function AuditLogDrawer({
   const getActionBadgeStyle = (action: string) => {
     const a = action.toLowerCase();
     if (a.includes("approved")) {
-      return { bg: "rgba(34, 197, 94, 0.15)", color: "#4ADE80", border: "rgba(34, 197, 94, 0.3)", icon: CheckCircle2 };
+      return { className: "badge-green", icon: CheckCircle2 };
     }
     if (a.includes("reject")) {
-      return { bg: "rgba(239, 68, 68, 0.15)", color: "#F87171", border: "rgba(239, 68, 68, 0.3)", icon: XCircle };
+      return { className: "badge-red", icon: XCircle };
     }
     if (a.includes("auto") || a.includes("automated")) {
-      return { bg: "rgba(59, 130, 246, 0.15)", color: "#60A5FA", border: "rgba(59, 130, 246, 0.3)", icon: Zap };
+      return { className: "badge-blue", icon: Zap };
     }
     if (a.includes("exception") || a.includes("extension")) {
-      return { bg: "rgba(245, 158, 11, 0.15)", color: "#FBBF24", border: "rgba(245, 158, 11, 0.3)", icon: AlertTriangle };
+      return { className: "badge-amber", icon: AlertTriangle };
     }
     if (a.includes("role") || a.includes("user")) {
-      return { bg: "rgba(139, 92, 246, 0.15)", color: "#C084FC", border: "rgba(139, 92, 246, 0.3)", icon: Shield };
+      return { className: "badge-purple", icon: Shield };
     }
-    return { bg: "var(--surface-subtle)", color: "var(--text-secondary)", border: "var(--border)", icon: Layers };
+    return { className: "badge-gray", icon: Layers };
   };
 
   const formatTimestamp = (dateInput: string | Date) => {
@@ -476,17 +476,11 @@ export default function AuditLogDrawer({
                       >
                         <div style={{ display: "flex", alignItems: "center", gap: "5px", flexWrap: "wrap" }}>
                           <span
+                            className={`badge ${badgeStyle.className}`}
                             style={{
-                              background: badgeStyle.bg,
-                              color: badgeStyle.color,
-                              border: `1px solid ${badgeStyle.border}`,
-                              borderRadius: "4px",
-                              padding: "1px 6px",
                               fontSize: "10.5px",
-                              fontWeight: 600,
-                              display: "inline-flex",
-                              alignItems: "center",
-                              gap: "3px",
+                              padding: "1px 6px",
+                              borderRadius: "4px",
                             }}
                           >
                             <BadgeIcon size={10} /> {log.action}

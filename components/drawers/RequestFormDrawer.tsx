@@ -463,7 +463,7 @@ export default function RequestFormDrawer({
                           transition: "all 0.15s ease",
                         }}
                       >
-                        {lvl === "STANDARD" ? "Standard" : lvl === "URGENT" ? "⚡ Urgent" : "🔥 Critical"}
+                        {lvl === "STANDARD" ? "Standard" : lvl === "URGENT" ? "Urgent" : "Critical"}
                       </button>
                     );
                   })}

@@ -87,7 +87,7 @@ export default function ApprovalDetailDrawer({
                 {request.isException ? (
                   <span className="badge badge-amber">Exception</span>
                 ) : (
-                  <span className="badge badge-gray">Standard</span>
+                  <span className="badge badge-green">Standard</span>
                 )}
               </div>
               <div style={{ fontSize: "12px", color: "var(--muted)", marginTop: "1px" }}>

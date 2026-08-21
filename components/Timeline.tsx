@@ -24,12 +24,12 @@ export default function Timeline({ steps }: { steps: TimelineStepItem[] }) {
             {!isLast && (
               <div
                 className="t-line"
-                style={{ background: isDone ? "#22C55E" : "var(--border)" }}
+                style={{ background: isDone ? "#1A7F37" : "var(--border)" }}
               />
             )}
             <div className="t-dot">
               {isDone ? (
-                <CheckCircle2 size={18} style={{ color: "#22C55E" }} />
+                <CheckCircle2 size={18} style={{ color: "#1A7F37" }} />
               ) : isCurrent ? (
                 <div style={{ width: "18px", height: "18px", borderRadius: "999px", border: "2px solid var(--accent)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                   <div style={{ width: "8px", height: "8px", borderRadius: "999px", background: "var(--accent)" }} />

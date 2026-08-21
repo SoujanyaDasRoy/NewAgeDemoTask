@@ -30,7 +30,7 @@ export default function RequestMiniStepper({ status }: RequestMiniStepperProps) 
 
   if (isRejected) {
     return (
-      <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "11.5px", color: "#DC2626", fontWeight: 600 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "11.5px", color: "#CF222E", fontWeight: 600 }}>
         <X size={13} /> Request Rejected
       </div>
     );
@@ -38,7 +38,7 @@ export default function RequestMiniStepper({ status }: RequestMiniStepperProps) 
 
   if (isExpired) {
     return (
-      <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "11.5px", color: "#94A3B8", fontWeight: 500 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "11.5px", color: "var(--muted)", fontWeight: 500 }}>
         <AlertCircle size={13} /> Access Expired
       </div>
     );
@@ -52,7 +52,7 @@ export default function RequestMiniStepper({ status }: RequestMiniStepperProps) 
           width: "16px",
           height: "16px",
           borderRadius: "999px",
-          background: "#16A34A",
+          background: "#1A7F37",
           color: "#FFF",
           display: "flex",
           alignItems: "center",
@@ -69,7 +69,7 @@ export default function RequestMiniStepper({ status }: RequestMiniStepperProps) 
         style={{
           flex: 1,
           height: "2px",
-          background: isStep2Done ? "#16A34A" : isStep2Current ? "#F59E0B" : "#E2E8F0",
+          background: isStep2Done ? "#1A7F37" : isStep2Current ? "#9A6700" : "var(--border)",
           borderRadius: "1px",
         }}
       />
@@ -81,16 +81,16 @@ export default function RequestMiniStepper({ status }: RequestMiniStepperProps) 
           height: "16px",
           borderRadius: "999px",
           background: isStep2Done
-            ? "#16A34A"
+            ? "#1A7F37"
             : isStep2Current
-            ? "#FEF3C7"
-            : "#F1F5F9",
+            ? "#FFF8C5"
+            : "var(--surface-subtle)",
           color: isStep2Done
             ? "#FFF"
             : isStep2Current
-            ? "#D97706"
-            : "#94A3B8",
-          border: isStep2Current ? "1.5px solid #D97706" : "none",
+            ? "#9A6700"
+            : "var(--muted)",
+          border: isStep2Current ? "1.5px solid rgba(210, 153, 34, 0.5)" : "none",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -107,7 +107,7 @@ export default function RequestMiniStepper({ status }: RequestMiniStepperProps) 
         style={{
           flex: 1,
           height: "2px",
-          background: isStep3Done ? "#16A34A" : isStep3Current ? "#3B82F6" : "#E2E8F0",
+          background: isStep3Done ? "#1A7F37" : isStep3Current ? "#0969DA" : "var(--border)",
           borderRadius: "1px",
         }}
       />
@@ -119,16 +119,16 @@ export default function RequestMiniStepper({ status }: RequestMiniStepperProps) 
           height: "16px",
           borderRadius: "999px",
           background: isStep3Done
-            ? "#16A34A"
+            ? "#1A7F37"
             : isStep3Current
-            ? "#EFF6FF"
-            : "#F1F5F9",
+            ? "#DDF4FF"
+            : "var(--surface-subtle)",
           color: isStep3Done
             ? "#FFF"
             : isStep3Current
-            ? "#2563EB"
-            : "#94A3B8",
-          border: isStep3Current ? "1.5px solid #2563EB" : "none",
+            ? "#0969DA"
+            : "var(--muted)",
+          border: isStep3Current ? "1.5px solid rgba(56, 139, 253, 0.5)" : "none",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",

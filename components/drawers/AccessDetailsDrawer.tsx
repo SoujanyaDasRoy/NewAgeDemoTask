@@ -74,8 +74,8 @@ export default function AccessDetailsDrawer({
                 <h3 style={{ margin: 0, fontSize: "15px", fontWeight: 700, color: "var(--text)" }}>
                   {accessItem.name}
                 </h3>
-                <span className="badge badge-gray" style={{ fontSize: "10.5px" }}>
-                  {accessItem.category}
+                <span className={`badge ${accessItem.category === "APPLICATION" ? "badge-teal" : "badge-purple"}`} style={{ fontSize: "10.5px" }}>
+                  {accessItem.category === "APPLICATION" ? "Application" : "Board"}
                 </span>
               </div>
               <div style={{ fontSize: "12px", color: "var(--muted)", marginTop: "1px" }}>
@@ -95,9 +95,9 @@ export default function AccessDetailsDrawer({
             style={{
               padding: "12px 14px",
               borderRadius: "8px",
-              background: isEligible ? "rgba(34, 197, 94, 0.12)" : "rgba(245, 158, 11, 0.12)",
-              border: `1px solid ${isEligible ? "rgba(34, 197, 94, 0.3)" : "rgba(245, 158, 11, 0.3)"}`,
-              color: isEligible ? "#4ADE80" : "#FBBF24",
+              background: isEligible ? "rgba(63, 185, 80, 0.1)" : "rgba(210, 153, 34, 0.1)",
+              border: `1px solid ${isEligible ? "rgba(63, 185, 80, 0.35)" : "rgba(210, 153, 34, 0.35)"}`,
+              color: isEligible ? "#1A7F37" : "#9A6700",
               fontSize: "12px",
               lineHeight: 1.45,
               display: "flex",
@@ -107,9 +107,9 @@ export default function AccessDetailsDrawer({
             }}
           >
             {isEligible ? (
-              <Zap size={15} style={{ color: "#4ADE80", flexShrink: 0, marginTop: "1px" }} />
+              <Zap size={15} style={{ color: "#1A7F37", flexShrink: 0, marginTop: "1px" }} />
             ) : (
-              <AlertTriangle size={15} style={{ color: "#FBBF24", flexShrink: 0, marginTop: "1px" }} />
+              <AlertTriangle size={15} style={{ color: "#9A6700", flexShrink: 0, marginTop: "1px" }} />
             )}
             <div>
               <strong style={{ color: "var(--text)" }}>{isEligible ? "Standard Policy Match:" : "Cross-Department Exception:"}</strong>{" "}

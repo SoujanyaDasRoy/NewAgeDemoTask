@@ -885,7 +885,7 @@ textarea:focus-visible {
   line-height: 1.4;
 }
 
-/* ---------- 🏷️ REFINED STATUS BADGES & MICRO-CHIPS ---------- */
+/* ---------- 🏷️ GITHUB PRIMER-INSPIRED SEMANTIC LABEL & BADGE SYSTEM ---------- */
 .badge {
   display: inline-flex;
   align-items: center;
@@ -908,83 +908,137 @@ textarea:focus-visible {
 }
 
 /* Dots Light */
-.badge-dot-green { background: #16A34A; }
-.badge-dot-blue { background: #2563EB; }
-.badge-dot-teal { background: #0D9488; }
-.badge-dot-red { background: #DC2626; }
-.badge-dot-gray { background: #94A3B8; }
-.badge-dot-amber-pulse { background: #D97706; }
-.badge-dot-blue-pulse { background: #2563EB; }
-.badge-dot-orange-pulse { background: #EA580C; }
-.badge-dot-violet-pulse { background: #7C3AED; }
+.badge-dot-green { background: #1A7F37; }
+.badge-dot-blue { background: #0969DA; }
+.badge-dot-teal, .badge-dot-cyan { background: #1B7C83; }
+.badge-dot-purple, .badge-dot-violet { background: #8250DF; }
+.badge-dot-amber, .badge-dot-orange { background: #9A6700; }
+.badge-dot-red { background: #CF222E; }
+.badge-dot-gray { background: #57606A; }
+
+.badge-dot-amber-pulse { background: #9A6700; animation: pulseDot 2s infinite ease-in-out; }
+.badge-dot-blue-pulse { background: #0969DA; animation: pulseDot 2s infinite ease-in-out; }
+.badge-dot-orange-pulse { background: #9A6700; animation: pulseDot 2s infinite ease-in-out; }
+.badge-dot-violet-pulse, .badge-dot-purple-pulse { background: #8250DF; animation: pulseDot 2s infinite ease-in-out; }
 
 /* Dots Dark Mode Luminous Glow */
-[data-theme="dark"] .badge-dot-green { background: #4ADE80; box-shadow: 0 0 6px rgba(74, 222, 128, 0.7); }
-[data-theme="dark"] .badge-dot-blue { background: #60A5FA; box-shadow: 0 0 6px rgba(96, 165, 250, 0.7); }
-[data-theme="dark"] .badge-dot-teal { background: #2DD4BF; box-shadow: 0 0 6px rgba(45, 212, 191, 0.7); }
-[data-theme="dark"] .badge-dot-red { background: #F87171; box-shadow: 0 0 6px rgba(248, 113, 113, 0.7); }
-[data-theme="dark"] .badge-dot-gray { background: #94A3B8; }
-[data-theme="dark"] .badge-dot-amber-pulse { background: #FBBF24; box-shadow: 0 0 6px rgba(251, 191, 36, 0.7); }
-[data-theme="dark"] .badge-dot-blue-pulse { background: #60A5FA; box-shadow: 0 0 6px rgba(96, 165, 250, 0.7); }
-[data-theme="dark"] .badge-dot-orange-pulse { background: #FB923C; box-shadow: 0 0 6px rgba(251, 146, 60, 0.7); }
-[data-theme="dark"] .badge-dot-violet-pulse { background: #C084FC; box-shadow: 0 0 6px rgba(192, 132, 252, 0.7); }
+[data-theme="dark"] .badge-dot-green { background: #3FB950; box-shadow: 0 0 6px rgba(63, 185, 80, 0.7); }
+[data-theme="dark"] .badge-dot-blue { background: #58A6FF; box-shadow: 0 0 6px rgba(56, 139, 253, 0.7); }
+[data-theme="dark"] .badge-dot-teal, [data-theme="dark"] .badge-dot-cyan { background: #56D4DD; box-shadow: 0 0 6px rgba(57, 197, 207, 0.7); }
+[data-theme="dark"] .badge-dot-purple, [data-theme="dark"] .badge-dot-violet { background: #BC8CFF; box-shadow: 0 0 6px rgba(163, 113, 247, 0.7); }
+[data-theme="dark"] .badge-dot-amber, [data-theme="dark"] .badge-dot-orange { background: #E3B341; box-shadow: 0 0 6px rgba(210, 153, 34, 0.7); }
+[data-theme="dark"] .badge-dot-red { background: #F85149; box-shadow: 0 0 6px rgba(248, 81, 73, 0.7); }
+[data-theme="dark"] .badge-dot-gray { background: #8B949E; }
 
-/* Badges Light */
-.badge-amber { background: #FEF3C7; color: #92400E; border-color: #FDE68A; }
-.badge-blue { background: #EFF6FF; color: #1E40AF; border-color: #DBEAFE; }
-.badge-orange { background: #FFF7ED; color: #9A3412; border-color: #FED7AA; }
-.badge-teal { background: #F0FDFA; color: #115E59; border-color: #CCFBF1; }
-.badge-green { background: #F0FDF4; color: #166534; border-color: #DCFCE7; }
-.badge-red { background: #FEF2F2; color: #991B1B; border-color: #FECACA; }
-.badge-violet { background: #F5F3FF; color: #5B21B6; border-color: #EDE9FE; }
-.badge-gray { background: #F8FAFC; color: #475569; border-color: #E2E8F0; }
-.badge-indigo { background: #EEF2FF; color: #3730A3; border-color: #E0E7FF; }
+[data-theme="dark"] .badge-dot-amber-pulse { background: #E3B341; box-shadow: 0 0 6px rgba(210, 153, 34, 0.7); animation: pulseDot 2s infinite ease-in-out; }
+[data-theme="dark"] .badge-dot-blue-pulse { background: #58A6FF; box-shadow: 0 0 6px rgba(56, 139, 253, 0.7); animation: pulseDot 2s infinite ease-in-out; }
+[data-theme="dark"] .badge-dot-orange-pulse { background: #E3B341; box-shadow: 0 0 6px rgba(210, 153, 34, 0.7); animation: pulseDot 2s infinite ease-in-out; }
+[data-theme="dark"] .badge-dot-violet-pulse, [data-theme="dark"] .badge-dot-purple-pulse { background: #BC8CFF; box-shadow: 0 0 6px rgba(163, 113, 247, 0.7); animation: pulseDot 2s infinite ease-in-out; }
 
-/* Badges Dark Mode: Translucent dark pills */
-[data-theme="dark"] .badge-amber {
-  background: rgba(245, 158, 11, 0.15);
-  color: #FBBF24;
-  border-color: rgba(245, 158, 11, 0.3);
+@keyframes pulseDot {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.25);
+    opacity: 0.75;
+  }
 }
-[data-theme="dark"] .badge-blue {
-  background: rgba(59, 130, 246, 0.15);
-  color: #60A5FA;
-  border-color: rgba(59, 130, 246, 0.3);
+
+/* Badges Light (GitHub Primer semantic label tokens) */
+.badge-blue, .badge-automated {
+  background: #DDF4FF;
+  color: #0969DA;
+  border-color: rgba(56, 139, 253, 0.35);
 }
-[data-theme="dark"] .badge-orange {
-  background: rgba(249, 115, 22, 0.15);
-  color: #FB923C;
-  border-color: rgba(249, 115, 22, 0.3);
+.badge-gray, .badge-neutral, .badge-manual {
+  background: #F6F8FA;
+  color: #57606A;
+  border-color: rgba(139, 148, 158, 0.35);
 }
-[data-theme="dark"] .badge-teal {
-  background: rgba(20, 184, 166, 0.15);
-  color: #2DD4BF;
-  border-color: rgba(20, 184, 166, 0.3);
+.badge-purple, .badge-violet, .badge-board {
+  background: #FBEFFF;
+  color: #8250DF;
+  border-color: rgba(163, 113, 247, 0.35);
 }
-[data-theme="dark"] .badge-green {
-  background: rgba(34, 197, 94, 0.15);
-  color: #4ADE80;
-  border-color: rgba(34, 197, 94, 0.3);
+.badge-teal, .badge-cyan, .badge-app {
+  background: #E6F8F9;
+  color: #1B7C83;
+  border-color: rgba(57, 197, 207, 0.35);
 }
-[data-theme="dark"] .badge-red {
-  background: rgba(239, 68, 68, 0.15);
-  color: #F87171;
-  border-color: rgba(239, 68, 68, 0.3);
+.badge-green, .badge-approved {
+  background: #DAFBE1;
+  color: #1A7F37;
+  border-color: rgba(63, 185, 80, 0.35);
 }
-[data-theme="dark"] .badge-violet {
-  background: rgba(139, 92, 246, 0.15);
-  color: #C084FC;
-  border-color: rgba(139, 92, 246, 0.3);
+.badge-amber, .badge-orange, .badge-exception {
+  background: #FFF8C5;
+  color: #9A6700;
+  border-color: rgba(210, 153, 34, 0.35);
 }
-[data-theme="dark"] .badge-gray {
-  background: rgba(148, 163, 184, 0.12);
-  color: #94A3B8;
-  border-color: rgba(148, 163, 184, 0.2);
+.badge-red, .badge-rejected {
+  background: #FFEBE9;
+  color: #CF222E;
+  border-color: rgba(255, 129, 130, 0.35);
+}
+.badge-indigo {
+  background: #FBEFFF;
+  color: #8250DF;
+  border-color: rgba(163, 113, 247, 0.35);
+}
+
+/* Badges Dark Mode: GitHub Primer dark tokens */
+[data-theme="dark"] .badge-blue,
+[data-theme="dark"] .badge-automated {
+  background: rgba(56, 139, 253, 0.1);
+  color: #58A6FF;
+  border-color: rgba(56, 139, 253, 0.35);
+}
+[data-theme="dark"] .badge-gray,
+[data-theme="dark"] .badge-neutral,
+[data-theme="dark"] .badge-manual {
+  background: rgba(139, 148, 158, 0.1);
+  color: #8B949E;
+  border-color: rgba(139, 148, 158, 0.35);
+}
+[data-theme="dark"] .badge-purple,
+[data-theme="dark"] .badge-violet,
+[data-theme="dark"] .badge-board {
+  background: rgba(163, 113, 247, 0.1);
+  color: #BC8CFF;
+  border-color: rgba(163, 113, 247, 0.35);
+}
+[data-theme="dark"] .badge-teal,
+[data-theme="dark"] .badge-cyan,
+[data-theme="dark"] .badge-app {
+  background: rgba(57, 197, 207, 0.1);
+  color: #56D4DD;
+  border-color: rgba(57, 197, 207, 0.35);
+}
+[data-theme="dark"] .badge-green,
+[data-theme="dark"] .badge-approved {
+  background: rgba(63, 185, 80, 0.1);
+  color: #3FB950;
+  border-color: rgba(63, 185, 80, 0.35);
+}
+[data-theme="dark"] .badge-amber,
+[data-theme="dark"] .badge-orange,
+[data-theme="dark"] .badge-exception {
+  background: rgba(210, 153, 34, 0.1);
+  color: #E3B341;
+  border-color: rgba(210, 153, 34, 0.35);
+}
+[data-theme="dark"] .badge-red,
+[data-theme="dark"] .badge-rejected {
+  background: rgba(248, 81, 73, 0.1);
+  color: #F85149;
+  border-color: rgba(248, 81, 73, 0.35);
 }
 [data-theme="dark"] .badge-indigo {
-  background: rgba(99, 102, 241, 0.15);
-  color: #A5B4FC;
-  border-color: rgba(99, 102, 241, 0.3);
+  background: rgba(163, 113, 247, 0.1);
+  color: #BC8CFF;
+  border-color: rgba(163, 113, 247, 0.35);
 }
 
 /* Micro Live Indicator */
@@ -992,13 +1046,13 @@ textarea:focus-visible {
   width: 6px;
   height: 6px;
   border-radius: 999px;
-  background: #16A34A;
+  background: #1A7F37;
   display: inline-block;
 }
 
 [data-theme="dark"] .live-pulse-dot {
-  background: #4ADE80;
-  box-shadow: 0 0 6px rgba(74, 222, 128, 0.8);
+  background: #3FB950;
+  box-shadow: 0 0 6px rgba(63, 185, 80, 0.8);
 }
 
 /* Filter Pills */
@@ -1247,13 +1301,37 @@ textarea:focus-visible {
   border: 1px solid var(--border);
 }
 
-[data-theme="dark"] .catalog-category-tag {
-  background: rgba(255, 255, 255, 0.04);
-  border-color: rgba(255, 255, 255, 0.08);
-  color: #94A3B8;
+.catalog-category-tag.board,
+.catalog-category-tag.BOARD {
+  background: #FBEFFF;
+  color: #8250DF;
+  border: 1px solid rgba(163, 113, 247, 0.35);
 }
 
-/* SCIM Automated / Manual Pill */
+[data-theme="dark"] .catalog-category-tag.board,
+[data-theme="dark"] .catalog-category-tag.BOARD {
+  background: rgba(163, 113, 247, 0.1);
+  color: #BC8CFF;
+  border: 1px solid rgba(163, 113, 247, 0.35);
+}
+
+.catalog-category-tag.application,
+.catalog-category-tag.APPLICATION,
+.catalog-category-tag.app {
+  background: #E6F8F9;
+  color: #1B7C83;
+  border: 1px solid rgba(57, 197, 207, 0.35);
+}
+
+[data-theme="dark"] .catalog-category-tag.application,
+[data-theme="dark"] .catalog-category-tag.APPLICATION,
+[data-theme="dark"] .catalog-category-tag.app {
+  background: rgba(57, 197, 207, 0.1);
+  color: #56D4DD;
+  border: 1px solid rgba(57, 197, 207, 0.35);
+}
+
+/* SCIM Automated / Manual Pill (GitHub Primer tokens) */
 .catalog-scim-pill {
   display: inline-flex;
   align-items: center;
@@ -1266,27 +1344,27 @@ textarea:focus-visible {
 }
 
 .catalog-scim-pill.automated {
-  background: #EFF6FF;
-  color: #1D4ED8;
-  border: 1px solid #BFDBFE;
+  background: #DDF4FF;
+  color: #0969DA;
+  border: 1px solid rgba(56, 139, 253, 0.35);
 }
 
 [data-theme="dark"] .catalog-scim-pill.automated {
-  background: rgba(37, 99, 235, 0.15);
-  color: #60A5FA;
-  border: 1px solid rgba(96, 165, 250, 0.3);
+  background: rgba(56, 139, 253, 0.1);
+  color: #58A6FF;
+  border: 1px solid rgba(56, 139, 253, 0.35);
 }
 
 .catalog-scim-pill.manual {
-  background: var(--surface-subtle);
-  color: var(--muted);
-  border: 1px solid var(--border);
+  background: #F6F8FA;
+  color: #57606A;
+  border: 1px solid rgba(139, 148, 158, 0.35);
 }
 
 [data-theme="dark"] .catalog-scim-pill.manual {
-  background: rgba(255, 255, 255, 0.05);
-  color: #94A3B8;
-  border-color: rgba(255, 255, 255, 0.1);
+  background: rgba(139, 148, 158, 0.1);
+  color: #8B949E;
+  border: 1px solid rgba(139, 148, 158, 0.35);
 }
 
 /* Description */
@@ -1359,7 +1437,7 @@ textarea:focus-visible {
   color: #F8FAFC;
 }
 
-/* Status / Eligibility Pill */
+/* Status / Eligibility Pill (GitHub Primer tokens) */
 .catalog-status-pill {
   display: inline-flex;
   align-items: center;
@@ -1371,27 +1449,27 @@ textarea:focus-visible {
 }
 
 .catalog-status-pill.status-eligible {
-  background: #F0FDF4;
-  color: #166534;
-  border: 1px solid #BBF7D0;
+  background: #DAFBE1;
+  color: #1A7F37;
+  border: 1px solid rgba(63, 185, 80, 0.35);
 }
 
 [data-theme="dark"] .catalog-status-pill.status-eligible {
-  background: rgba(74, 222, 128, 0.15);
-  color: #4ADE80;
-  border: 1px solid rgba(74, 222, 128, 0.3);
+  background: rgba(63, 185, 80, 0.1);
+  color: #3FB950;
+  border: 1px solid rgba(63, 185, 80, 0.35);
 }
 
 .catalog-status-pill.status-exception {
-  background: #FEF3C7;
-  color: #92400E;
-  border: 1px solid #FDE68A;
+  background: #FFF8C5;
+  color: #9A6700;
+  border: 1px solid rgba(210, 153, 34, 0.35);
 }
 
 [data-theme="dark"] .catalog-status-pill.status-exception {
-  background: rgba(253, 224, 71, 0.15);
-  color: #FDE047;
-  border: 1px solid rgba(253, 224, 71, 0.3);
+  background: rgba(210, 153, 34, 0.1);
+  color: #E3B341;
+  border: 1px solid rgba(210, 153, 34, 0.35);
 }
 
 /* Right Actions Container */
@@ -1432,9 +1510,9 @@ textarea:focus-visible {
   align-items: center;
   gap: 5px;
   cursor: pointer;
-  background: #FEF3C7;
-  color: #92400E;
-  border: 1px solid #FDE68A;
+  background: #FFF8C5;
+  color: #9A6700;
+  border: 1px solid rgba(210, 153, 34, 0.35);
   transition: all 0.14s cubic-bezier(0.16, 1, 0.3, 1);
   user-select: none;
 }
@@ -1442,19 +1520,19 @@ textarea:focus-visible {
 .catalog-btn-exception:hover {
   background: #FDE68A;
   color: #78350F;
-  border-color: #F59E0B;
+  border-color: rgba(210, 153, 34, 0.5);
 }
 
 [data-theme="dark"] .catalog-btn-exception {
-  background: rgba(245, 158, 11, 0.15);
-  color: #FDE047;
-  border: 1px solid rgba(245, 158, 11, 0.3);
+  background: rgba(210, 153, 34, 0.1);
+  color: #E3B341;
+  border: 1px solid rgba(210, 153, 34, 0.35);
 }
 
 [data-theme="dark"] .catalog-btn-exception:hover {
-  background: rgba(245, 158, 11, 0.25);
+  background: rgba(210, 153, 34, 0.25);
   color: #FEF08A;
-  border-color: rgba(245, 158, 11, 0.5);
+  border-color: rgba(210, 153, 34, 0.5);
 }
 
 .mono {
@@ -2137,62 +2215,194 @@ textarea:focus-visible {
   animation: spin 1s linear infinite;
 }
 
-/* ---------- 📱 RESPONSIVE MEDIA QUERIES ---------- */
-@media (max-width: 1200px) {
+/* ---------- 📱 100% COMPREHENSIVE RESPONSIVE DESIGN ---------- */
+
+/* Tablet (768px - 1024px) */
+@media (max-width: 1024px) and (min-width: 768px) {
+  .main-container {
+    width: 94%;
+    padding: 20px 0 48px;
+  }
   .metrics-grid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  .grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
   }
   .grid-3 {
     grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
   }
-}
-
-@media (max-width: 1080px) {
-  .grid-2 {
-    grid-template-columns: 1fr;
+  .catalog-row {
+    gap: 14px;
+    padding: 14px 18px;
   }
-}
-
-@media (max-width: 820px) {
   .header-inner {
-    padding: 10px 0;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 10px;
+    width: 94%;
+  }
+}
+
+/* Mobile (< 768px) */
+@media (max-width: 767px) {
+  .header {
+    position: sticky;
+    top: 0;
+  }
+  .header-inner {
+    width: 94%;
+    padding: 8px 0;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    min-height: auto;
+  }
+  .brand {
+    gap: 8px;
+  }
+  .brand-badge {
+    width: 28px;
+    height: 28px;
+    font-size: 11.5px;
   }
   .header-right {
-    justify-content: space-between;
-    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    flex-wrap: wrap;
   }
-}
+  .user-pill-dept {
+    display: none;
+  }
+  .user-pill-name {
+    max-width: 80px;
+  }
+  .header-review-badge {
+    height: 30px;
+    padding: 0 8px;
+    font-size: 11px;
+  }
+  .header-primary-btn {
+    height: 30px;
+    padding: 0 10px;
+    font-size: 11.5px;
+  }
+  .header-icon-btn,
+  .user-profile-pill {
+    height: 30px;
+  }
 
-@media (max-width: 640px) {
   .main-container {
     width: 94%;
-    padding: 14px 0 40px;
+    padding: 14px 0 48px;
+    gap: 14px;
   }
+
+  /* Metrics grid: 2 columns on mobile */
   .metrics-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
   }
+  .metric-card {
+    padding: 12px 14px;
+    gap: 8px;
+  }
+  .metric-number {
+    font-size: 20px;
+  }
+
+  /* .grid-2: Stack to 1 column */
+  .grid-2 {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  /* .grid-3: Stack to 1 column */
+  .grid-3 {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  /* .catalog-row: Column wrap on small screens so action buttons stack cleanly */
+  .catalog-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 14px 16px;
+  }
+  .catalog-content {
+    width: 100%;
+  }
+  .catalog-header-line {
+    gap: 6px;
+  }
+  .catalog-actions-wrap {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border-subtle);
+  }
+  .catalog-btn-info,
+  .catalog-btn-request,
+  .catalog-btn-exception {
+    flex: 1;
+    justify-content: center;
+    text-align: center;
+    height: 36px;
+  }
+
   .card {
     padding: 16px 14px;
   }
-  .grid-3 {
-    grid-template-columns: 1fr;
-  }
-  .drawer {
-    width: 100vw;
-    max-width: 100vw;
+  .section-head {
+    flex-wrap: wrap;
+    gap: 8px;
   }
   .search-row {
     flex-direction: column;
+    gap: 8px;
+  }
+  .search-row .btn {
+    width: 100%;
+    justify-content: center;
+    height: 38px;
+  }
+  .filter-pills-row {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .filter-pill {
+    flex-shrink: 0;
+  }
+}
+
+/* Small Screens & Mobile Drawers (< 640px) */
+@media (max-width: 640px) {
+  /* Drawers: Full width (100vw) on screens < 640px */
+  .drawer {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    border-left: none;
+  }
+  .drawer-head {
+    padding: 14px 16px;
+  }
+  .drawer-body {
+    padding: 16px;
   }
   .field-grid {
     grid-template-columns: 1fr !important;
   }
   .notif-panel {
     right: -10px;
-    width: calc(100vw - 28px);
+    width: calc(100vw - 24px);
     max-width: 340px;
   }
   .toast-container {
@@ -2202,5 +2412,22 @@ textarea:focus-visible {
   }
   .toast {
     width: 100%;
+  }
+  .user-dropdown-popover {
+    right: -10px;
+    width: calc(100vw - 24px);
+    max-width: 300px;
+  }
+  .floating-batch-bar {
+    width: calc(100vw - 24px);
+    justify-content: space-between;
+    padding: 8px 12px;
+    bottom: 14px;
+  }
+  .brand-sub-text {
+    display: none;
+  }
+  .brand-divider {
+    display: none;
   }
 }

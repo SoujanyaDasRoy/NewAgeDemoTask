@@ -16,8 +16,8 @@ export const STATUS_MAP: Record<
   },
   APPROVED: {
     label: "Approved",
-    className: "badge-blue",
-    dotClass: "badge-dot-blue",
+    className: "badge-green",
+    dotClass: "badge-dot-green",
   },
   PROVISIONING: {
     label: "Provisioning",
@@ -26,13 +26,13 @@ export const STATUS_MAP: Record<
   },
   PENDING_MANUAL_PROVISIONING: {
     label: "Pending Provisioning",
-    className: "badge-orange",
-    dotClass: "badge-dot-orange-pulse",
+    className: "badge-amber",
+    dotClass: "badge-dot-amber-pulse",
   },
   ACCESS_PROVISIONED: {
     label: "Access Provisioned",
-    className: "badge-teal",
-    dotClass: "badge-dot-teal",
+    className: "badge-green",
+    dotClass: "badge-dot-green",
   },
   COMPLETED: {
     label: "Completed",
@@ -61,8 +61,8 @@ export const STATUS_MAP: Record<
   },
   Approved: {
     label: "Approved",
-    className: "badge-blue",
-    dotClass: "badge-dot-blue",
+    className: "badge-green",
+    dotClass: "badge-dot-green",
   },
   Provisioning: {
     label: "Provisioning",
@@ -71,13 +71,13 @@ export const STATUS_MAP: Record<
   },
   "Pending Manual Provisioning": {
     label: "Pending Provisioning",
-    className: "badge-orange",
-    dotClass: "badge-dot-orange-pulse",
+    className: "badge-amber",
+    dotClass: "badge-dot-amber-pulse",
   },
   "Access Provisioned": {
     label: "Access Provisioned",
-    className: "badge-teal",
-    dotClass: "badge-dot-teal",
+    className: "badge-green",
+    dotClass: "badge-dot-green",
   },
   Completed: {
     label: "Completed",
@@ -91,8 +91,8 @@ export const STATUS_MAP: Record<
   },
   "Pending Governance Review": {
     label: "Pending Review",
-    className: "badge-violet",
-    dotClass: "badge-dot-violet-pulse",
+    className: "badge-purple",
+    dotClass: "badge-dot-purple-pulse",
   },
   "Access ID Created": {
     label: "Access ID Created",

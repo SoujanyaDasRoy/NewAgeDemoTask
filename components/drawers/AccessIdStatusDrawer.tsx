@@ -175,16 +175,16 @@ export default function AccessIdStatusDrawer({
                     style={{
                       padding: "10px 12px",
                       borderRadius: "8px",
-                      background: "rgba(34, 197, 94, 0.15)",
-                      border: "1px solid rgba(34, 197, 94, 0.3)",
-                      color: "#4ADE80",
+                      background: "rgba(63, 185, 80, 0.1)",
+                      border: "1px solid rgba(63, 185, 80, 0.35)",
+                      color: "#1A7F37",
                       fontSize: "12px",
                       display: "flex",
                       alignItems: "center",
                       gap: "6px",
                     }}
                   >
-                    <ShieldCheck size={15} style={{ color: "#4ADE80" }} /> Verified: No namespace collisions in directory.
+                    <ShieldCheck size={15} style={{ color: "#1A7F37" }} /> Verified: No namespace collisions in directory.
                   </div>
                 )}
               </div>
@@ -213,8 +213,8 @@ export default function AccessIdStatusDrawer({
               style={{
                 padding: "18px",
                 borderRadius: "10px",
-                background: "rgba(34, 197, 94, 0.12)",
-                border: "1px solid rgba(34, 197, 94, 0.3)",
+                background: "rgba(63, 185, 80, 0.1)",
+                border: "1px solid rgba(63, 185, 80, 0.35)",
                 textAlign: "center",
               }}
             >
@@ -223,8 +223,8 @@ export default function AccessIdStatusDrawer({
                   width: "42px",
                   height: "42px",
                   borderRadius: "999px",
-                  background: "rgba(34, 197, 94, 0.2)",
-                  color: "#4ADE80",
+                  background: "rgba(63, 185, 80, 0.2)",
+                  color: "#1A7F37",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -233,7 +233,7 @@ export default function AccessIdStatusDrawer({
               >
                 <CheckCircle2 size={24} />
               </div>
-              <div style={{ fontSize: "13.5px", fontWeight: 700, color: "#4ADE80" }}>
+              <div style={{ fontSize: "13.5px", fontWeight: 700, color: "#1A7F37" }}>
                 Active &amp; Governed Access ID
               </div>
               <div className="mono" style={{ fontSize: "18px", fontWeight: 800, color: "var(--text)", margin: "6px 0" }}>

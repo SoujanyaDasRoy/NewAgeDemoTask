@@ -1054,11 +1054,17 @@ function PortalDashboard() {
               <span
                 className="metric-pill-sub"
                 style={{
-                  color: pendingApprovals.length > 0 ? "#D97706" : "#166534",
+                  color: pendingApprovals.length > 0 ? "#9A6700" : "#1A7F37",
                   fontWeight: 600,
                 }}
               >
-                {pendingApprovals.length > 0 ? "Action Needed" : "✓ All Clear"}
+                {pendingApprovals.length > 0 ? (
+                  "Action Needed"
+                ) : (
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: "3px" }}>
+                    <Check size={11} strokeWidth={2.5} /> All Clear
+                  </span>
+                )}
               </span>
             </div>
           </div>
@@ -1089,13 +1095,17 @@ function PortalDashboard() {
                 style={{
                   color:
                     accessIdQueue.filter((q) => q.status === "Pending Governance Review").length > 0
-                      ? "#7C3AED"
-                      : "#64748B",
+                      ? "#8250DF"
+                      : "var(--muted)",
                 }}
               >
-                {accessIdQueue.filter((q) => q.status === "Pending Governance Review").length > 0
-                  ? `${accessIdQueue.filter((q) => q.status === "Pending Governance Review").length} Queued`
-                  : "✓ 100% Policy Bound"}
+                {accessIdQueue.filter((q) => q.status === "Pending Governance Review").length > 0 ? (
+                  `${accessIdQueue.filter((q) => q.status === "Pending Governance Review").length} Queued`
+                ) : (
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: "3px" }}>
+                    <Check size={11} strokeWidth={2.5} /> 100% Policy Bound
+                  </span>
+                )}
               </span>
             </div>
           </div>
@@ -1169,8 +1179,10 @@ function PortalDashboard() {
             <button
               className={`filter-pill ${directoryFilter === "AUTOMATED" ? "active" : ""}`}
               onClick={() => setDirectoryFilter("AUTOMATED")}
+              style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}
             >
-              ⚡ Automated ({catalog.filter((c) => c.automation).length})
+              <Zap size={11} strokeWidth={2.2} />
+              <span>Automated ({catalog.filter((c) => c.automation).length})</span>
             </button>
             <button
               className={`filter-pill ${directoryFilter === "BOARDS" ? "active" : ""}`}
@@ -1228,13 +1240,13 @@ function PortalDashboard() {
                         <span className="catalog-tool-chip">
                           {item.tool}
                         </span>
-                        <span className="catalog-category-tag">
+                        <span className={`catalog-category-tag ${item.category === "APPLICATION" ? "application" : "board"}`}>
                           {item.category === "APPLICATION" ? "Application" : "Board"}
                         </span>
                         {item.automation ? (
                           <span className="catalog-scim-pill automated">
                             <Zap size={11} strokeWidth={2.5} />
-                            <span>⚡ Automated SCIM</span>
+                            <span>Automated SCIM</span>
                           </span>
                         ) : (
                           <span className="catalog-scim-pill manual">
@@ -1602,14 +1614,14 @@ function PortalDashboard() {
                           title="1-Click Approve"
                           onClick={() => handleApprove(req.id)}
                         >
-                          ✓ Approve
+                          <Check size={12} strokeWidth={2.5} /> Approve
                         </button>
                         <button
                           className="quick-action-btn quick-action-reject"
                           title="Reject"
                           onClick={() => setApprovalRequest(req)}
                         >
-                          ✕ Reject
+                          <X size={12} strokeWidth={2.5} /> Reject
                         </button>
                       </div>
                     </div>
@@ -1677,25 +1689,29 @@ function PortalDashboard() {
 
                   {/* 2-Column Key Metadata Grid */}
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px", marginTop: "10px" }}>
-                    <div style={{ background: "#F8FAFC", padding: "6px 8px", borderRadius: "6px", border: "1px solid var(--border)" }}>
-                      <div style={{ fontSize: "10px", color: "#64748B", fontWeight: 600, textTransform: "uppercase" }}>
+                    <div style={{ background: "var(--surface-subtle)", padding: "6px 8px", borderRadius: "6px", border: "1px solid var(--border)" }}>
+                      <div style={{ fontSize: "10px", color: "var(--muted)", fontWeight: 600, textTransform: "uppercase" }}>
                         Eligibility
                       </div>
                       <div style={{ fontSize: "11.5px", fontWeight: 600, marginTop: "2px" }}>
                         {item.isEligible ? (
-                          <span style={{ color: "#166534" }}>✓ Eligible</span>
+                          <span style={{ color: "#1A7F37", display: "inline-flex", alignItems: "center", gap: "3px" }}>
+                            <Check size={11} strokeWidth={2.5} /> Eligible
+                          </span>
                         ) : (
-                          <span style={{ color: "#92400E" }}>Exception Req.</span>
+                          <span style={{ color: "#9A6700", display: "inline-flex", alignItems: "center", gap: "3px" }}>
+                            <AlertTriangle size={11} strokeWidth={2.2} /> Exception Req.
+                          </span>
                         )}
                       </div>
                     </div>
 
-                    <div style={{ background: "#F8FAFC", padding: "6px 8px", borderRadius: "6px", border: "1px solid var(--border)" }}>
-                      <div style={{ fontSize: "10px", color: "#64748B", fontWeight: 600, textTransform: "uppercase", display: "flex", alignItems: "center", gap: "3px" }}>
+                    <div style={{ background: "var(--surface-subtle)", padding: "6px 8px", borderRadius: "6px", border: "1px solid var(--border)" }}>
+                      <div style={{ fontSize: "10px", color: "var(--muted)", fontWeight: 600, textTransform: "uppercase", display: "flex", alignItems: "center", gap: "3px" }}>
                         <Key size={10} /> Access ID
                       </div>
-                      <div style={{ fontSize: "11.5px", fontWeight: 600, color: "#0F172A", marginTop: "2px" }} className="mono">
-                        {item.accessId || <span style={{ color: "#94A3B8" }}>—</span>}
+                      <div style={{ fontSize: "11.5px", fontWeight: 600, color: "var(--text)", marginTop: "2px" }} className="mono">
+                        {item.accessId || <span style={{ color: "var(--muted-2)" }}>—</span>}
                       </div>
                     </div>
                   </div>
@@ -1734,7 +1750,7 @@ function PortalDashboard() {
                     </div>
                   </div>
                   {manualProvisionQueue.length > 0 && (
-                    <span className="badge badge-orange">
+                    <span className="badge badge-amber">
                       {manualProvisionQueue.length} pending
                     </span>
                   )}
