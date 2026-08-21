@@ -28,6 +28,7 @@ import {
   Check,
   X,
   Layers,
+  AlertTriangle,
 } from "lucide-react";
 
 import StatusBadge from "@/components/StatusBadge";
@@ -244,13 +245,9 @@ function PortalDashboard() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [syncUrlParam]);
 
-  // ── SEARCH HANDLER ────────────────────────────────────────────────────────
+  // ── SEARCH & DIRECTORY HANDLER ───────────────────────────────────────────
   useEffect(() => {
     const q = searchQuery.toLowerCase().trim();
-    if (!q && directoryFilter === "ALL") {
-      setSearchResults([]);
-      return;
-    }
     const results = catalog.filter((item) => {
       const matchesText =
         !q ||
@@ -613,6 +610,31 @@ function PortalDashboard() {
                 <Zap size={11} /> {pendingApprovals.length} Pending
               </span>
             )}
+
+            {/* Primary Request Access Button in Header */}
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={() => {
+                if (catalog.length > 0) {
+                  setRequestFormItem(catalog[0]);
+                }
+              }}
+              style={{
+                fontSize: "12px",
+                height: "32px",
+                padding: "0 12px",
+                fontWeight: 600,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "5px",
+                background: "#0F1B33",
+                boxShadow: "0 2px 6px rgba(15, 27, 51, 0.15)",
+              }}
+              title="Submit a new access or board permission request"
+            >
+              <Plus size={13} /> + Request Access
+            </button>
 
             {/* Quick Action Utility Buttons */}
             <button
@@ -1165,17 +1187,62 @@ function PortalDashboard() {
                         </span>
                       </div>
                     </div>
-                    <button
-                      className="btn btn-secondary"
-                      style={{ fontSize: "12px", height: "32px", padding: "0 12px", flexShrink: 0 }}
-                      aria-label={`View details for ${item.name}`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setAccessDetailsItem(item);
-                      }}
-                    >
-                      View <ChevronRight size={14} />
-                    </button>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 }}>
+                      <button
+                        className="btn btn-secondary"
+                        style={{ fontSize: "12px", height: "34px", padding: "0 10px" }}
+                        aria-label={`View details for ${item.name}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setAccessDetailsItem(item);
+                        }}
+                      >
+                        Info
+                      </button>
+                      {item.isEligible ? (
+                        <button
+                          className="btn btn-primary"
+                          style={{
+                            fontSize: "12px",
+                            height: "34px",
+                            padding: "0 14px",
+                            fontWeight: 600,
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "5px",
+                          }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setRequestFormItem(item);
+                          }}
+                        >
+                          <Plus size={13} /> Request Access
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          className="btn btn-secondary"
+                          style={{
+                            fontSize: "12px",
+                            height: "34px",
+                            padding: "0 12px",
+                            fontWeight: 600,
+                            background: "#FEF3C7",
+                            color: "#92400E",
+                            border: "1px solid #FDE68A",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "5px",
+                          }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setExceptionFormItem(item);
+                          }}
+                        >
+                          <AlertTriangle size={13} /> Request Exception
+                        </button>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
