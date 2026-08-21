@@ -147,6 +147,7 @@ export default function CommandPalette({
             }}
             onKeyDown={handleKeyDown}
             placeholder="Search tools, boards, requests, or press Esc to exit..."
+            aria-label="Spotlight search query"
             style={{
               flex: 1,
               border: "none",

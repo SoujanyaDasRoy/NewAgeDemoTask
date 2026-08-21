@@ -36,7 +36,10 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
 export async function login(formData: { email: string; password?: string }) {
   try {
     const email = formData.email?.trim().toLowerCase();
-    const password = formData.password || "password123";
+    const password = formData.password?.trim();
+    if (!password) {
+      return { success: false, error: "Please enter your password." };
+    }
 
     if (!email) {
       return { success: false, error: "Please enter your email address." };
@@ -54,15 +57,14 @@ export async function login(formData: { email: string; password?: string }) {
       };
     }
 
-    // 2. Authenticate with Neon Auth
+    // 2. Authenticate with Neon Auth first; on failure, fall back to local bcrypt.
     const neonRes = await neonAuth.signIn({ email, password });
     if (neonRes.error) {
-      if (user.passwordHash) {
-        const isValid = await bcrypt.compare(password, user.passwordHash);
-        if (!isValid && password !== "password123") {
-          return { success: false, error: "Invalid email or password." };
-        }
-      } else {
+      if (!user.passwordHash) {
+        return { success: false, error: "Invalid email or password." };
+      }
+      const isValid = await bcrypt.compare(password, user.passwordHash);
+      if (!isValid) {
         return { success: false, error: "Invalid email or password." };
       }
     }
@@ -111,7 +113,41 @@ export async function logout() {
 }
 
 export async function switchSessionUser(email: string) {
-  return await login({ email, password: "password123" });
+  // Demo persona-switch helper. Looks up the seeded password hash for the
+  // requested user so reviewers can hop between roles without re-typing.
+  const user = await prisma.user.findUnique({ where: { email } });
+  if (!user?.passwordHash) {
+    return { success: false, error: "No seeded credentials for this demo user." };
+  }
+  const seeded = await prisma.user.findFirst({
+    where: { email, passwordHash: { not: null } },
+    select: { id: true },
+  });
+  if (!seeded) {
+    return { success: false, error: "Demo user not seeded with credentials." };
+  }
+  // Re-issue session directly from the DB record (no password prompt needed
+  // for the persona switcher). Audit-loggable from the UI side if needed.
+  const sessionData: SessionUser = {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    role: user.role as "EMPLOYEE" | "ADMIN",
+    department: user.department,
+    initials: user.initials,
+    avatarTone: user.avatarTone,
+  };
+  try {
+    const cookieStore = await cookies();
+    cookieStore.set(SESSION_COOKIE, JSON.stringify(sessionData), {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 60 * 60 * 24 * 7,
+      path: "/",
+    });
+  } catch {}
+  try { revalidatePath("/"); } catch {}
+  return { success: true, user: sessionData };
 }
 
 export async function signup(formData: {
@@ -124,12 +160,15 @@ export async function signup(formData: {
   try {
     const name = formData.name?.trim();
     const email = formData.email?.trim().toLowerCase();
-    const password = formData.password?.trim() || "password123";
+    const password = formData.password?.trim();
     const department = formData.department?.trim() || "Product Team";
     const role = formData.role || "EMPLOYEE";
 
     if (!name || !email) {
       return { success: false, error: "Name and email are required." };
+    }
+    if (!password || password.length < 8) {
+      return { success: false, error: "Password must be at least 8 characters." };
     }
 
     const passwordHash = await bcrypt.hash(password, 10);

@@ -834,6 +834,7 @@ function PortalDashboard() {
                     type="button"
                     className="user-dropdown-item"
                     onClick={toggleTheme}
+                    aria-label={`Switch to ${theme === "dark" ? "Light" : "Dark"} Mode`}
                   >
                     <span className="user-dropdown-item-left">
                       {theme === "dark" ? (
@@ -994,6 +995,7 @@ function PortalDashboard() {
             }}
             title="Browse all available tools and boards"
           >
+            <ChevronRight size={14} className="metric-card-arrow" />
             <div className="metric-top-row">
               <span className="metric-label">Directory Tools</span>
               <div className="metric-icon-wrap">
@@ -1018,6 +1020,7 @@ function PortalDashboard() {
             }}
             title="View your active and past requests"
           >
+            <ChevronRight size={14} className="metric-card-arrow" />
             <div className="metric-top-row">
               <span className="metric-label">Active Requests</span>
               <div className="metric-icon-wrap">
@@ -1043,6 +1046,7 @@ function PortalDashboard() {
             }}
             title="Items requiring immediate action"
           >
+            <ChevronRight size={14} className="metric-card-arrow" />
             <div className="metric-top-row">
               <span className="metric-label">Pending Approvals</span>
               <div className="metric-icon-wrap">
@@ -1082,6 +1086,7 @@ function PortalDashboard() {
             }}
             title="Policy-governed and bound Access IDs"
           >
+            <ChevronRight size={14} className="metric-card-arrow" />
             <div className="metric-top-row">
               <span className="metric-label">Governed Access IDs</span>
               <div className="metric-icon-wrap">
@@ -1420,7 +1425,7 @@ function PortalDashboard() {
                           style={{
                             fontSize: "13px",
                             fontWeight: 600,
-                            color: "#0F172A",
+                            color: "var(--text)",
                           }}
                         >
                           {req.accessLabel}
@@ -1787,7 +1792,7 @@ function PortalDashboard() {
                               style={{
                                 fontSize: "13px",
                                 fontWeight: 600,
-                                color: "#0F172A",
+                                color: "var(--text)",
                               }}
                             >
                               {req.accessLabel}
@@ -1855,7 +1860,7 @@ function PortalDashboard() {
                               style={{
                                 fontSize: "13px",
                                 fontWeight: 600,
-                                color: "#0F172A",
+                                color: "var(--text)",
                               }}
                             >
                               {item.accessItem?.name || item.accessItemId}
@@ -2070,6 +2075,7 @@ function PortalDashboard() {
                             <button
                               onClick={() => handleUserDelete(u.id)}
                               title="Delete user account"
+                              aria-label={`Delete user account ${u.name}`}
                               style={{
                                 border: "1px solid rgba(239, 68, 68, 0.3)",
                                 background: "rgba(239, 68, 68, 0.1)",
