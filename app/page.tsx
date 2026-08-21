@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, Suspense } from "react";
+import React, { useState, useEffect, useCallback, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   Bell,
@@ -115,6 +115,10 @@ function PortalDashboard() {
   const [directoryFilter, setDirectoryFilter] = useState<"ALL" | "AUTOMATED" | "BOARDS" | "APPLICATIONS">("ALL");
   const [userSearchQuery, setUserSearchQuery] = useState("");
   const [userDeptFilter, setUserDeptFilter] = useState("ALL");
+
+  // DOM Refs for Popovers & Dropdowns
+  const userMenuRef = useRef<HTMLDivElement>(null);
+  const notifRef = useRef<HTMLDivElement>(null);
 
   // Multi-Select Batch Approvals State
   const [selectedApprovalIds, setSelectedApprovalIds] = useState<string[]>([]);
@@ -243,6 +247,20 @@ function PortalDashboard() {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [syncUrlParam]);
+
+  // ── CLICK OUTSIDE LISTENER FOR DROPDOWNS ─────────────────────────────────
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+        setUserMenuOpen(false);
+      }
+      if (notifRef.current && !notifRef.current.contains(e.target as Node)) {
+        setNotifOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // ── SEARCH & DIRECTORY HANDLER ───────────────────────────────────────────
   useEffect(() => {
@@ -586,120 +604,50 @@ function PortalDashboard() {
             </div>
           </div>
 
-          {/* Right side */}
+          {/* Right side - Decluttered Precision Minimalist Header */}
           <div className="header-right">
-            {/* Pending Actions Quick Pill (if any) */}
+            {/* Item 1: Pending Actions Quick Pill (if any pending approvals exist) */}
             {pendingApprovals.length > 0 && (
-              <span
-                className="badge badge-amber"
-                style={{
-                  cursor: "pointer",
-                  fontSize: "11px",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "4px",
-                }}
+              <button
+                type="button"
+                className="header-review-badge"
                 onClick={() => {
                   const el = document.getElementById("approvals-section");
                   el?.scrollIntoView({ behavior: "smooth" });
                 }}
-                title="Pending approvals requiring your action"
+                title="Pending approvals requiring your review"
               >
-                <Zap size={11} /> {pendingApprovals.length} Pending
-              </span>
+                <span className="header-review-dot" />
+                <span>{pendingApprovals.length} to review</span>
+              </button>
             )}
 
-            {/* Primary Request Access Button in Header */}
+            {/* Item 2: Single Primary CTA Button */}
             <button
               type="button"
-              className="btn btn-primary"
+              className="header-primary-btn"
               onClick={() => {
                 if (catalog.length > 0) {
                   setRequestFormItem(catalog[0]);
                 }
               }}
-              style={{
-                fontSize: "12px",
-                height: "32px",
-                padding: "0 12px",
-                fontWeight: 600,
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "5px",
-              }}
               title="Submit a new access request"
             >
-              <Plus size={13} /> + Request Access
+              <Plus size={14} strokeWidth={2.4} />
+              <span>Request Access</span>
             </button>
 
-            {/* Quick Action Utility Buttons */}
-            <button
-              type="button"
-              className="btn btn-secondary"
-              onClick={() => setAuditDrawerOpen(true)}
-              style={{
-                fontSize: "12px",
-                height: "32px",
-                padding: "0 10px",
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "5px",
-              }}
-              title="Open Live Audit Trail"
-            >
-              <Shield size={13} /> Audit Trail
-            </button>
-
-            <button
-              type="button"
-              className="btn btn-secondary"
-              onClick={() => setSlackModalOpen(true)}
-              style={{
-                fontSize: "12px",
-                height: "32px",
-                padding: "0 10px",
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "5px",
-              }}
-              title="Slack Webhook & Block Kit Simulator"
-            >
-              <MessageSquare size={13} style={{ color: "#E01E5A" }} /> Slack Preview
-            </button>
-
-            {isRoleAdmin && (
+            {/* Item 3: Notification Bell with Subtle Unread Dot */}
+            <div ref={notifRef} style={{ position: "relative" }}>
               <button
                 type="button"
-                className="btn btn-secondary"
-                onClick={handleExportComplianceCSV}
-                style={{
-                  fontSize: "12px",
-                  height: "32px",
-                  padding: "0 10px",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "5px",
-                }}
-                title="1-Click SOC2/ISO-27001 Access Compliance CSV Export"
+                className={`header-icon-btn ${notifOpen ? "active" : ""}`}
+                onClick={handleNotifClick}
+                title="Notifications"
+                aria-label="Notifications"
               >
-                <FileSpreadsheet size={13} style={{ color: "#16A34A" }} /> Export CSV
-              </button>
-            )}
-
-            {/* Role Badge */}
-            <span
-              className={isRoleAdmin ? "badge badge-blue" : "badge badge-gray"}
-              style={{ fontSize: "11.5px", display: "inline-flex", alignItems: "center", gap: "5px" }}
-            >
-              <span className="live-pulse-dot" />
-              {isRoleAdmin ? "Board Admin" : "Employee"}
-            </span>
-
-            {/* Notifications */}
-            <div style={{ position: "relative" }}>
-              <button className="icon-btn" onClick={handleNotifClick} title="Notifications">
-                <Bell size={16} />
-                {unreadCount > 0 && <span className="notif-dot">{unreadCount}</span>}
+                <Bell size={15} strokeWidth={1.8} />
+                {unreadCount > 0 && <span className="header-notif-dot" />}
               </button>
 
               {/* Notification Panel */}
@@ -792,46 +740,37 @@ function PortalDashboard() {
               </div>
             </div>
 
-            {/* Interactive User Profile Dropdown Menu */}
-            <div style={{ position: "relative" }}>
+            {/* Item 4: Refined User Profile Pill & Rich Tools Dropdown */}
+            <div ref={userMenuRef} style={{ position: "relative" }}>
               <button
                 type="button"
-                className="user-profile-btn"
+                className={`user-profile-pill ${userMenuOpen ? "active" : ""}`}
                 onClick={() => setUserMenuOpen((prev) => !prev)}
-                title="Account Settings"
+                title="Account Settings & Quick Tools"
+                aria-expanded={userMenuOpen}
               >
                 <div
-                  className="avatar"
+                  className="avatar-sm"
                   style={{
-                    width: "28px",
-                    height: "28px",
-                    fontSize: "11px",
                     background: currentUser.avatarTone || "#0F172A",
                   }}
                 >
                   {currentUser.initials}
                 </div>
-                <div style={{ display: "flex", flexDirection: "column" }}>
-                  <div className="name" style={{ fontSize: "12px", fontWeight: 600, color: "#0F172A" }}>
-                    {currentUser.name}
-                  </div>
-                  <div className="role" style={{ fontSize: "10.5px", color: "#64748B" }}>
-                    {currentUser.department}
-                  </div>
+                <div className="user-pill-meta">
+                  <span className="user-pill-name">{currentUser.name}</span>
+                  <span className="user-pill-dept">{currentUser.department}</span>
                 </div>
                 <ChevronDown
                   size={12}
-                  style={{
-                    color: "#94A3B8",
-                    transform: userMenuOpen ? "rotate(180deg)" : "rotate(0deg)",
-                    transition: "transform 0.15s ease",
-                  }}
+                  className={`user-pill-chevron ${userMenuOpen ? "open" : ""}`}
                 />
               </button>
 
               {/* User Menu Popover */}
               {userMenuOpen && (
                 <div className="user-dropdown-popover">
+                  {/* User Profile Summary */}
                   <div className="user-dropdown-header">
                     <div className="user-dropdown-name">{currentUser.name}</div>
                     <div className="user-dropdown-email">{currentUser.email}</div>
@@ -839,28 +778,89 @@ function PortalDashboard() {
                       className="user-dropdown-badge"
                       style={{
                         background: isRoleAdmin ? "#EFF6FF" : "#F1F5F9",
-                        color: isRoleAdmin ? "#1E40AF" : "#475569",
+                        color: isRoleAdmin ? "#1D4ED8" : "#475569",
                       }}
                     >
                       <Shield size={10} /> {isRoleAdmin ? "Board Admin" : "Employee"} · {currentUser.department}
                     </div>
                   </div>
+
                   <div className="user-dropdown-divider" />
+
+                  {/* Quick Tools */}
+                  <div className="user-dropdown-section-title">Quick Tools</div>
+
                   <button
+                    type="button"
                     className="user-dropdown-item"
                     onClick={() => {
                       setUserMenuOpen(false);
                       setCmdPaletteOpen(true);
                     }}
                   >
-                    <Search size={13} /> Quick Search (⌘K)
+                    <span className="user-dropdown-item-left">
+                      <Search size={13} className="user-dropdown-icon" />
+                      <span>Spotlight Search</span>
+                    </span>
+                    <kbd className="user-dropdown-shortcut">⌘K</kbd>
                   </button>
-                  <div className="user-dropdown-divider" />
+
                   <button
+                    type="button"
+                    className="user-dropdown-item"
+                    onClick={() => {
+                      setUserMenuOpen(false);
+                      setAuditDrawerOpen(true);
+                    }}
+                  >
+                    <span className="user-dropdown-item-left">
+                      <Shield size={13} className="user-dropdown-icon" />
+                      <span>Live Audit Trail Stream</span>
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    className="user-dropdown-item"
+                    onClick={() => {
+                      setUserMenuOpen(false);
+                      setSlackModalOpen(true);
+                    }}
+                  >
+                    <span className="user-dropdown-item-left">
+                      <MessageSquare size={13} className="user-dropdown-icon text-slack" />
+                      <span>Slack Integration Preview</span>
+                    </span>
+                  </button>
+
+                  {isRoleAdmin && (
+                    <button
+                      type="button"
+                      className="user-dropdown-item"
+                      onClick={() => {
+                        setUserMenuOpen(false);
+                        handleExportComplianceCSV();
+                      }}
+                    >
+                      <span className="user-dropdown-item-left">
+                        <FileSpreadsheet size={13} className="user-dropdown-icon text-csv" />
+                        <span>Export Compliance CSV</span>
+                      </span>
+                    </button>
+                  )}
+
+                  <div className="user-dropdown-divider" />
+
+                  {/* Sign Out */}
+                  <button
+                    type="button"
                     className="user-dropdown-item danger"
                     onClick={() => logout()}
                   >
-                    <LogOut size={13} /> Sign out
+                    <span className="user-dropdown-item-left">
+                      <LogOut size={13} />
+                      <span>Sign Out</span>
+                    </span>
                   </button>
                 </div>
               )}
