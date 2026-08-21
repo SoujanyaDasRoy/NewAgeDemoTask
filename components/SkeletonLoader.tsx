@@ -7,18 +7,18 @@ export default function SkeletonLoader() {
     <div
       style={{
         minHeight: "100vh",
-        background: "#F8FAFC",
+        background: "var(--bg)",
         display: "flex",
         flexDirection: "column",
-        fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+        fontFamily: "inherit",
       }}
     >
       {/* Header Skeleton */}
       <div
         style={{
           height: "60px",
-          background: "#FFFFFF",
-          borderBottom: "1px solid #E2E8F0",
+          background: "var(--surface)",
+          borderBottom: "1px solid var(--border)",
           padding: "0 24px",
           display: "flex",
           alignItems: "center",
@@ -53,8 +53,8 @@ export default function SkeletonLoader() {
             <div
               key={i}
               style={{
-                background: "#FFFFFF",
-                border: "1px solid #E2E8F0",
+                background: "var(--surface)",
+                border: "1px solid var(--border)",
                 borderRadius: "10px",
                 padding: "16px",
                 height: "90px",
@@ -69,8 +69,8 @@ export default function SkeletonLoader() {
         {/* Search Card Skeleton */}
         <div
           style={{
-            background: "#FFFFFF",
-            border: "1px solid #E2E8F0",
+            background: "var(--surface)",
+            border: "1px solid var(--border)",
             borderRadius: "12px",
             padding: "20px",
             marginBottom: "16px",
@@ -85,8 +85,8 @@ export default function SkeletonLoader() {
         <div style={{ display: "grid", gridTemplateColumns: "1.8fr 1.2fr", gap: "16px", marginBottom: "16px" }}>
           <div
             style={{
-              background: "#FFFFFF",
-              border: "1px solid #E2E8F0",
+              background: "var(--surface)",
+              border: "1px solid var(--border)",
               borderRadius: "12px",
               padding: "20px",
               minHeight: "220px",
@@ -99,8 +99,8 @@ export default function SkeletonLoader() {
 
           <div
             style={{
-              background: "#FFFFFF",
-              border: "1px solid #E2E8F0",
+              background: "var(--surface)",
+              border: "1px solid var(--border)",
               borderRadius: "12px",
               padding: "20px",
               minHeight: "220px",

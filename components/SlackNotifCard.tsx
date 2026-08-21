@@ -109,20 +109,20 @@ export default function SlackNotifCard({
       </div>
 
       {/* Card body */}
-      <div style={{ padding: "14px", background: "#fff" }}>
+      <div style={{ padding: "14px", background: "var(--surface)" }}>
         {/* Left accent bar + content */}
         <div style={{ display: "flex", gap: "10px" }}>
           <div
             style={{
               width: "4px",
               borderRadius: "2px",
-              background: "#2F6FED",
+              background: matchedRequest?.isException ? "#F59E0B" : "var(--accent)",
               flexShrink: 0,
               alignSelf: "stretch",
             }}
           />
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: "13px", fontWeight: 700, color: "#111827", lineHeight: "1.3" }}>
+            <div style={{ fontSize: "13px", fontWeight: 700, color: "var(--text)", lineHeight: "1.3" }}>
               🔔 Access Request — {matchedRequest?.accessLabel}
             </div>
             <div
@@ -134,44 +134,44 @@ export default function SlackNotifCard({
               }}
             >
               <div>
-                <div style={{ fontSize: "10.5px", fontWeight: 700, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                <div style={{ fontSize: "10.5px", fontWeight: 700, color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
                   Request ID
                 </div>
-                <div style={{ fontSize: "12.5px", fontWeight: 600, color: "#374151", fontFamily: "monospace" }}>
+                <div style={{ fontSize: "12.5px", fontWeight: 600, color: "var(--text)", fontFamily: "monospace" }}>
                   {matchedRequest?.id}
                 </div>
               </div>
               <div>
-                <div style={{ fontSize: "10.5px", fontWeight: 700, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                <div style={{ fontSize: "10.5px", fontWeight: 700, color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
                   From
                 </div>
-                <div style={{ fontSize: "12.5px", fontWeight: 600, color: "#374151" }}>
+                <div style={{ fontSize: "12.5px", fontWeight: 600, color: "var(--text)" }}>
                   {matchedRequest?.requester?.name || matchedRequest?.beneficiaryName}
                 </div>
               </div>
               <div>
-                <div style={{ fontSize: "10.5px", fontWeight: 700, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                <div style={{ fontSize: "10.5px", fontWeight: 700, color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
                   Provisioning
                 </div>
-                <div style={{ fontSize: "12.5px", fontWeight: 600, color: "#374151" }}>
+                <div style={{ fontSize: "12.5px", fontWeight: 600, color: "var(--text)" }}>
                   {matchedRequest?.automation ? "Automated" : "Manual"}
                 </div>
               </div>
               <div>
-                <div style={{ fontSize: "10.5px", fontWeight: 700, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                <div style={{ fontSize: "10.5px", fontWeight: 700, color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
                   Type
                 </div>
-                <div style={{ fontSize: "12.5px", fontWeight: 600, color: matchedRequest?.isException ? "#B45309" : "#374151" }}>
+                <div style={{ fontSize: "12.5px", fontWeight: 600, color: matchedRequest?.isException ? "#F59E0B" : "var(--text)" }}>
                   {matchedRequest?.isException ? "Exception" : "Standard"}
                 </div>
               </div>
             </div>
 
             <div style={{ marginTop: "10px" }}>
-              <div style={{ fontSize: "10.5px", fontWeight: 700, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+              <div style={{ fontSize: "10.5px", fontWeight: 700, color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
                 Justification
               </div>
-              <div style={{ fontSize: "12.5px", color: "#4B5563", marginTop: "3px", lineHeight: "1.45" }}>
+              <div style={{ fontSize: "12.5px", color: "var(--text-secondary)", marginTop: "3px", lineHeight: "1.45" }}>
                 {justificationPreview}
               </div>
             </div>
@@ -179,7 +179,7 @@ export default function SlackNotifCard({
         </div>
 
         {/* Divider */}
-        <div style={{ borderTop: "1px solid #F1F5F9", margin: "14px 0 12px" }} />
+        <div style={{ borderTop: "1px solid var(--border)", margin: "14px 0 12px" }} />
 
         {/* Action area */}
         {decided === "approved" ? (
@@ -189,11 +189,11 @@ export default function SlackNotifCard({
               alignItems: "center",
               gap: "8px",
               padding: "10px 14px",
-              background: "#F0FDF4",
+              background: "rgba(34, 197, 94, 0.15)",
               borderRadius: "8px",
               fontSize: "13px",
               fontWeight: 700,
-              color: "#15803D",
+              color: "#4ADE80",
             }}
           >
             <Check size={16} /> Approved via Slack
@@ -205,11 +205,11 @@ export default function SlackNotifCard({
               alignItems: "center",
               gap: "8px",
               padding: "10px 14px",
-              background: "#FEF2F2",
+              background: "rgba(239, 68, 68, 0.15)",
               borderRadius: "8px",
               fontSize: "13px",
               fontWeight: 700,
-              color: "#B91C1C",
+              color: "#F87171",
             }}
           >
             <X size={16} /> Rejected via Slack
@@ -227,7 +227,7 @@ export default function SlackNotifCard({
                 padding: "8px 16px",
                 borderRadius: "7px",
                 border: "none",
-                background: "#2F6FED",
+                background: "var(--accent)",
                 color: "#fff",
                 fontSize: "12.5px",
                 fontWeight: 700,
@@ -249,16 +249,16 @@ export default function SlackNotifCard({
                   gap: "6px",
                   padding: "8px 14px",
                   borderRadius: "7px",
-                  border: "1px solid #E5E7EB",
-                  background: "#fff",
-                  color: "#374151",
+                  border: "1px solid var(--border)",
+                  background: "var(--surface-subtle)",
+                  color: "var(--text)",
                   fontSize: "12.5px",
                   fontWeight: 700,
                   cursor: loading ? "not-allowed" : "pointer",
                 }}
               >
                 <X size={14} style={{ color: "#EF4444" }} /> Reject
-                <ChevronDown size={13} style={{ color: "#9CA3AF" }} />
+                <ChevronDown size={13} style={{ color: "var(--muted)" }} />
               </button>
 
               {rejectOpen && (
@@ -267,10 +267,10 @@ export default function SlackNotifCard({
                     position: "absolute",
                     left: 0,
                     top: "38px",
-                    background: "#fff",
+                    background: "var(--surface-popover)",
                     border: "1px solid var(--border)",
                     borderRadius: "9px",
-                    boxShadow: "0 8px 20px rgba(15,23,42,0.12)",
+                    boxShadow: "var(--shadow-popover)",
                     zIndex: 10,
                     minWidth: "220px",
                     overflow: "hidden",
@@ -281,10 +281,10 @@ export default function SlackNotifCard({
                       padding: "8px 12px",
                       fontSize: "11px",
                       fontWeight: 700,
-                      color: "#9CA3AF",
+                      color: "var(--muted)",
                       textTransform: "uppercase",
                       letterSpacing: "0.05em",
-                      borderBottom: "1px solid #F1F5F9",
+                      borderBottom: "1px solid var(--border)",
                     }}
                   >
                     Select Reason
@@ -301,11 +301,11 @@ export default function SlackNotifCard({
                         border: "none",
                         textAlign: "left",
                         fontSize: "12.5px",
-                        color: "#374151",
+                        color: "var(--text)",
                         cursor: "pointer",
-                        borderBottom: "1px solid #F8FAFC",
+                        borderBottom: "1px solid var(--border)",
                       }}
-                      onMouseEnter={(e) => (e.currentTarget.style.background = "#FEF2F2")}
+                      onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(239, 68, 68, 0.12)")}
                       onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                     >
                       {reason}

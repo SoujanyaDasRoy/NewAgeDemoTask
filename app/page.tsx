@@ -28,6 +28,8 @@ import {
   X,
   Layers,
   AlertTriangle,
+  Sun,
+  Moon,
 } from "lucide-react";
 
 import StatusBadge from "@/components/StatusBadge";
@@ -137,6 +139,29 @@ function PortalDashboard() {
   const [adminProvisionRequest, setAdminProvisionRequest] = useState<any>(null);
   const [boardConfigItem, setBoardConfigItem] = useState<any>(null);
   const [accessIdItem, setAccessIdItem] = useState<any>(null);
+
+  // ── THEME MANAGEMENT ─────────────────────────────────────────────────────
+  const [theme, setTheme] = useState<"light" | "dark">("dark");
+
+  useEffect(() => {
+    const current = document.documentElement.getAttribute("data-theme") as "light" | "dark";
+    if (current) {
+      setTheme(current);
+    } else {
+      const saved = localStorage.getItem("newage_theme") as "light" | "dark" | null;
+      const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+      const initial = saved || (prefersDark ? "dark" : "light");
+      setTheme(initial);
+      document.documentElement.setAttribute("data-theme", initial);
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const nextTheme = theme === "dark" ? "light" : "dark";
+    setTheme(nextTheme);
+    localStorage.setItem("newage_theme", nextTheme);
+    document.documentElement.setAttribute("data-theme", nextTheme);
+  };
 
   // ── URL DEEP LINK SYNC ───────────────────────────────────────────────────
   const syncUrlParam = useCallback((key: string | null, value: string | null) => {
@@ -637,7 +662,24 @@ function PortalDashboard() {
               <span>Request Access</span>
             </button>
 
-            {/* Item 3: Notification Bell with Subtle Unread Dot */}
+            {/* Item 3: Theme Toggle Switch */}
+            <button
+              type="button"
+              className="header-icon-btn"
+              onClick={toggleTheme}
+              title={`Switch to ${theme === "dark" ? "Light" : "Dark"} Mode`}
+              aria-label="Toggle Theme"
+            >
+              <div className="theme-toggle-icon-wrap">
+                {theme === "dark" ? (
+                  <Sun size={15} strokeWidth={2} style={{ color: "#FBBF24" }} />
+                ) : (
+                  <Moon size={15} strokeWidth={1.8} style={{ color: "#475569" }} />
+                )}
+              </div>
+            </button>
+
+            {/* Item 4: Notification Bell with Subtle Unread Dot */}
             <div ref={notifRef} style={{ position: "relative" }}>
               <button
                 type="button"
@@ -655,7 +697,7 @@ function PortalDashboard() {
                 <div className="notif-panel-head">
                   <span>Notifications</span>
                   <span
-                    style={{ fontSize: "11px", color: "#64748B", cursor: "pointer", fontWeight: 500 }}
+                    style={{ fontSize: "11px", color: "var(--muted)", cursor: "pointer", fontWeight: 500 }}
                     onClick={async () => {
                       await markNotificationsRead(isRoleAdmin ? "admin" : "employee");
                       await loadData();
@@ -670,7 +712,7 @@ function PortalDashboard() {
                       style={{
                         padding: "24px",
                         textAlign: "center",
-                        color: "#94A3B8",
+                        color: "var(--muted)",
                         fontSize: "12.5px",
                       }}
                     >
@@ -740,7 +782,7 @@ function PortalDashboard() {
               </div>
             </div>
 
-            {/* Item 4: Refined User Profile Pill & Rich Tools Dropdown */}
+            {/* Item 5: Refined User Profile Pill & Rich Tools Dropdown */}
             <div ref={userMenuRef} style={{ position: "relative" }}>
               <button
                 type="button"
@@ -777,13 +819,45 @@ function PortalDashboard() {
                     <div
                       className="user-dropdown-badge"
                       style={{
-                        background: isRoleAdmin ? "#EFF6FF" : "#F1F5F9",
-                        color: isRoleAdmin ? "#1D4ED8" : "#475569",
+                        background: isRoleAdmin ? "var(--accent-light)" : "var(--surface-subtle)",
+                        color: isRoleAdmin ? "var(--accent)" : "var(--text-secondary)",
                       }}
                     >
                       <Shield size={10} /> {isRoleAdmin ? "Board Admin" : "Employee"} · {currentUser.department}
                     </div>
                   </div>
+
+                  <div className="user-dropdown-divider" />
+
+                  {/* Appearance Switch */}
+                  <button
+                    type="button"
+                    className="user-dropdown-item"
+                    onClick={toggleTheme}
+                  >
+                    <span className="user-dropdown-item-left">
+                      {theme === "dark" ? (
+                        <Sun size={13} className="user-dropdown-icon" style={{ color: "#FBBF24" }} />
+                      ) : (
+                        <Moon size={13} className="user-dropdown-icon" />
+                      )}
+                      <span>{theme === "dark" ? "Light Mode" : "Dark Mode"}</span>
+                    </span>
+                    <span
+                      style={{
+                        fontSize: "10.5px",
+                        fontFamily: "inherit",
+                        padding: "1px 6px",
+                        borderRadius: "4px",
+                        background: "var(--surface-subtle)",
+                        border: "1px solid var(--border)",
+                        color: "var(--muted)",
+                        fontWeight: 600,
+                      }}
+                    >
+                      {theme === "dark" ? "☀️ Light" : "🌙 Dark"}
+                    </span>
+                  </button>
 
                   <div className="user-dropdown-divider" />
 
@@ -1439,8 +1513,8 @@ function PortalDashboard() {
                       key={req.id}
                       className="list-row"
                       style={{
-                        background: isSelected ? "#F0FDF4" : "#FFFFFF",
-                        borderColor: isSelected ? "#BBF7D0" : "var(--border)",
+                        background: isSelected ? "var(--accent-light)" : "var(--surface)",
+                        borderColor: isSelected ? "var(--accent)" : "var(--border)",
                       }}
                       onClick={() => setApprovalRequest(req)}
                     >
@@ -1451,8 +1525,8 @@ function PortalDashboard() {
                           width: "18px",
                           height: "18px",
                           borderRadius: "4px",
-                          border: isSelected ? "1.5px solid #16A34A" : "1.5px solid #CBD5E1",
-                          background: isSelected ? "#16A34A" : "#FFFFFF",
+                          border: isSelected ? "1.5px solid #16A34A" : "1.5px solid var(--border)",
+                          background: isSelected ? "#16A34A" : "var(--surface)",
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
@@ -1494,7 +1568,7 @@ function PortalDashboard() {
                             style={{
                               fontSize: "13px",
                               fontWeight: 600,
-                              color: "#0F172A",
+                              color: "var(--text)",
                             }}
                           >
                             {req.accessLabel}
@@ -1506,7 +1580,7 @@ function PortalDashboard() {
                             </span>
                           )}
                         </div>
-                        <div style={{ fontSize: "11.5px", color: "#64748B", marginTop: "3px" }}>
+                        <div style={{ fontSize: "11.5px", color: "var(--muted)", marginTop: "3px" }}>
                           <span className="mono">{req.id}</span> ·{" "}
                           {req.requester?.name || req.beneficiaryName} ·{" "}
                           {new Date(req.createdAt).toLocaleDateString("en-GB", {
@@ -1826,7 +1900,7 @@ function PortalDashboard() {
               {/* Toolbar */}
               <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "center", marginBottom: "12px" }}>
                 <div style={{ flex: 1, minWidth: "200px", position: "relative", display: "flex", alignItems: "center" }}>
-                  <Search size={14} style={{ position: "absolute", left: "10px", color: "#94A3B8" }} />
+                  <Search size={14} style={{ position: "absolute", left: "10px", color: "var(--muted)" }} />
                   <input
                     type="text"
                     placeholder="Search users by name or email..."
@@ -1840,7 +1914,8 @@ function PortalDashboard() {
                       border: "1px solid var(--border)",
                       fontSize: "12px",
                       outline: "none",
-                      background: "#FFFFFF",
+                      background: "var(--surface-input)",
+                      color: "var(--text)",
                     }}
                   />
                 </div>
@@ -1864,7 +1939,7 @@ function PortalDashboard() {
                   overflowX: "auto",
                   border: "1px solid var(--border)",
                   borderRadius: "8px",
-                  background: "#FFFFFF",
+                  background: "var(--surface)",
                 }}
               >
                 <table
@@ -1876,7 +1951,7 @@ function PortalDashboard() {
                   }}
                 >
                   <thead>
-                    <tr style={{ background: "#F8FAFC", borderBottom: "1px solid var(--border)", color: "#64748B" }}>
+                    <tr style={{ background: "var(--surface-subtle)", borderBottom: "1px solid var(--border)", color: "var(--muted)" }}>
                       <th style={{ padding: "10px 14px", fontWeight: 600, fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.04em" }}>User</th>
                       <th style={{ padding: "10px 14px", fontWeight: 600, fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.04em" }}>Email</th>
                       <th style={{ padding: "10px 14px", fontWeight: 600, fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.04em" }}>Department</th>
@@ -1896,7 +1971,7 @@ function PortalDashboard() {
                       <tr
                         key={u.id}
                         style={{
-                          borderBottom: "1px solid #F1F5F9",
+                          borderBottom: "1px solid var(--border-subtle)",
                         }}
                       >
                         <td style={{ padding: "10px 14px", display: "flex", alignItems: "center", gap: "8px" }}>
@@ -1912,7 +1987,7 @@ function PortalDashboard() {
                             {u.initials || "U"}
                           </div>
                           <div>
-                            <div style={{ fontWeight: 600, color: "#0F172A" }}>{u.name}</div>
+                            <div style={{ fontWeight: 600, color: "var(--text)" }}>{u.name}</div>
                             {u.id === currentUser.id && (
                               <span className="badge badge-blue" style={{ fontSize: "9.5px", padding: "1px 5px", marginTop: "1px" }}>
                                 Current User
@@ -1920,7 +1995,7 @@ function PortalDashboard() {
                             )}
                           </div>
                         </td>
-                        <td style={{ padding: "10px 14px", color: "#64748B" }}>{u.email}</td>
+                        <td style={{ padding: "10px 14px", color: "var(--muted)" }}>{u.email}</td>
                         <td style={{ padding: "10px 14px" }}>
                           <select
                             value={u.department}
@@ -1930,8 +2005,8 @@ function PortalDashboard() {
                               borderRadius: "5px",
                               border: "1px solid var(--border)",
                               fontSize: "11.5px",
-                              background: "#F8FAFC",
-                              color: "#0F172A",
+                              background: "var(--surface-input)",
+                              color: "var(--text)",
                               outline: "none",
                               cursor: "pointer",
                             }}
@@ -1956,11 +2031,11 @@ function PortalDashboard() {
                             style={{
                               padding: "4px 8px",
                               borderRadius: "5px",
-                              border: `1px solid ${u.role === "ADMIN" ? "#BFDBFE" : "var(--border)"}`,
+                              border: "1px solid var(--border)",
                               fontSize: "11.5px",
                               fontWeight: 600,
-                              background: u.role === "ADMIN" ? "#EFF6FF" : "#F8FAFC",
-                              color: u.role === "ADMIN" ? "#1E40AF" : "#334155",
+                              background: u.role === "ADMIN" ? "var(--accent-light)" : "var(--surface-input)",
+                              color: u.role === "ADMIN" ? "var(--accent)" : "var(--text)",
                               outline: "none",
                               cursor: "pointer",
                             }}
@@ -1975,9 +2050,9 @@ function PortalDashboard() {
                               onClick={() => handleUserDelete(u.id)}
                               title="Delete user account"
                               style={{
-                                border: "1px solid #FECACA",
-                                background: "#FEF2F2",
-                                color: "#DC2626",
+                                border: "1px solid rgba(239, 68, 68, 0.3)",
+                                background: "rgba(239, 68, 68, 0.1)",
+                                color: "#EF4444",
                                 cursor: "pointer",
                                 padding: "4px 6px",
                                 borderRadius: "5px",

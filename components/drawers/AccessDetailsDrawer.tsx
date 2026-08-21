@@ -71,14 +71,14 @@ export default function AccessDetailsDrawer({
             <ServiceLogo tool={accessItem.tool} size={24} />
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
-                <h3 style={{ margin: 0, fontSize: "15px", fontWeight: 700, color: "#0F172A" }}>
+                <h3 style={{ margin: 0, fontSize: "15px", fontWeight: 700, color: "var(--text)" }}>
                   {accessItem.name}
                 </h3>
                 <span className="badge badge-gray" style={{ fontSize: "10.5px" }}>
                   {accessItem.category}
                 </span>
               </div>
-              <div style={{ fontSize: "12px", color: "#64748B", marginTop: "1px" }}>
+              <div style={{ fontSize: "12px", color: "var(--muted)", marginTop: "1px" }}>
                 {accessItem.tool} · Owned by {accessItem.group}
               </div>
             </div>
@@ -95,9 +95,9 @@ export default function AccessDetailsDrawer({
             style={{
               padding: "12px 14px",
               borderRadius: "8px",
-              background: isEligible ? "#F0FDF4" : "#FFFBEB",
-              border: `1px solid ${isEligible ? "#DCFCE7" : "#FDE68A"}`,
-              color: isEligible ? "#166534" : "#92400E",
+              background: isEligible ? "rgba(34, 197, 94, 0.12)" : "rgba(245, 158, 11, 0.12)",
+              border: `1px solid ${isEligible ? "rgba(34, 197, 94, 0.3)" : "rgba(245, 158, 11, 0.3)"}`,
+              color: isEligible ? "#4ADE80" : "#FBBF24",
               fontSize: "12px",
               lineHeight: 1.45,
               display: "flex",
@@ -107,19 +107,21 @@ export default function AccessDetailsDrawer({
             }}
           >
             {isEligible ? (
-              <Zap size={15} style={{ color: "#16A34A", flexShrink: 0, marginTop: "1px" }} />
+              <Zap size={15} style={{ color: "#4ADE80", flexShrink: 0, marginTop: "1px" }} />
             ) : (
-              <AlertTriangle size={15} style={{ color: "#D97706", flexShrink: 0, marginTop: "1px" }} />
+              <AlertTriangle size={15} style={{ color: "#FBBF24", flexShrink: 0, marginTop: "1px" }} />
             )}
             <div>
-              <strong>{isEligible ? "Standard Policy Match:" : "Cross-Department Exception:"}</strong>{" "}
-              {isEligible
-                ? `You belong to an authorized department. Requests route directly to ${accessItem.approver}.`
-                : `This resource belongs to ${accessItem.group}. You can submit a business exception request for review.`}
+              <strong style={{ color: "var(--text)" }}>{isEligible ? "Standard Policy Match:" : "Cross-Department Exception:"}</strong>{" "}
+              <span style={{ color: "var(--text-secondary)" }}>
+                {isEligible
+                  ? `You belong to an authorized department. Requests route directly to ${accessItem.approver}.`
+                  : `This resource belongs to ${accessItem.group}. You can submit a business exception request for review.`}
+              </span>
             </div>
           </div>
 
-          <p style={{ fontSize: "13px", color: "#334155", lineHeight: "1.5", margin: "0 0 16px" }}>
+          <p style={{ fontSize: "13px", color: "var(--text-secondary)", lineHeight: "1.5", margin: "0 0 16px" }}>
             {accessItem.description}
           </p>
 
@@ -142,7 +144,7 @@ export default function AccessDetailsDrawer({
                           border: "none",
                           background: "transparent",
                           cursor: "pointer",
-                          color: copied ? "#16A34A" : "#94A3B8",
+                          color: copied ? "#4ADE80" : "var(--muted)",
                           padding: "0",
                           display: "flex",
                         }}
@@ -152,7 +154,7 @@ export default function AccessDetailsDrawer({
                       </button>
                     </>
                   ) : (
-                    <span style={{ color: "#D97706", fontStyle: "italic" }}>Governance Review</span>
+                    <span style={{ color: "#F59E0B", fontStyle: "italic" }}>Governance Review</span>
                   )}
                 </span>
               </div>
@@ -160,7 +162,7 @@ export default function AccessDetailsDrawer({
                 <span className="f-label">Provisioning Type</span>
                 <span className="f-value">
                   {accessItem.automation ? (
-                    <span style={{ color: "#2563EB", fontWeight: 600, display: "inline-flex", alignItems: "center", gap: "3px" }}>
+                    <span style={{ color: "var(--accent)", fontWeight: 600, display: "inline-flex", alignItems: "center", gap: "3px" }}>
                       <Zap size={11} /> Automated SCIM
                     </span>
                   ) : (

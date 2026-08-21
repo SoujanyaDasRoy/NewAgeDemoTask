@@ -102,13 +102,13 @@ export default function RequestDetailDrawer({
             <ServiceLogo tool={toolName} size={24} />
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
-                <h3 style={{ margin: 0, fontSize: "15px", fontWeight: 700, color: "#0F172A" }}>
+                <h3 style={{ margin: 0, fontSize: "15px", fontWeight: 700, color: "var(--text)" }}>
                   {request.accessLabel}
                 </h3>
                 <StatusBadge status={request.status} />
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "2px" }}>
-                <span className="mono" style={{ fontSize: "11.5px", color: "#64748B", fontWeight: 600 }}>
+                <span className="mono" style={{ fontSize: "11.5px", color: "var(--muted)", fontWeight: 600 }}>
                   {request.id}
                 </span>
                 <button
@@ -118,7 +118,7 @@ export default function RequestDetailDrawer({
                     border: "none",
                     background: "transparent",
                     cursor: "pointer",
-                    color: copied ? "#16A34A" : "#94A3B8",
+                    color: copied ? "#4ADE80" : "var(--muted)",
                     padding: "0",
                     display: "flex",
                   }}
@@ -126,8 +126,8 @@ export default function RequestDetailDrawer({
                 >
                   {copied ? <CheckCheck size={12} /> : <Copy size={12} />}
                 </button>
-                <span style={{ fontSize: "11px", color: "#CBD5E1" }}>·</span>
-                <span style={{ fontSize: "11.5px", color: "#64748B" }}>
+                <span style={{ fontSize: "11px", color: "var(--border)" }}>·</span>
+                <span style={{ fontSize: "11.5px", color: "var(--muted)" }}>
                   Submitted {new Date(request.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
                 </span>
               </div>
@@ -142,23 +142,18 @@ export default function RequestDetailDrawer({
           {/* SLA / Nudge Status Banner (If Pending) */}
           {isPendingApproval && (
             <div
+              className="warn-box"
               style={{
                 marginBottom: "16px",
-                padding: "12px",
-                borderRadius: "8px",
-                background: "#FFFBEB",
-                border: "1px solid #FDE68A",
-                display: "flex",
-                alignItems: "center",
                 justifyContent: "space-between",
-                gap: "10px",
+                alignItems: "center",
               }}
             >
               <div>
-                <div style={{ fontSize: "12.5px", fontWeight: 700, color: "#92400E", display: "flex", alignItems: "center", gap: "5px" }}>
-                  <Clock size={13} /> Awaiting {request.approverName}&apos;s Decision
+                <div style={{ fontSize: "12.5px", fontWeight: 700, display: "flex", alignItems: "center", gap: "5px" }}>
+                  <Clock size={13} style={{ color: "#F59E0B" }} /> Awaiting {request.approverName}&apos;s Decision
                 </div>
-                <div style={{ fontSize: "11.5px", color: "#B45309", marginTop: "1px" }}>
+                <div style={{ fontSize: "11.5px", marginTop: "1px" }}>
                   Estimated Turnaround: Typically reviewed within 2 hours.
                 </div>
               </div>
@@ -167,9 +162,9 @@ export default function RequestDetailDrawer({
                 type="button"
                 onClick={handleSlackNudge}
                 style={{
-                  border: "1px solid #FDE68A",
-                  background: nudged ? "#FEF3C7" : "#FFFFFF",
-                  color: "#92400E",
+                  border: "1px solid var(--border)",
+                  background: nudged ? "rgba(245, 158, 11, 0.2)" : "var(--surface)",
+                  color: "var(--text)",
                   borderRadius: "6px",
                   padding: "4px 8px",
                   fontSize: "11.5px",
@@ -193,8 +188,8 @@ export default function RequestDetailDrawer({
                 marginBottom: "16px",
                 padding: "12px",
                 borderRadius: "8px",
-                background: isExpired ? "#FEF2F2" : "#F0FDF4",
-                border: `1px solid ${isExpired ? "#FECACA" : "#DCFCE7"}`,
+                background: isExpired ? "rgba(239, 68, 68, 0.12)" : "rgba(34, 197, 94, 0.12)",
+                border: `1px solid ${isExpired ? "rgba(239, 68, 68, 0.3)" : "rgba(34, 197, 94, 0.3)"}`,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
@@ -206,7 +201,7 @@ export default function RequestDetailDrawer({
                   style={{
                     fontSize: "12.5px",
                     fontWeight: 700,
-                    color: isExpired ? "#991B1B" : "#166534",
+                    color: isExpired ? "#F87171" : "#4ADE80",
                     display: "flex",
                     alignItems: "center",
                     gap: "5px",
@@ -215,7 +210,7 @@ export default function RequestDetailDrawer({
                   <Calendar size={14} />
                   {isExpired ? "Access Expired" : `Valid Until ${request.requiredUntil}`}
                 </div>
-                <div style={{ fontSize: "11.5px", color: isExpired ? "#B91C1C" : "#15803D", marginTop: "1px" }}>
+                <div style={{ fontSize: "11.5px", color: "var(--muted)", marginTop: "1px" }}>
                   {isExpired
                     ? "This temporary exception has elapsed."
                     : `${daysRemaining} day${daysRemaining === 1 ? "" : "s"} remaining before auto-expiry.`}
@@ -242,14 +237,14 @@ export default function RequestDetailDrawer({
                 marginBottom: "16px",
                 padding: "12px",
                 borderRadius: "8px",
-                background: "#F8FAFC",
+                background: "var(--surface-subtle)",
                 border: "1px solid var(--border)",
               }}
             >
-              <div style={{ fontSize: "12.5px", fontWeight: 700, color: "#0F172A" }}>
+              <div style={{ fontSize: "12.5px", fontWeight: 700, color: "var(--text)" }}>
                 Access Provisioned for {request.beneficiaryName}
               </div>
-              <div style={{ fontSize: "11.5px", color: "#64748B", marginTop: "2px" }}>
+              <div style={{ fontSize: "11.5px", color: "var(--muted)", marginTop: "2px" }}>
                 Please confirm with the colleague that access is active, then close this ticket.
               </div>
               <button
@@ -295,7 +290,7 @@ export default function RequestDetailDrawer({
                 <span className="f-label">Provisioning Mode</span>
                 <span className="f-value">
                   {request.automation ? (
-                    <span style={{ color: "#2563EB", fontWeight: 600, display: "inline-flex", alignItems: "center", gap: "3px" }}>
+                    <span style={{ color: "var(--accent)", fontWeight: 600, display: "inline-flex", alignItems: "center", gap: "3px" }}>
                       <Zap size={11} /> Automated SCIM
                     </span>
                   ) : (
@@ -318,11 +313,11 @@ export default function RequestDetailDrawer({
                 style={{
                   marginTop: "4px",
                   padding: "10px 12px",
-                  background: "#F8FAFC",
+                  background: "var(--surface-subtle)",
                   border: "1px solid var(--border)",
                   borderRadius: "8px",
                   fontSize: "12.5px",
-                  color: "#334155",
+                  color: "var(--text-secondary)",
                   lineHeight: "1.45",
                 }}
               >
@@ -333,16 +328,16 @@ export default function RequestDetailDrawer({
             {/* Rejection Reason if any */}
             {request.rejectionReason && (
               <div style={{ marginTop: "14px" }}>
-                <span className="f-label" style={{ color: "#DC2626" }}>Rejection Feedback</span>
+                <span className="f-label" style={{ color: "#EF4444" }}>Rejection Feedback</span>
                 <div
                   style={{
                     marginTop: "4px",
                     padding: "10px 12px",
-                    background: "#FEF2F2",
-                    border: "1px solid #FECACA",
+                    background: "rgba(239, 68, 68, 0.12)",
+                    border: "1px solid rgba(239, 68, 68, 0.3)",
                     borderRadius: "8px",
                     fontSize: "12.5px",
-                    color: "#991B1B",
+                    color: "#F87171",
                   }}
                 >
                   {request.rejectionReason}

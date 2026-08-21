@@ -24,18 +24,18 @@ export default function Timeline({ steps }: { steps: TimelineStepItem[] }) {
             {!isLast && (
               <div
                 className="t-line"
-                style={{ background: isDone ? "#22C55E" : "#E5E7EB" }}
+                style={{ background: isDone ? "#22C55E" : "var(--border)" }}
               />
             )}
             <div className="t-dot">
               {isDone ? (
-                <CheckCircle2 size={18} className="text-[#22C55E]" />
+                <CheckCircle2 size={18} style={{ color: "#22C55E" }} />
               ) : isCurrent ? (
-                <div className="w-[18px] h-[18px] rounded-full border-2 border-[#2F6FED] flex items-center justify-center">
-                  <div className="w-2 h-2 rounded-full bg-[#2F6FED]" />
+                <div style={{ width: "18px", height: "18px", borderRadius: "999px", border: "2px solid var(--accent)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <div style={{ width: "8px", height: "8px", borderRadius: "999px", background: "var(--accent)" }} />
                 </div>
               ) : (
-                <Circle size={18} className="text-[#D1D5DB]" />
+                <Circle size={18} style={{ color: "var(--border)" }} />
               )}
             </div>
             <div>

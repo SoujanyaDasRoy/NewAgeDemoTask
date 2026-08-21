@@ -140,45 +140,25 @@ export default function RequestFormDrawer({
         aria-label="Request Access Form"
       >
         {/* Drawer Header */}
-        <div className="drawer-head" style={{ padding: "18px 22px", borderBottom: "1px solid #E2E8F0" }}>
+        <div className="drawer-head" style={{ padding: "18px 22px", borderBottom: "1px solid var(--border)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
             <ServiceLogo tool={accessItem.tool} size={28} />
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
-                <h3 style={{ margin: 0, fontSize: "16px", fontWeight: 700, color: "#0F172A", letterSpacing: "-0.02em" }}>
+                <h3 style={{ margin: 0, fontSize: "16px", fontWeight: 700, color: "var(--text)", letterSpacing: "-0.02em" }}>
                   {submittedId ? "Request Submitted" : "Request Access"}
                 </h3>
                 {isException ? (
-                  <span
-                    style={{
-                      fontSize: "11px",
-                      fontWeight: 600,
-                      color: "#92400E",
-                      background: "#FEF3C7",
-                      border: "1px solid #FDE68A",
-                      padding: "2px 7px",
-                      borderRadius: "999px",
-                    }}
-                  >
+                  <span className="badge badge-amber">
                     Exception
                   </span>
                 ) : (
-                  <span
-                    style={{
-                      fontSize: "11px",
-                      fontWeight: 600,
-                      color: "#166534",
-                      background: "#DCFCE7",
-                      border: "1px solid #BBF7D0",
-                      padding: "2px 7px",
-                      borderRadius: "999px",
-                    }}
-                  >
+                  <span className="badge badge-green">
                     Standard Policy
                   </span>
                 )}
               </div>
-              <div style={{ fontSize: "12.5px", color: "#64748B", marginTop: "2px" }}>
+              <div style={{ fontSize: "12.5px", color: "var(--muted)", marginTop: "2px" }}>
                 {accessItem.tool} · {accessItem.name}
               </div>
             </div>
@@ -187,15 +167,6 @@ export default function RequestFormDrawer({
             className="drawer-close"
             onClick={handleResetAndClose}
             aria-label="Close drawer"
-            style={{
-              width: "32px",
-              height: "32px",
-              borderRadius: "8px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "#64748B",
-            }}
           >
             <X size={16} />
           </button>
@@ -211,29 +182,29 @@ export default function RequestFormDrawer({
                   width: "52px",
                   height: "52px",
                   borderRadius: "999px",
-                  background: "#F0FDF4",
-                  color: "#16A34A",
+                  background: "rgba(34, 197, 94, 0.15)",
+                  color: "#4ADE80",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   margin: "0 auto 14px",
-                  border: "1px solid #DCFCE7",
+                  border: "1px solid rgba(34, 197, 94, 0.3)",
                 }}
               >
                 <CheckCircle2 size={28} />
               </div>
 
-              <h4 style={{ fontSize: "17px", fontWeight: 700, color: "#0F172A", margin: "0 0 6px", letterSpacing: "-0.02em" }}>
+              <h4 style={{ fontSize: "17px", fontWeight: 700, color: "var(--text)", margin: "0 0 6px", letterSpacing: "-0.02em" }}>
                 Request Successfully Submitted
               </h4>
-              <p style={{ fontSize: "13px", color: "#64748B", margin: "0 0 20px" }}>
+              <p style={{ fontSize: "13px", color: "var(--muted)", margin: "0 0 20px" }}>
                 Your request has been routed to <strong>{accessItem.approver}</strong> for review.
               </p>
 
               <div
                 style={{
-                  background: "#F8FAFC",
-                  border: "1px solid #E2E8F0",
+                  background: "var(--surface-subtle)",
+                  border: "1px solid var(--border)",
                   borderRadius: "10px",
                   padding: "14px 16px",
                   maxWidth: "320px",
@@ -244,8 +215,8 @@ export default function RequestFormDrawer({
                 }}
               >
                 <div style={{ textAlign: "left" }}>
-                  <div style={{ fontSize: "10px", color: "#64748B", fontWeight: 700, letterSpacing: "0.05em" }}>REQUEST ID</div>
-                  <div className="mono" style={{ fontSize: "15px", fontWeight: 700, color: "#0F172A", marginTop: "2px" }}>
+                  <div style={{ fontSize: "10px", color: "var(--muted)", fontWeight: 700, letterSpacing: "0.05em" }}>REQUEST ID</div>
+                  <div className="mono" style={{ fontSize: "15px", fontWeight: 700, color: "var(--text)", marginTop: "2px" }}>
                     {submittedId}
                   </div>
                 </div>
@@ -253,20 +224,20 @@ export default function RequestFormDrawer({
                   type="button"
                   onClick={copyId}
                   style={{
-                    border: "1px solid #CBD5E1",
-                    background: "#FFFFFF",
+                    border: "1px solid var(--border)",
+                    background: "var(--surface)",
                     borderRadius: "6px",
                     padding: "5px 10px",
                     fontSize: "12px",
                     fontWeight: 600,
-                    color: "#334155",
+                    color: "var(--text-secondary)",
                     cursor: "pointer",
                     display: "flex",
                     alignItems: "center",
                     gap: "5px",
                   }}
                 >
-                  {copied ? <CheckCheck size={13} style={{ color: "#16A34A" }} /> : <Copy size={13} />}
+                  {copied ? <CheckCheck size={13} style={{ color: "#4ADE80" }} /> : <Copy size={13} />}
                   {copied ? "Copied" : "Copy"}
                 </button>
               </div>
@@ -274,7 +245,7 @@ export default function RequestFormDrawer({
               <button
                 type="button"
                 className="btn btn-primary"
-                style={{ width: "100%", height: "42px", background: "#0F172A", fontSize: "13px", fontWeight: 600 }}
+                style={{ width: "100%", height: "42px", fontSize: "13px", fontWeight: 600 }}
                 onClick={handleResetAndClose}
               >
                 Done · Return to Dashboard
@@ -288,9 +259,9 @@ export default function RequestFormDrawer({
                 style={{
                   padding: "12px 14px",
                   borderRadius: "10px",
-                  background: isException ? "#FEFCE8" : "#F0FDF4",
-                  border: `1px solid ${isException ? "#FEF08A" : "#BBF7D0"}`,
-                  color: isException ? "#854D0E" : "#166534",
+                  background: isException ? "rgba(245, 158, 11, 0.12)" : "rgba(34, 197, 94, 0.12)",
+                  border: `1px solid ${isException ? "rgba(245, 158, 11, 0.3)" : "rgba(34, 197, 94, 0.3)"}`,
+                  color: isException ? "#FBBF24" : "#4ADE80",
                   fontSize: "12.5px",
                   lineHeight: 1.45,
                   display: "flex",
@@ -300,33 +271,36 @@ export default function RequestFormDrawer({
                 }}
               >
                 {isException ? (
-                  <ShieldAlert size={16} style={{ flexShrink: 0, marginTop: "2px", color: "#CA8A04" }} />
+                  <ShieldAlert size={16} style={{ flexShrink: 0, marginTop: "2px", color: "#FBBF24" }} />
                 ) : (
-                  <Zap size={16} style={{ flexShrink: 0, marginTop: "2px", color: "#16A34A" }} />
+                  <Zap size={16} style={{ flexShrink: 0, marginTop: "2px", color: "#4ADE80" }} />
                 )}
                 <div>
-                  <strong style={{ color: isException ? "#713F12" : "#14532D" }}>
+                  <strong style={{ color: "var(--text)" }}>
                     {isException ? "Exception Required:" : "Standard Policy Match:"}
                   </strong>{" "}
-                  {isException
-                    ? `This tool belongs to ${accessItem.group}. Justification will be sent to ${accessItem.approver} for sign-off.`
-                    : `Pre-approved for your department. Will be routed to ${accessItem.approver}.`}
+                  <span style={{ color: "var(--text-secondary)" }}>
+                    {isException
+                      ? `This tool belongs to ${accessItem.group}. Justification will be sent to ${accessItem.approver} for sign-off.`
+                      : `Pre-approved for your department. Will be routed to ${accessItem.approver}.`}
+                  </span>
                 </div>
               </div>
 
               {/* 1. Who needs this access? (Linear-Grade Segmented Capsule) */}
               <div style={{ marginBottom: "20px" }}>
-                <label style={{ fontSize: "12px", fontWeight: 600, color: "#334155", display: "block", marginBottom: "8px" }}>
+                <label style={{ fontSize: "12px", fontWeight: 600, color: "var(--text-secondary)", display: "block", marginBottom: "8px" }}>
                   Who needs this access?
                 </label>
                 <div
                   style={{
-                    background: "#F1F5F9",
+                    background: "var(--surface-subtle)",
                     padding: "3px",
                     borderRadius: "9px",
                     display: "grid",
                     gridTemplateColumns: "1fr 1fr",
                     gap: "3px",
+                    border: "1px solid var(--border)",
                   }}
                 >
                   <button
@@ -336,8 +310,8 @@ export default function RequestFormDrawer({
                       padding: "7px 10px",
                       borderRadius: "7px",
                       border: "none",
-                      background: !onBehalf ? "#FFFFFF" : "transparent",
-                      color: !onBehalf ? "#0F172A" : "#64748B",
+                      background: !onBehalf ? "var(--surface)" : "transparent",
+                      color: !onBehalf ? "var(--text)" : "var(--muted)",
                       fontWeight: !onBehalf ? 600 : 500,
                       fontSize: "12.5px",
                       cursor: "pointer",
@@ -345,11 +319,11 @@ export default function RequestFormDrawer({
                       alignItems: "center",
                       gap: "6px",
                       justifyContent: "center",
-                      boxShadow: !onBehalf ? "0 1px 3px rgba(15, 23, 42, 0.08)" : "none",
+                      boxShadow: !onBehalf ? "var(--shadow-xs)" : "none",
                       transition: "all 0.15s cubic-bezier(0.16, 1, 0.3, 1)",
                     }}
                   >
-                    <User size={13} style={{ color: !onBehalf ? "#2563EB" : "#94A3B8" }} />
+                    <User size={13} style={{ color: !onBehalf ? "var(--accent)" : "var(--muted)" }} />
                     <span>For Myself</span>
                   </button>
                   <button
@@ -359,8 +333,8 @@ export default function RequestFormDrawer({
                       padding: "7px 10px",
                       borderRadius: "7px",
                       border: "none",
-                      background: onBehalf ? "#FFFFFF" : "transparent",
-                      color: onBehalf ? "#0F172A" : "#64748B",
+                      background: onBehalf ? "var(--surface)" : "transparent",
+                      color: onBehalf ? "var(--text)" : "var(--muted)",
                       fontWeight: onBehalf ? 600 : 500,
                       fontSize: "12.5px",
                       cursor: "pointer",
@@ -368,22 +342,22 @@ export default function RequestFormDrawer({
                       alignItems: "center",
                       gap: "6px",
                       justifyContent: "center",
-                      boxShadow: onBehalf ? "0 1px 3px rgba(15, 23, 42, 0.08)" : "none",
+                      boxShadow: onBehalf ? "var(--shadow-xs)" : "none",
                       transition: "all 0.15s cubic-bezier(0.16, 1, 0.3, 1)",
                     }}
                   >
-                    <Users size={13} style={{ color: onBehalf ? "#2563EB" : "#94A3B8" }} />
+                    <Users size={13} style={{ color: onBehalf ? "var(--accent)" : "var(--muted)" }} />
                     <span>On Behalf of Colleague</span>
                   </button>
                 </div>
 
                 {onBehalf && (
                   <div style={{ marginTop: "10px" }}>
-                    <label style={{ fontSize: "11.5px", fontWeight: 600, color: "#64748B", display: "block", marginBottom: "4px" }}>
+                    <label style={{ fontSize: "11.5px", fontWeight: 600, color: "var(--muted)", display: "block", marginBottom: "4px" }}>
                       Select Colleague
                     </label>
                     <select
-                      className="form-input"
+                      className="form-select"
                       value={beneficiary || teamOptions[0]}
                       onChange={(e) => setBeneficiary(e.target.value)}
                       style={{ cursor: "pointer", height: "38px" }}
@@ -401,11 +375,11 @@ export default function RequestFormDrawer({
               {/* 2. Access Duration (Crisp Tile Cards) */}
               <div style={{ marginBottom: "20px" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "8px" }}>
-                  <label style={{ fontSize: "12px", fontWeight: 600, color: "#334155", display: "flex", alignItems: "center", gap: "5px" }}>
-                    <Clock size={13} style={{ color: "#64748B" }} /> Access Duration
+                  <label style={{ fontSize: "12px", fontWeight: 600, color: "var(--text-secondary)", display: "flex", alignItems: "center", gap: "5px" }}>
+                    <Clock size={13} style={{ color: "var(--muted)" }} /> Access Duration
                   </label>
-                  <span style={{ fontSize: "11px", color: "#64748B" }}>
-                    Expires: <strong style={{ color: "#0F172A" }}>{requiredUntilFormatted}</strong>
+                  <span style={{ fontSize: "11px", color: "var(--muted)" }}>
+                    Expires: <strong style={{ color: "var(--text)" }}>{requiredUntilFormatted}</strong>
                   </span>
                 </div>
 
@@ -420,9 +394,9 @@ export default function RequestFormDrawer({
                         style={{
                           padding: "9px 12px",
                           borderRadius: "8px",
-                          border: isSelected ? "1.5px solid #2563EB" : "1px solid #E2E8F0",
-                          background: isSelected ? "#EFF6FF" : "#FFFFFF",
-                          color: isSelected ? "#1D4ED8" : "#334155",
+                          border: isSelected ? "1.5px solid var(--accent)" : "1px solid var(--border)",
+                          background: isSelected ? "var(--accent-light)" : "var(--surface)",
+                          color: isSelected ? "var(--accent)" : "var(--text-secondary)",
                           fontSize: "12px",
                           fontWeight: isSelected ? 600 : 500,
                           cursor: "pointer",
@@ -435,7 +409,7 @@ export default function RequestFormDrawer({
                       >
                         <span>{preset.label}</span>
                         {isSelected && (
-                          <div style={{ width: "6px", height: "6px", borderRadius: "999px", background: "#2563EB" }} />
+                          <div style={{ width: "6px", height: "6px", borderRadius: "999px", background: "var(--accent)" }} />
                         )}
                       </button>
                     );
@@ -445,17 +419,18 @@ export default function RequestFormDrawer({
 
               {/* 3. Request Urgency (Segmented Control) */}
               <div style={{ marginBottom: "20px" }}>
-                <label style={{ fontSize: "12px", fontWeight: 600, color: "#334155", display: "block", marginBottom: "8px" }}>
+                <label style={{ fontSize: "12px", fontWeight: 600, color: "var(--text-secondary)", display: "block", marginBottom: "8px" }}>
                   Request Urgency
                 </label>
                 <div
                   style={{
-                    background: "#F1F5F9",
+                    background: "var(--surface-subtle)",
                     padding: "3px",
                     borderRadius: "9px",
                     display: "grid",
                     gridTemplateColumns: "1fr 1fr 1fr",
                     gap: "3px",
+                    border: "1px solid var(--border)",
                   }}
                 >
                   {(["STANDARD", "URGENT", "CRITICAL"] as const).map((lvl) => {
@@ -469,14 +444,14 @@ export default function RequestFormDrawer({
                           padding: "6px 8px",
                           borderRadius: "7px",
                           border: "none",
-                          background: isSelected ? "#FFFFFF" : "transparent",
+                          background: isSelected ? "var(--surface)" : "transparent",
                           color: isSelected
                             ? lvl === "CRITICAL"
-                              ? "#DC2626"
+                              ? "#EF4444"
                               : lvl === "URGENT"
-                              ? "#D97706"
-                              : "#0F172A"
-                            : "#64748B",
+                              ? "#F59E0B"
+                              : "var(--text)"
+                            : "var(--muted)",
                           fontWeight: isSelected ? 600 : 500,
                           fontSize: "12px",
                           cursor: "pointer",
@@ -484,7 +459,7 @@ export default function RequestFormDrawer({
                           alignItems: "center",
                           justifyContent: "center",
                           gap: "4px",
-                          boxShadow: isSelected ? "0 1px 3px rgba(15, 23, 42, 0.08)" : "none",
+                          boxShadow: isSelected ? "var(--shadow-xs)" : "none",
                           transition: "all 0.15s ease",
                         }}
                       >
@@ -498,10 +473,10 @@ export default function RequestFormDrawer({
               {/* 4. Business Justification with Quick Fill Chips */}
               <div style={{ marginBottom: "22px" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "6px" }}>
-                  <label style={{ fontSize: "12px", fontWeight: 600, color: "#334155" }}>
-                    Business Justification <span style={{ color: "#DC2626" }}>*</span>
+                  <label style={{ fontSize: "12px", fontWeight: 600, color: "var(--text-secondary)" }}>
+                    Business Justification <span style={{ color: "#EF4444" }}>*</span>
                   </label>
-                  <span style={{ fontSize: "11px", color: "#94A3B8" }}>1-Click Presets:</span>
+                  <span style={{ fontSize: "11px", color: "var(--muted)" }}>1-Click Presets:</span>
                 </div>
 
                 {/* Clean Quick Chips */}
@@ -514,9 +489,9 @@ export default function RequestFormDrawer({
                         type="button"
                         onClick={() => setJustification(text)}
                         style={{
-                          border: isSelected ? "1px solid #93C5FD" : "1px solid #E2E8F0",
-                          background: isSelected ? "#EFF6FF" : "#F8FAFC",
-                          color: isSelected ? "#1D4ED8" : "#475569",
+                          border: isSelected ? "1px solid var(--accent)" : "1px solid var(--border)",
+                          background: isSelected ? "var(--accent-light)" : "var(--surface)",
+                          color: isSelected ? "var(--accent)" : "var(--text-secondary)",
                           padding: "4px 9px",
                           borderRadius: "6px",
                           fontSize: "11px",
@@ -540,15 +515,13 @@ export default function RequestFormDrawer({
                   style={{
                     fontSize: "12.5px",
                     lineHeight: 1.5,
-                    borderRadius: "8px",
-                    borderColor: "#E2E8F0",
                   }}
                   required
                 />
               </div>
 
               {error && (
-                <div style={{ color: "#DC2626", fontSize: "12px", marginBottom: "14px", fontWeight: 500 }}>
+                <div style={{ color: "#EF4444", fontSize: "12px", marginBottom: "14px", fontWeight: 500 }}>
                   {error}
                 </div>
               )}
@@ -571,7 +544,6 @@ export default function RequestFormDrawer({
                     height: "40px",
                     fontSize: "13px",
                     fontWeight: 600,
-                    background: "#0F172A",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",

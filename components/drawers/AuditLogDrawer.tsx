@@ -129,21 +129,21 @@ export default function AuditLogDrawer({
   const getActionBadgeStyle = (action: string) => {
     const a = action.toLowerCase();
     if (a.includes("approved")) {
-      return { bg: "#F0FDF4", color: "#166534", border: "#DCFCE7", icon: CheckCircle2 };
+      return { bg: "rgba(34, 197, 94, 0.15)", color: "#4ADE80", border: "rgba(34, 197, 94, 0.3)", icon: CheckCircle2 };
     }
     if (a.includes("reject")) {
-      return { bg: "#FEF2F2", color: "#991B1B", border: "#FECACA", icon: XCircle };
+      return { bg: "rgba(239, 68, 68, 0.15)", color: "#F87171", border: "rgba(239, 68, 68, 0.3)", icon: XCircle };
     }
     if (a.includes("auto") || a.includes("automated")) {
-      return { bg: "#EFF6FF", color: "#1E40AF", border: "#DBEAFE", icon: Zap };
+      return { bg: "rgba(59, 130, 246, 0.15)", color: "#60A5FA", border: "rgba(59, 130, 246, 0.3)", icon: Zap };
     }
     if (a.includes("exception") || a.includes("extension")) {
-      return { bg: "#FFFBEB", color: "#92400E", border: "#FDE68A", icon: AlertTriangle };
+      return { bg: "rgba(245, 158, 11, 0.15)", color: "#FBBF24", border: "rgba(245, 158, 11, 0.3)", icon: AlertTriangle };
     }
     if (a.includes("role") || a.includes("user")) {
-      return { bg: "#F5F3FF", color: "#5B21B6", border: "#EDE9FE", icon: Shield };
+      return { bg: "rgba(139, 92, 246, 0.15)", color: "#C084FC", border: "rgba(139, 92, 246, 0.3)", icon: Shield };
     }
-    return { bg: "#F8FAFC", color: "#334155", border: "#E2E8F0", icon: Layers };
+    return { bg: "var(--surface-subtle)", color: "var(--text-secondary)", border: "var(--border)", icon: Layers };
   };
 
   const formatTimestamp = (dateInput: string | Date) => {
@@ -217,25 +217,25 @@ export default function AuditLogDrawer({
                 width: "30px",
                 height: "30px",
                 borderRadius: "8px",
-                background: "#0F172A",
+                background: "var(--btn-primary-bg)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                color: "#FFFFFF",
+                color: "var(--btn-primary-text)",
               }}
             >
               <Shield size={16} />
             </div>
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
-                <h3 style={{ margin: 0, fontSize: "15px", fontWeight: 700, color: "#0F172A" }}>
+                <h3 style={{ margin: 0, fontSize: "15px", fontWeight: 700, color: "var(--text)" }}>
                   Live Audit Trail
                 </h3>
                 <span className="badge badge-green" style={{ fontSize: "10.5px" }}>
                   <span className="live-pulse-dot" /> Active Ledger
                 </span>
               </div>
-              <div style={{ fontSize: "11.5px", color: "#64748B", marginTop: "1px" }}>
+              <div style={{ fontSize: "11.5px", color: "var(--muted)", marginTop: "1px" }}>
                 Immutable cryptographic ledger of access decisions and role updates
               </div>
             </div>
@@ -271,40 +271,40 @@ export default function AuditLogDrawer({
           >
             <div
               style={{
-                background: "#F8FAFC",
+                background: "var(--surface-subtle)",
                 border: "1px solid var(--border)",
                 borderRadius: "8px",
                 padding: "8px 12px",
               }}
             >
-              <div style={{ fontSize: "10.5px", color: "#64748B", fontWeight: 600, textTransform: "uppercase" }}>Total Events</div>
-              <div style={{ fontSize: "16px", fontWeight: 700, color: "#0F172A", marginTop: "2px" }}>
+              <div style={{ fontSize: "10.5px", color: "var(--muted)", fontWeight: 600, textTransform: "uppercase" }}>Total Events</div>
+              <div style={{ fontSize: "16px", fontWeight: 700, color: "var(--text)", marginTop: "2px" }}>
                 {auditLogs.length}
               </div>
             </div>
             <div
               style={{
-                background: "#F8FAFC",
+                background: "var(--surface-subtle)",
                 border: "1px solid var(--border)",
                 borderRadius: "8px",
                 padding: "8px 12px",
               }}
             >
-              <div style={{ fontSize: "10.5px", color: "#64748B", fontWeight: 600, textTransform: "uppercase" }}>Approvals</div>
-              <div style={{ fontSize: "16px", fontWeight: 700, color: "#166534", marginTop: "2px" }}>
+              <div style={{ fontSize: "10.5px", color: "var(--muted)", fontWeight: 600, textTransform: "uppercase" }}>Approvals</div>
+              <div style={{ fontSize: "16px", fontWeight: 700, color: "#4ADE80", marginTop: "2px" }}>
                 {counts.APPROVAL}
               </div>
             </div>
             <div
               style={{
-                background: "#F8FAFC",
+                background: "var(--surface-subtle)",
                 border: "1px solid var(--border)",
                 borderRadius: "8px",
                 padding: "8px 12px",
               }}
             >
-              <div style={{ fontSize: "10.5px", color: "#64748B", fontWeight: 600, textTransform: "uppercase" }}>Automations</div>
-              <div style={{ fontSize: "16px", fontWeight: 700, color: "#1E40AF", marginTop: "2px" }}>
+              <div style={{ fontSize: "10.5px", color: "var(--muted)", fontWeight: 600, textTransform: "uppercase" }}>Automations</div>
+              <div style={{ fontSize: "16px", fontWeight: 700, color: "var(--accent)", marginTop: "2px" }}>
                 {counts.AUTOMATION}
               </div>
             </div>
@@ -313,7 +313,7 @@ export default function AuditLogDrawer({
           {/* Search Toolbar */}
           <div style={{ display: "flex", gap: "8px", marginBottom: "10px", alignItems: "center" }}>
             <div style={{ flex: 1, position: "relative", display: "flex", alignItems: "center" }}>
-              <Search size={14} style={{ position: "absolute", left: "10px", color: "#94A3B8" }} />
+              <Search size={14} style={{ position: "absolute", left: "10px", color: "var(--muted)" }} />
               <input
                 type="text"
                 placeholder="Filter by actor, NAR ID, or action..."
@@ -327,7 +327,8 @@ export default function AuditLogDrawer({
                   border: "1px solid var(--border)",
                   fontSize: "12px",
                   outline: "none",
-                  background: "#FFFFFF",
+                  background: "var(--surface-input)",
+                  color: "var(--text)",
                 }}
               />
               {searchQuery && (
@@ -339,7 +340,7 @@ export default function AuditLogDrawer({
                     right: "8px",
                     background: "none",
                     border: "none",
-                    color: "#94A3B8",
+                    color: "var(--muted)",
                     cursor: "pointer",
                   }}
                 >
@@ -434,11 +435,11 @@ export default function AuditLogDrawer({
                   <div
                     key={log.id}
                     style={{
-                      background: "#FFFFFF",
+                      background: "var(--surface)",
                       border: "1px solid var(--border)",
                       borderRadius: "8px",
                       padding: "10px 12px",
-                      boxShadow: "var(--shadow-xs)",
+                      boxShadow: "var(--shadow-card)",
                       display: "flex",
                       gap: "10px",
                       alignItems: "flex-start",
@@ -491,7 +492,7 @@ export default function AuditLogDrawer({
                             <BadgeIcon size={10} /> {log.action}
                           </span>
 
-                          <span style={{ fontSize: "12px", fontWeight: 700, color: "#0F172A" }}>
+                          <span style={{ fontSize: "12px", fontWeight: 700, color: "var(--text)" }}>
                             {log.userName}
                           </span>
                         </div>
@@ -503,9 +504,9 @@ export default function AuditLogDrawer({
                             onClick={() => handleCopy(log.id, log.id)}
                             title="Click to copy full event hash"
                             style={{
-                              background: copiedId === log.id ? "#F0FDF4" : "#F8FAFC",
-                              color: copiedId === log.id ? "#166534" : "#64748B",
-                              border: `1px solid ${copiedId === log.id ? "#DCFCE7" : "#E2E8F0"}`,
+                              background: copiedId === log.id ? "rgba(34, 197, 94, 0.15)" : "var(--surface-subtle)",
+                              color: copiedId === log.id ? "#4ADE80" : "var(--muted)",
+                              border: `1px solid ${copiedId === log.id ? "rgba(34, 197, 94, 0.3)" : "var(--border)"}`,
                               borderRadius: "4px",
                               padding: "1px 5px",
                               fontSize: "10px",
@@ -526,7 +527,7 @@ export default function AuditLogDrawer({
                       <div
                         style={{
                           fontSize: "12px",
-                          color: "#334155",
+                          color: "var(--text-secondary)",
                           lineHeight: "1.4",
                           wordBreak: "break-word",
                         }}
@@ -538,7 +539,7 @@ export default function AuditLogDrawer({
                       <div
                         style={{
                           fontSize: "10.5px",
-                          color: "#94A3B8",
+                          color: "var(--muted)",
                           marginTop: "4px",
                           display: "flex",
                           alignItems: "center",
@@ -549,7 +550,7 @@ export default function AuditLogDrawer({
                           <Clock size={10} /> {dateStr} at {timeStr}
                         </span>
                         <span>·</span>
-                        <span style={{ fontWeight: 500, color: "#64748B" }}>{relative}</span>
+                        <span style={{ fontWeight: 500, color: "var(--muted)" }}>{relative}</span>
                       </div>
                     </div>
                   </div>

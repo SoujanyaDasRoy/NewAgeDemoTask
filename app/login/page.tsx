@@ -96,22 +96,22 @@ export default function LoginPage() {
     <div
       style={{
         minHeight: "100vh",
-        background: "linear-gradient(135deg, #F8FAFC 0%, #EFF6FF 100%)",
+        background: "var(--bg)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         padding: "24px",
-        fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+        fontFamily: "inherit",
       }}
     >
       <div
         style={{
           width: "100%",
           maxWidth: "880px",
-          background: "#FFFFFF",
+          background: "var(--surface)",
           borderRadius: "18px",
-          border: "1px solid #E2E8F0",
-          boxShadow: "0 20px 50px -10px rgba(15, 27, 51, 0.12), 0 0 0 1px rgba(15, 27, 51, 0.03)",
+          border: "1px solid var(--border)",
+          boxShadow: "var(--shadow-popover)",
           overflow: "hidden",
           display: "grid",
           gridTemplateColumns: "1fr 1.15fr",
@@ -120,7 +120,7 @@ export default function LoginPage() {
         {/* Left Feature Showcase Pane */}
         <div
           style={{
-            background: "linear-gradient(145deg, #0F172A 0%, #1E293B 50%, #1E3A8A 100%)",
+            background: "linear-gradient(145deg, #090D16 0%, #111827 50%, #1E3A8A 100%)",
             padding: "36px 32px",
             color: "#FFFFFF",
             display: "flex",
@@ -258,7 +258,8 @@ export default function LoginPage() {
           <div
             style={{
               display: "flex",
-              background: "#F1F5F9",
+              background: "var(--surface-subtle)",
+              border: "1px solid var(--border)",
               borderRadius: "10px",
               padding: "4px",
               marginBottom: "24px",
@@ -275,13 +276,13 @@ export default function LoginPage() {
                 flex: 1,
                 padding: "8px 12px",
                 border: "none",
-                background: tab === "login" ? "#FFFFFF" : "transparent",
-                color: tab === "login" ? "#0F1B33" : "#64748B",
+                background: tab === "login" ? "var(--surface)" : "transparent",
+                color: tab === "login" ? "var(--text)" : "var(--muted)",
                 fontWeight: 600,
                 fontSize: "13px",
                 borderRadius: "7px",
                 cursor: "pointer",
-                boxShadow: tab === "login" ? "0 1px 3px rgba(0,0,0,0.08)" : "none",
+                boxShadow: tab === "login" ? "var(--shadow-xs)" : "none",
                 transition: "all 0.15s ease",
               }}
             >
@@ -298,13 +299,13 @@ export default function LoginPage() {
                 flex: 1,
                 padding: "8px 12px",
                 border: "none",
-                background: tab === "signup" ? "#FFFFFF" : "transparent",
-                color: tab === "signup" ? "#0F1B33" : "#64748B",
+                background: tab === "signup" ? "var(--surface)" : "transparent",
+                color: tab === "signup" ? "var(--text)" : "var(--muted)",
                 fontWeight: 600,
                 fontSize: "13px",
                 borderRadius: "7px",
                 cursor: "pointer",
-                boxShadow: tab === "signup" ? "0 1px 3px rgba(0,0,0,0.08)" : "none",
+                boxShadow: tab === "signup" ? "var(--shadow-xs)" : "none",
                 transition: "all 0.15s ease",
               }}
             >
@@ -321,9 +322,9 @@ export default function LoginPage() {
                 gap: "8px",
                 padding: "10px 14px",
                 borderRadius: "8px",
-                background: "#FEF2F2",
-                border: "1px solid #FCA5A5",
-                color: "#991B1B",
+                background: "rgba(239, 68, 68, 0.15)",
+                border: "1px solid rgba(239, 68, 68, 0.3)",
+                color: "#F87171",
                 fontSize: "12.5px",
                 marginBottom: "16px",
               }}
@@ -341,9 +342,9 @@ export default function LoginPage() {
                 gap: "8px",
                 padding: "10px 14px",
                 borderRadius: "8px",
-                background: "#F0FDF4",
-                border: "1px solid #86EFAC",
-                color: "#166534",
+                background: "rgba(34, 197, 94, 0.15)",
+                border: "1px solid rgba(34, 197, 94, 0.3)",
+                color: "#4ADE80",
                 fontSize: "12.5px",
                 marginBottom: "16px",
               }}
@@ -357,7 +358,7 @@ export default function LoginPage() {
           {tab === "login" ? (
             <form onSubmit={handleLogin}>
               <div style={{ marginBottom: "16px" }}>
-                <label style={{ display: "block", fontSize: "12.5px", fontWeight: 600, color: "#334155", marginBottom: "6px" }}>
+                <label style={{ display: "block", fontSize: "12.5px", fontWeight: 600, color: "var(--text)", marginBottom: "6px" }}>
                   Work Email Address
                 </label>
                 <input
@@ -371,10 +372,11 @@ export default function LoginPage() {
                     height: "42px",
                     padding: "0 14px",
                     borderRadius: "8px",
-                    border: "1px solid #CBD5E1",
+                    border: "1px solid var(--border)",
                     fontSize: "13.5px",
                     outline: "none",
-                    background: "#F8FAFC",
+                    background: "var(--surface-input)",
+                    color: "var(--text)",
                     boxSizing: "border-box",
                   }}
                 />
@@ -382,10 +384,10 @@ export default function LoginPage() {
 
               <div style={{ marginBottom: "22px" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "6px" }}>
-                  <label style={{ fontSize: "12.5px", fontWeight: 600, color: "#334155" }}>
+                  <label style={{ fontSize: "12.5px", fontWeight: 600, color: "var(--text)" }}>
                     Password
                   </label>
-                  <span style={{ fontSize: "11px", color: "#64748B" }}>Demo: password123</span>
+                  <span style={{ fontSize: "11px", color: "var(--muted)" }}>Demo: password123</span>
                 </div>
                 <div style={{ position: "relative" }}>
                   <input
@@ -399,10 +401,11 @@ export default function LoginPage() {
                       height: "42px",
                       padding: "0 40px 0 14px",
                       borderRadius: "8px",
-                      border: "1px solid #CBD5E1",
+                      border: "1px solid var(--border)",
                       fontSize: "13.5px",
                       outline: "none",
-                      background: "#F8FAFC",
+                      background: "var(--surface-input)",
+                      color: "var(--text)",
                       boxSizing: "border-box",
                     }}
                   />
@@ -416,7 +419,7 @@ export default function LoginPage() {
                       transform: "translateY(-50%)",
                       border: "none",
                       background: "transparent",
-                      color: "#64748B",
+                      color: "var(--muted)",
                       cursor: "pointer",
                       display: "flex",
                     }}
@@ -430,22 +433,14 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={loading}
+                className="btn btn-primary btn-block"
                 style={{
-                  width: "100%",
                   height: "44px",
-                  background: "#0F1B33",
-                  color: "#FFFFFF",
-                  border: "none",
-                  borderRadius: "8px",
                   fontSize: "13.5px",
-                  fontWeight: 600,
-                  cursor: "pointer",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   gap: "8px",
-                  boxShadow: "0 2px 6px rgba(15, 27, 51, 0.2)",
-                  transition: "background 0.15s ease",
                 }}
               >
                 {loading ? "Verifying..." : "Sign In to Portal"} <ArrowRight size={15} />
@@ -455,7 +450,7 @@ export default function LoginPage() {
             /* CREATE ACCOUNT FORM */
             <form onSubmit={handleSignup}>
               <div style={{ marginBottom: "14px" }}>
-                <label style={{ display: "block", fontSize: "12.5px", fontWeight: 600, color: "#334155", marginBottom: "6px" }}>
+                <label style={{ display: "block", fontSize: "12.5px", fontWeight: 600, color: "var(--text)", marginBottom: "6px" }}>
                   Full Name
                 </label>
                 <input
@@ -469,17 +464,18 @@ export default function LoginPage() {
                     height: "40px",
                     padding: "0 14px",
                     borderRadius: "8px",
-                    border: "1px solid #CBD5E1",
+                    border: "1px solid var(--border)",
                     fontSize: "13.5px",
                     outline: "none",
-                    background: "#F8FAFC",
+                    background: "var(--surface-input)",
+                    color: "var(--text)",
                     boxSizing: "border-box",
                   }}
                 />
               </div>
 
               <div style={{ marginBottom: "14px" }}>
-                <label style={{ display: "block", fontSize: "12.5px", fontWeight: 600, color: "#334155", marginBottom: "6px" }}>
+                <label style={{ display: "block", fontSize: "12.5px", fontWeight: 600, color: "var(--text)", marginBottom: "6px" }}>
                   Company Work Email
                 </label>
                 <input
@@ -493,17 +489,18 @@ export default function LoginPage() {
                     height: "40px",
                     padding: "0 14px",
                     borderRadius: "8px",
-                    border: "1px solid #CBD5E1",
+                    border: "1px solid var(--border)",
                     fontSize: "13.5px",
                     outline: "none",
-                    background: "#F8FAFC",
+                    background: "var(--surface-input)",
+                    color: "var(--text)",
                     boxSizing: "border-box",
                   }}
                 />
               </div>
 
               <div style={{ marginBottom: "14px" }}>
-                <label style={{ display: "block", fontSize: "12.5px", fontWeight: 600, color: "#334155", marginBottom: "6px" }}>
+                <label style={{ display: "block", fontSize: "12.5px", fontWeight: 600, color: "var(--text)", marginBottom: "6px" }}>
                   Department / Team
                 </label>
                 <select
@@ -514,10 +511,11 @@ export default function LoginPage() {
                     height: "40px",
                     padding: "0 14px",
                     borderRadius: "8px",
-                    border: "1px solid #CBD5E1",
+                    border: "1px solid var(--border)",
                     fontSize: "13.5px",
                     outline: "none",
-                    background: "#F8FAFC",
+                    background: "var(--surface-input)",
+                    color: "var(--text)",
                     boxSizing: "border-box",
                     cursor: "pointer",
                   }}
@@ -532,7 +530,7 @@ export default function LoginPage() {
               </div>
 
               <div style={{ marginBottom: "20px" }}>
-                <label style={{ display: "block", fontSize: "12.5px", fontWeight: 600, color: "#334155", marginBottom: "6px" }}>
+                <label style={{ display: "block", fontSize: "12.5px", fontWeight: 600, color: "var(--text)", marginBottom: "6px" }}>
                   Create Password
                 </label>
                 <div style={{ position: "relative" }}>
@@ -547,10 +545,11 @@ export default function LoginPage() {
                       height: "40px",
                       padding: "0 40px 0 14px",
                       borderRadius: "8px",
-                      border: "1px solid #CBD5E1",
+                      border: "1px solid var(--border)",
                       fontSize: "13.5px",
                       outline: "none",
-                      background: "#F8FAFC",
+                      background: "var(--surface-input)",
+                      color: "var(--text)",
                       boxSizing: "border-box",
                     }}
                   />
@@ -564,7 +563,7 @@ export default function LoginPage() {
                       transform: "translateY(-50%)",
                       border: "none",
                       background: "transparent",
-                      color: "#64748B",
+                      color: "var(--muted)",
                       cursor: "pointer",
                       display: "flex",
                     }}
@@ -577,22 +576,14 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={loading}
+                className="btn btn-primary btn-block"
                 style={{
-                  width: "100%",
                   height: "44px",
-                  background: "#2563EB",
-                  color: "#FFFFFF",
-                  border: "none",
-                  borderRadius: "8px",
                   fontSize: "13.5px",
-                  fontWeight: 600,
-                  cursor: "pointer",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   gap: "8px",
-                  boxShadow: "0 2px 6px rgba(37, 99, 235, 0.25)",
-                  transition: "background 0.15s ease",
                 }}
               >
                 {loading ? "Creating Account..." : "Create Account & Sign In"} <ArrowRight size={15} />

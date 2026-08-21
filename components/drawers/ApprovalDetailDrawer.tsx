@@ -81,7 +81,7 @@ export default function ApprovalDetailDrawer({
             <ServiceLogo tool={toolName} size={24} />
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
-                <h3 style={{ margin: 0, fontSize: "15px", fontWeight: 700, color: "#0F172A" }}>
+                <h3 style={{ margin: 0, fontSize: "15px", fontWeight: 700, color: "var(--text)" }}>
                   Approval Review
                 </h3>
                 {request.isException ? (
@@ -90,7 +90,7 @@ export default function ApprovalDetailDrawer({
                   <span className="badge badge-gray">Standard</span>
                 )}
               </div>
-              <div style={{ fontSize: "12px", color: "#64748B", marginTop: "1px" }}>
+              <div style={{ fontSize: "12px", color: "var(--muted)", marginTop: "1px" }}>
                 {request.accessLabel} · <span className="mono">{request.id}</span>
               </div>
             </div>
@@ -107,17 +107,18 @@ export default function ApprovalDetailDrawer({
             style={{
               padding: "14px 16px",
               borderRadius: "10px",
-              background: "#0F172A",
-              color: "#FFFFFF",
+              background: "var(--surface-subtle)",
+              color: "var(--text)",
+              border: "1px solid var(--border)",
               marginBottom: "20px",
-              boxShadow: "0 4px 12px rgba(15, 23, 42, 0.12)",
+              boxShadow: "var(--shadow-card)",
             }}
           >
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "10px" }}>
-              <div style={{ fontSize: "12.5px", fontWeight: 600, color: "#F1F5F9", display: "flex", alignItems: "center", gap: "6px" }}>
-                <ShieldCheck size={14} style={{ color: "#60A5FA" }} /> Pending Decision
+              <div style={{ fontSize: "12.5px", fontWeight: 600, color: "var(--text)", display: "flex", alignItems: "center", gap: "6px" }}>
+                <ShieldCheck size={14} style={{ color: "#3B82F6" }} /> Pending Decision
               </div>
-              <span style={{ fontSize: "11px", color: "#94A3B8" }}>
+              <span style={{ fontSize: "11px", color: "var(--muted)" }}>
                 Approver: <strong>{actingUserName}</strong>
               </span>
             </div>
@@ -152,9 +153,9 @@ export default function ApprovalDetailDrawer({
                   height: "36px",
                   fontSize: "12.5px",
                   fontWeight: 600,
-                  background: "transparent",
-                  color: "#FCA5A5",
-                  border: "1px solid #7F1D1D",
+                  background: "rgba(239, 68, 68, 0.1)",
+                  color: "#EF4444",
+                  border: "1px solid rgba(239, 68, 68, 0.3)",
                   borderRadius: "6px",
                   cursor: "pointer",
                   display: "inline-flex",
@@ -173,23 +174,17 @@ export default function ApprovalDetailDrawer({
           {/* Exception Details Callout */}
           {request.isException && (
             <div
+              className="warn-box"
               style={{
                 marginBottom: "18px",
-                padding: "12px",
-                borderRadius: "8px",
-                background: "#FFFBEB",
-                border: "1px solid #FDE68A",
-                display: "flex",
-                alignItems: "flex-start",
-                gap: "8px",
               }}
             >
-              <AlertTriangle size={16} style={{ color: "#D97706", flexShrink: 0, marginTop: "1px" }} />
+              <AlertTriangle size={16} style={{ color: "#F59E0B", flexShrink: 0, marginTop: "1px" }} />
               <div>
-                <div style={{ fontWeight: 700, color: "#92400E", fontSize: "12.5px" }}>
+                <div style={{ fontWeight: 700, fontSize: "12.5px" }}>
                   Cross-Department Exception Request
                 </div>
-                <div style={{ color: "#B45309", marginTop: "3px", fontSize: "11.5px", lineHeight: 1.45 }}>
+                <div style={{ marginTop: "3px", fontSize: "11.5px", lineHeight: 1.45 }}>
                   <strong>Reason:</strong> {request.exceptionReason || "Project need outside standard department group"} <br />
                   <strong>Urgency:</strong> {request.urgency || "Standard"} ·{" "}
                   <strong>Required Until:</strong> {request.requiredUntil || "Indefinite"}
@@ -222,7 +217,7 @@ export default function ApprovalDetailDrawer({
                 <span className="f-label">Provisioning Type</span>
                 <span className="f-value">
                   {request.automation ? (
-                    <span style={{ color: "#2563EB", fontWeight: 600, display: "inline-flex", alignItems: "center", gap: "3px" }}>
+                    <span style={{ color: "var(--accent)", fontWeight: 600, display: "inline-flex", alignItems: "center", gap: "3px" }}>
                       <Zap size={11} /> Automated SCIM
                     </span>
                   ) : (
@@ -245,11 +240,11 @@ export default function ApprovalDetailDrawer({
                 style={{
                   marginTop: "5px",
                   padding: "10px 12px",
-                  background: "#F8FAFC",
+                  background: "var(--surface-subtle)",
                   border: "1px solid var(--border)",
                   borderRadius: "8px",
                   fontSize: "12.5px",
-                  color: "#334155",
+                  color: "var(--text-secondary)",
                   lineHeight: "1.45",
                 }}
               >
@@ -265,7 +260,7 @@ export default function ApprovalDetailDrawer({
             style={{
               position: "absolute",
               inset: 0,
-              background: "rgba(15, 23, 42, 0.5)",
+              background: "rgba(0, 0, 0, 0.65)",
               backdropFilter: "blur(4px)",
               display: "flex",
               alignItems: "center",
@@ -278,21 +273,21 @@ export default function ApprovalDetailDrawer({
               style={{
                 width: "100%",
                 maxWidth: "380px",
-                background: "#FFFFFF",
+                background: "var(--surface-drawer)",
                 borderRadius: "12px",
                 padding: "20px",
-                boxShadow: "0 20px 45px rgba(0,0,0,0.2)",
+                boxShadow: "var(--shadow-popover)",
                 border: "1px solid var(--border)",
               }}
             >
               <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "10px" }}>
-                <AlertCircle size={16} style={{ color: "#DC2626" }} />
-                <h4 style={{ margin: 0, fontSize: "14.5px", fontWeight: 700, color: "#0F172A" }}>
+                <AlertCircle size={16} style={{ color: "#EF4444" }} />
+                <h4 style={{ margin: 0, fontSize: "14.5px", fontWeight: 700, color: "var(--text)" }}>
                   Reject Access Request
                 </h4>
               </div>
 
-              <p style={{ fontSize: "12px", color: "#64748B", margin: "0 0 12px", lineHeight: 1.4 }}>
+              <p style={{ fontSize: "12px", color: "var(--muted)", margin: "0 0 12px", lineHeight: 1.4 }}>
                 Select a standard rejection reason or provide custom feedback:
               </p>
 
@@ -305,12 +300,12 @@ export default function ApprovalDetailDrawer({
                       alignItems: "center",
                       gap: "7px",
                       fontSize: "11.5px",
-                      color: "#334155",
+                      color: "var(--text-secondary)",
                       cursor: "pointer",
-                      padding: "5px 8px",
+                      padding: "6px 9px",
                       borderRadius: "6px",
-                      background: rejectReason === r ? "#FEF2F2" : "#F8FAFC",
-                      border: `1px solid ${rejectReason === r ? "#FECACA" : "#E2E8F0"}`,
+                      background: rejectReason === r ? "rgba(239, 68, 68, 0.15)" : "var(--surface-subtle)",
+                      border: `1px solid ${rejectReason === r ? "rgba(239, 68, 68, 0.3)" : "var(--border)"}`,
                     }}
                   >
                     <input
@@ -325,7 +320,7 @@ export default function ApprovalDetailDrawer({
               </div>
 
               <div style={{ marginBottom: "16px" }}>
-                <label style={{ fontSize: "11px", fontWeight: 600, color: "#64748B", display: "block", marginBottom: "4px" }}>
+                <label style={{ fontSize: "11px", fontWeight: 600, color: "var(--muted)", display: "block", marginBottom: "4px" }}>
                   Additional Notes (Optional)
                 </label>
                 <textarea

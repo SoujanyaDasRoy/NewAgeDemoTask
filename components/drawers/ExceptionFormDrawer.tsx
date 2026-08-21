@@ -81,12 +81,12 @@ export default function ExceptionFormDrawer({
         <div className="drawer-head">
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-              <h3 style={{ margin: 0, fontSize: "15px", fontWeight: 700, color: "#0F172A" }}>
+              <h3 style={{ margin: 0, fontSize: "15px", fontWeight: 700, color: "var(--text)" }}>
                 {submittedId ? "Exception Request Submitted" : "Request Access Exception"}
               </h3>
               <span className="badge badge-amber" style={{ fontSize: "10.5px" }}>Exception</span>
             </div>
-            <div className="sub" style={{ fontSize: "12px", color: "#64748B", marginTop: "1px" }}>
+            <div className="sub" style={{ fontSize: "12px", color: "var(--muted)", marginTop: "1px" }}>
               {accessItem.tool} – {accessItem.name}
             </div>
           </div>
@@ -103,21 +103,21 @@ export default function ExceptionFormDrawer({
                   width: "48px",
                   height: "48px",
                   borderRadius: "999px",
-                  background: "#FFFBEB",
-                  border: "1px solid #FDE68A",
+                  background: "rgba(245, 158, 11, 0.15)",
+                  border: "1px solid rgba(245, 158, 11, 0.3)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   margin: "0 auto 12px",
-                  color: "#D97706",
+                  color: "#FBBF24",
                 }}
               >
                 <AlertTriangle size={24} />
               </div>
-              <h4 style={{ fontSize: "16px", fontWeight: 700, margin: 0, color: "#0F172A" }}>
+              <h4 style={{ fontSize: "16px", fontWeight: 700, margin: 0, color: "var(--text)" }}>
                 Exception Request Submitted
               </h4>
-              <p style={{ fontSize: "12.5px", color: "#64748B", marginTop: "4px" }}>
+              <p style={{ fontSize: "12.5px", color: "var(--muted)", marginTop: "4px" }}>
                 Routed to {accessItem.approver} for exception evaluation.
               </p>
 
@@ -125,7 +125,7 @@ export default function ExceptionFormDrawer({
                 style={{
                   marginTop: "20px",
                   padding: "12px 14px",
-                  background: "#F8FAFC",
+                  background: "var(--surface-subtle)",
                   borderRadius: "8px",
                   border: "1px solid var(--border)",
                   textAlign: "left",
@@ -135,24 +135,24 @@ export default function ExceptionFormDrawer({
                 }}
               >
                 <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12.5px" }}>
-                  <span style={{ color: "#64748B" }}>Request ID</span>
-                  <span className="mono font-bold text-[#0F172A]">{submittedId}</span>
+                  <span style={{ color: "var(--muted)" }}>Request ID</span>
+                  <span className="mono font-bold" style={{ color: "var(--text)" }}>{submittedId}</span>
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12.5px" }}>
-                  <span style={{ color: "#64748B" }}>Status</span>
+                  <span style={{ color: "var(--muted)" }}>Status</span>
                   <StatusBadge status="Pending Exception Approval" />
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12.5px" }}>
-                  <span style={{ color: "#64748B" }}>Approver</span>
-                  <span style={{ fontWeight: 600, color: "#0F172A" }}>{accessItem.approver}</span>
+                  <span style={{ color: "var(--muted)" }}>Approver</span>
+                  <span style={{ fontWeight: 600, color: "var(--text)" }}>{accessItem.approver}</span>
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12.5px" }}>
-                  <span style={{ color: "#64748B" }}>Required Until</span>
-                  <span style={{ fontWeight: 600, color: "#0F172A" }}>{requiredUntil}</span>
+                  <span style={{ color: "var(--muted)" }}>Required Until</span>
+                  <span style={{ fontWeight: 600, color: "var(--text)" }}>{requiredUntil}</span>
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12.5px" }}>
-                  <span style={{ color: "#64748B" }}>Urgency</span>
-                  <span style={{ fontWeight: 600, color: urgency === "CRITICAL" ? "#DC2626" : urgency === "URGENT" ? "#D97706" : "#475569" }}>
+                  <span style={{ color: "var(--muted)" }}>Urgency</span>
+                  <span style={{ fontWeight: 600, color: urgency === "CRITICAL" ? "#EF4444" : urgency === "URGENT" ? "#F59E0B" : "var(--text)" }}>
                     {urgency}
                   </span>
                 </div>
@@ -169,12 +169,12 @@ export default function ExceptionFormDrawer({
           ) : (
             <form onSubmit={handleSubmit}>
               <div className="warn-box" style={{ marginBottom: "16px" }}>
-                <AlertTriangle size={15} style={{ marginTop: "1px", flexShrink: 0 }} />
+                <AlertTriangle size={15} style={{ marginTop: "1px", flexShrink: 0, color: "#F59E0B" }} />
                 <div>
-                  <div style={{ fontWeight: 700, color: "#92400E" }}>
+                  <div style={{ fontWeight: 700 }}>
                     Out-of-Department Resource
                   </div>
-                  <div style={{ color: "#B45309", marginTop: "2px" }}>
+                  <div style={{ marginTop: "2px", fontSize: "11.5px" }}>
                     This resource belongs to {accessItem.group}. A justified exception review is required.
                   </div>
                 </div>
@@ -242,7 +242,7 @@ export default function ExceptionFormDrawer({
                     if (error) setError("");
                   }}
                 />
-                {error && <div style={{ color: "#DC2626", fontSize: "11.5px", marginTop: "4px" }}>{error}</div>}
+                {error && <div style={{ color: "#EF4444", fontSize: "11.5px", marginTop: "4px" }}>{error}</div>}
               </div>
 
               <div style={{ display: "flex", gap: "8px", marginTop: "20px" }}>

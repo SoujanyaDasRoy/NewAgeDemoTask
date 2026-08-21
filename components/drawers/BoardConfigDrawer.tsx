@@ -106,14 +106,14 @@ export default function BoardConfigDrawer({
             <ServiceLogo tool={accessItem.tool} size={24} />
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                <h3 style={{ margin: 0, fontSize: "15px", fontWeight: 700, color: "#0F172A" }}>
+                <h3 style={{ margin: 0, fontSize: "15px", fontWeight: 700, color: "var(--text)" }}>
                   Manage Configuration
                 </h3>
                 <span className="badge badge-gray" style={{ fontSize: "10.5px" }}>
                   {accessItem.tool}
                 </span>
               </div>
-              <div className="sub" style={{ fontSize: "12px", color: "#64748B", marginTop: "1px" }}>
+              <div className="sub" style={{ fontSize: "12px", color: "var(--muted)", marginTop: "1px" }}>
                 {accessItem.name}
               </div>
             </div>
@@ -130,16 +130,16 @@ export default function BoardConfigDrawer({
             style={{
               padding: "14px 16px",
               borderRadius: "10px",
-              background: "#FFFFFF",
+              background: "var(--surface)",
               border: "1px solid var(--border)",
               marginBottom: "20px",
-              boxShadow: "var(--shadow-xs)",
+              boxShadow: "var(--shadow-card)",
             }}
           >
             <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "12px" }}>
               <div style={{ flex: 1 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                  <span style={{ fontSize: "13.5px", fontWeight: 700, color: "#0F172A" }}>
+                  <span style={{ fontSize: "13.5px", fontWeight: 700, color: "var(--text)" }}>
                     Automated SCIM Provisioning
                   </span>
                   {automation ? (
@@ -155,7 +155,7 @@ export default function BoardConfigDrawer({
                 <div
                   style={{
                     fontSize: "12px",
-                    color: "#64748B",
+                    color: "var(--muted)",
                     marginTop: "3px",
                     lineHeight: 1.4,
                   }}
@@ -171,7 +171,7 @@ export default function BoardConfigDrawer({
                 style={{
                   border: "none",
                   background: "transparent",
-                  color: automation ? "#0F172A" : "#CBD5E1",
+                  color: automation ? "var(--accent)" : "var(--muted)",
                   cursor: "pointer",
                   display: "flex",
                   alignItems: "center",
@@ -180,7 +180,7 @@ export default function BoardConfigDrawer({
                 onClick={handleToggle}
                 title={automation ? "Disable automation" : "Enable automation"}
               >
-                {automation ? <ToggleRight size={34} style={{ color: "#2563EB" }} /> : <ToggleLeft size={34} />}
+                {automation ? <ToggleRight size={34} style={{ color: "var(--accent)" }} /> : <ToggleLeft size={34} />}
               </button>
             </div>
           </div>
@@ -193,14 +193,14 @@ export default function BoardConfigDrawer({
             {/* Primary Approver */}
             <div className="form-group" style={{ marginBottom: "14px" }}>
               <label className="form-label" style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-                <User size={13} style={{ color: "#64748B" }} /> Primary Approver
+                <User size={13} style={{ color: "var(--muted)" }} /> Primary Approver
               </label>
               <span className="form-sublabel">
                 First recipient of all incoming access requests for this board.
               </span>
               <div style={{ marginTop: "4px" }}>
                 <select
-                  className="form-input"
+                  className="form-select"
                   value={approver}
                   onChange={(e) => setApprover(e.target.value)}
                   style={{ cursor: "pointer", height: "36px" }}
@@ -218,14 +218,14 @@ export default function BoardConfigDrawer({
             {/* Backup Approver */}
             <div className="form-group" style={{ marginBottom: "14px" }}>
               <label className="form-label" style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-                <Shield size={13} style={{ color: "#64748B" }} /> Backup Approver
+                <Shield size={13} style={{ color: "var(--muted)" }} /> Backup Approver
               </label>
               <span className="form-sublabel">
                 Can step in to approve if the primary approver is unavailable.
               </span>
               <div style={{ marginTop: "4px" }}>
                 <select
-                  className="form-input"
+                  className="form-select"
                   value={backupApprover}
                   onChange={(e) => setBackupApprover(e.target.value)}
                   style={{ cursor: "pointer", height: "36px" }}
@@ -243,14 +243,14 @@ export default function BoardConfigDrawer({
             {/* Access Provider (IT Admin) */}
             <div className="form-group" style={{ marginBottom: "18px" }}>
               <label className="form-label" style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-                <Building size={13} style={{ color: "#64748B" }} /> Access Provider (IT Admin)
+                <Building size={13} style={{ color: "var(--muted)" }} /> Access Provider (IT Admin)
               </label>
               <span className="form-sublabel">
                 Responsible for manual provisioning when automation is disabled.
               </span>
               <div style={{ marginTop: "4px" }}>
                 <select
-                  className="form-input"
+                  className="form-select"
                   value={provider}
                   onChange={(e) => setProvider(e.target.value)}
                   style={{ cursor: "pointer", height: "36px" }}
@@ -276,18 +276,18 @@ export default function BoardConfigDrawer({
                   display: "grid",
                   gridTemplateColumns: "1fr 1fr",
                   gap: "10px",
-                  background: "#F8FAFC",
+                  background: "var(--surface-subtle)",
                   padding: "10px 12px",
                   borderRadius: "8px",
                   border: "1px solid var(--border)",
                 }}
               >
                 <div>
-                  <span style={{ fontSize: "10.5px", color: "#64748B", fontWeight: 600, display: "flex", alignItems: "center", gap: "4px", textTransform: "uppercase" }}>
+                  <span style={{ fontSize: "10.5px", color: "var(--muted)", fontWeight: 600, display: "flex", alignItems: "center", gap: "4px", textTransform: "uppercase" }}>
                     <Key size={11} /> Access ID
                   </span>
                   <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "3px" }}>
-                    <span className="mono" style={{ fontSize: "12.5px", fontWeight: 700, color: "#0F172A" }}>
+                    <span className="mono" style={{ fontSize: "12.5px", fontWeight: 700, color: "var(--text)" }}>
                       {accessItem.accessId || "Unassigned"}
                     </span>
                     {accessItem.accessId && (
@@ -298,7 +298,7 @@ export default function BoardConfigDrawer({
                           border: "none",
                           background: "transparent",
                           cursor: "pointer",
-                          color: copied ? "#16A34A" : "#94A3B8",
+                          color: copied ? "#4ADE80" : "var(--muted)",
                           padding: "2px",
                           display: "flex",
                           alignItems: "center",
@@ -312,7 +312,7 @@ export default function BoardConfigDrawer({
                 </div>
 
                 <div>
-                  <span style={{ fontSize: "10.5px", color: "#64748B", fontWeight: 600, display: "flex", alignItems: "center", gap: "4px", textTransform: "uppercase" }}>
+                  <span style={{ fontSize: "10.5px", color: "var(--muted)", fontWeight: 600, display: "flex", alignItems: "center", gap: "4px", textTransform: "uppercase" }}>
                     <Building size={11} /> Owning Group
                   </span>
                   <div style={{ marginTop: "3px" }}>

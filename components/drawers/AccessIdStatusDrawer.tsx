@@ -84,12 +84,12 @@ export default function AccessIdStatusDrawer({
             <ServiceLogo tool={accessItem.tool} size={24} />
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
-                <h3 style={{ margin: 0, fontSize: "15px", fontWeight: 700, color: "#0F172A" }}>
+                <h3 style={{ margin: 0, fontSize: "15px", fontWeight: 700, color: "var(--text)" }}>
                   Access ID Governance
                 </h3>
                 {queueItem && <StatusBadge status={queueItem.status} />}
               </div>
-              <div style={{ fontSize: "12px", color: "#64748B", marginTop: "1px" }}>
+              <div style={{ fontSize: "12px", color: "var(--muted)", marginTop: "1px" }}>
                 {accessItem.tool} · {accessItem.name}
               </div>
             </div>
@@ -108,7 +108,7 @@ export default function AccessIdStatusDrawer({
                 style={{
                   padding: "14px 16px",
                   borderRadius: "10px",
-                  background: "#F8FAFC",
+                  background: "var(--surface-subtle)",
                   border: "1px solid var(--border)",
                   marginBottom: "18px",
                 }}
@@ -117,15 +117,15 @@ export default function AccessIdStatusDrawer({
                   style={{
                     fontSize: "13px",
                     fontWeight: 700,
-                    color: "#0F172A",
+                    color: "var(--text)",
                     display: "flex",
                     alignItems: "center",
                     gap: "6px",
                   }}
                 >
-                  <Key size={15} style={{ color: "#64748B" }} /> Unique Access ID Required
+                  <Key size={15} style={{ color: "var(--muted)" }} /> Unique Access ID Required
                 </div>
-                <div style={{ fontSize: "12px", color: "#64748B", marginTop: "4px", lineHeight: "1.45" }}>
+                <div style={{ fontSize: "12px", color: "var(--muted)", marginTop: "4px", lineHeight: "1.45" }}>
                   This board requires an official Access ID before automated SCIM provisioning can be activated.
                 </div>
               </div>
@@ -140,13 +140,13 @@ export default function AccessIdStatusDrawer({
                     style={{
                       padding: "10px 12px",
                       borderRadius: "8px",
-                      background: "#F8FAFC",
+                      background: "var(--surface-subtle)",
                       border: "1px solid var(--border)",
                       display: "flex",
                       alignItems: "center",
                       gap: "8px",
                       fontSize: "12px",
-                      color: "#64748B",
+                      color: "var(--muted)",
                     }}
                   >
                     <Loader2 size={14} className="animate-spin" /> Verifying against global identity catalog...
@@ -156,9 +156,9 @@ export default function AccessIdStatusDrawer({
                     style={{
                       padding: "10px 12px",
                       borderRadius: "8px",
-                      background: "#FEF2F2",
-                      border: "1px solid #FECACA",
-                      color: "#991B1B",
+                      background: "rgba(239, 68, 68, 0.15)",
+                      border: "1px solid rgba(239, 68, 68, 0.3)",
+                      color: "#F87171",
                       fontSize: "12px",
                       display: "flex",
                       alignItems: "flex-start",
@@ -175,16 +175,16 @@ export default function AccessIdStatusDrawer({
                     style={{
                       padding: "10px 12px",
                       borderRadius: "8px",
-                      background: "#F0FDF4",
-                      border: "1px solid #DCFCE7",
-                      color: "#166534",
+                      background: "rgba(34, 197, 94, 0.15)",
+                      border: "1px solid rgba(34, 197, 94, 0.3)",
+                      color: "#4ADE80",
                       fontSize: "12px",
                       display: "flex",
                       alignItems: "center",
                       gap: "6px",
                     }}
                   >
-                    <ShieldCheck size={15} style={{ color: "#16A34A" }} /> Verified: No namespace collisions in directory.
+                    <ShieldCheck size={15} style={{ color: "#4ADE80" }} /> Verified: No namespace collisions in directory.
                   </div>
                 )}
               </div>
@@ -213,8 +213,8 @@ export default function AccessIdStatusDrawer({
               style={{
                 padding: "18px",
                 borderRadius: "10px",
-                background: "#F0FDF4",
-                border: "1px solid #DCFCE7",
+                background: "rgba(34, 197, 94, 0.12)",
+                border: "1px solid rgba(34, 197, 94, 0.3)",
                 textAlign: "center",
               }}
             >
@@ -223,8 +223,8 @@ export default function AccessIdStatusDrawer({
                   width: "42px",
                   height: "42px",
                   borderRadius: "999px",
-                  background: "#DCFCE7",
-                  color: "#16A34A",
+                  background: "rgba(34, 197, 94, 0.2)",
+                  color: "#4ADE80",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -233,13 +233,13 @@ export default function AccessIdStatusDrawer({
               >
                 <CheckCircle2 size={24} />
               </div>
-              <div style={{ fontSize: "13.5px", fontWeight: 700, color: "#166534" }}>
+              <div style={{ fontSize: "13.5px", fontWeight: 700, color: "#4ADE80" }}>
                 Active &amp; Governed Access ID
               </div>
-              <div className="mono" style={{ fontSize: "18px", fontWeight: 800, color: "#0F172A", margin: "6px 0" }}>
+              <div className="mono" style={{ fontSize: "18px", fontWeight: 800, color: "var(--text)", margin: "6px 0" }}>
                 {accessItem.accessId}
               </div>
-              <div style={{ fontSize: "11.5px", color: "#15803D" }}>
+              <div style={{ fontSize: "11.5px", color: "var(--muted)" }}>
                 Synchronized with identity provider and automated provisioning engine.
               </div>
             </div>

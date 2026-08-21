@@ -100,7 +100,7 @@ export default function CommandPalette({
         position: "fixed",
         inset: 0,
         zIndex: 9999,
-        background: "rgba(15, 27, 51, 0.45)",
+        background: "rgba(0, 0, 0, 0.65)",
         backdropFilter: "blur(8px)",
         display: "flex",
         alignItems: "flex-start",
@@ -116,10 +116,10 @@ export default function CommandPalette({
         style={{
           width: "100%",
           maxWidth: "600px",
-          background: "#FFFFFF",
+          background: "var(--surface-popover)",
           borderRadius: "14px",
-          border: "1px solid #E2E8F0",
-          boxShadow: "0 20px 45px -10px rgba(15, 27, 51, 0.2), 0 0 0 1px rgba(15, 27, 51, 0.05)",
+          border: "1px solid var(--border)",
+          boxShadow: "var(--shadow-popover)",
           overflow: "hidden",
           display: "flex",
           flexDirection: "column",
@@ -132,11 +132,11 @@ export default function CommandPalette({
             display: "flex",
             alignItems: "center",
             padding: "14px 18px",
-            borderBottom: "1px solid #F1F5F9",
+            borderBottom: "1px solid var(--border)",
             gap: "12px",
           }}
         >
-          <Search size={18} style={{ color: "#64748B", flexShrink: 0 }} />
+          <Search size={18} style={{ color: "var(--muted)", flexShrink: 0 }} />
           <input
             ref={inputRef}
             type="text"
@@ -152,7 +152,7 @@ export default function CommandPalette({
               border: "none",
               outline: "none",
               fontSize: "14.5px",
-              color: "#0F1B33",
+              color: "var(--text)",
               background: "transparent",
             }}
           />
@@ -160,10 +160,10 @@ export default function CommandPalette({
             style={{
               padding: "2px 6px",
               borderRadius: "4px",
-              background: "#F1F5F9",
-              border: "1px solid #CBD5E1",
+              background: "var(--surface-subtle)",
+              border: "1px solid var(--border)",
               fontSize: "11px",
-              color: "#64748B",
+              color: "var(--muted)",
               fontFamily: "inherit",
               fontWeight: 600,
             }}
@@ -175,11 +175,11 @@ export default function CommandPalette({
         {/* Results List */}
         <div style={{ maxHeight: "380px", overflowY: "auto", padding: "8px" }}>
           {totalItems === 0 ? (
-            <div style={{ padding: "36px 20px", textAlign: "center", color: "#64748B" }}>
-              <div style={{ fontSize: "14px", fontWeight: 600, color: "#334155" }}>
+            <div style={{ padding: "36px 20px", textAlign: "center", color: "var(--muted)" }}>
+              <div style={{ fontSize: "14px", fontWeight: 600, color: "var(--text)" }}>
                 No results found for &ldquo;{query}&rdquo;
               </div>
-              <div style={{ fontSize: "12px", color: "#94A3B8", marginTop: "4px" }}>
+              <div style={{ fontSize: "12px", color: "var(--muted)", marginTop: "4px" }}>
                 Try searching for Monday.com, Salesforce, Zendesk, or request ID.
               </div>
             </div>
@@ -192,7 +192,7 @@ export default function CommandPalette({
                     style={{
                       fontSize: "11px",
                       fontWeight: 700,
-                      color: "#94A3B8",
+                      color: "var(--muted)",
                       textTransform: "uppercase",
                       letterSpacing: "0.05em",
                       padding: "6px 10px 4px",
@@ -215,7 +215,7 @@ export default function CommandPalette({
                           justifyContent: "space-between",
                           padding: "9px 12px",
                           borderRadius: "8px",
-                          background: isSelected ? "#F1F5F9" : "transparent",
+                          background: isSelected ? "var(--surface-subtle)" : "transparent",
                           cursor: "pointer",
                           transition: "background 0.1s ease",
                         }}
@@ -223,10 +223,10 @@ export default function CommandPalette({
                         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                           <ServiceLogo tool={item.tool} size={18} />
                           <div>
-                            <div style={{ fontSize: "13.5px", fontWeight: 600, color: "#0F1B33" }}>
+                            <div style={{ fontSize: "13.5px", fontWeight: 600, color: "var(--text)" }}>
                               {item.name}
                             </div>
-                            <div style={{ fontSize: "11.5px", color: "#64748B" }}>
+                            <div style={{ fontSize: "11.5px", color: "var(--muted)" }}>
                               {item.tool} · {item.category === "APPLICATION" ? "Application" : "Board"}
                               {item.accessId && <span style={{ marginLeft: "6px" }} className="mono">ID: {item.accessId}</span>}
                             </div>
@@ -252,7 +252,7 @@ export default function CommandPalette({
                     style={{
                       fontSize: "11px",
                       fontWeight: 700,
-                      color: "#94A3B8",
+                      color: "var(--muted)",
                       textTransform: "uppercase",
                       letterSpacing: "0.05em",
                       padding: "6px 10px 4px",
@@ -276,31 +276,25 @@ export default function CommandPalette({
                           justifyContent: "space-between",
                           padding: "9px 12px",
                           borderRadius: "8px",
-                          background: isSelected ? "#F1F5F9" : "transparent",
+                          background: isSelected ? "var(--surface-subtle)" : "transparent",
                           cursor: "pointer",
                           transition: "background 0.1s ease",
                         }}
                       >
                         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                          <Package size={16} style={{ color: "#2563EB" }} />
+                          <Package size={16} style={{ color: "var(--accent)" }} />
                           <div>
-                            <div style={{ fontSize: "13.5px", fontWeight: 600, color: "#0F1B33" }}>
+                            <div style={{ fontSize: "13.5px", fontWeight: 600, color: "var(--text)" }}>
                               {req.accessLabel}
                             </div>
-                            <div style={{ fontSize: "11.5px", color: "#64748B" }}>
+                            <div style={{ fontSize: "11.5px", color: "var(--muted)" }}>
                               <span className="mono">{req.id}</span> · For: {req.beneficiaryName}
                             </div>
                           </div>
                         </div>
                         <span
-                          style={{
-                            fontSize: "11px",
-                            fontWeight: 600,
-                            padding: "3px 8px",
-                            borderRadius: "999px",
-                            background: req.status === "COMPLETED" ? "#F0FDF4" : "#FFFBEB",
-                            color: req.status === "COMPLETED" ? "#16A34A" : "#B45309",
-                          }}
+                          className={`badge ${req.status === "COMPLETED" ? "badge-green" : "badge-amber"}`}
+                          style={{ fontSize: "10.5px" }}
                         >
                           {req.status.replace(/_/g, " ")}
                         </span>
@@ -317,21 +311,21 @@ export default function CommandPalette({
         <div
           style={{
             padding: "8px 16px",
-            background: "#F8FAFC",
-            borderTop: "1px solid #F1F5F9",
+            background: "var(--surface-subtle)",
+            borderTop: "1px solid var(--border)",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
             fontSize: "11.5px",
-            color: "#64748B",
+            color: "var(--muted)",
           }}
         >
           <div style={{ display: "flex", gap: "12px" }}>
             <span>
-              <kbd style={{ padding: "1px 4px", background: "#FFF", border: "1px solid #CBD5E1", borderRadius: "3px" }}>↑</kbd> <kbd style={{ padding: "1px 4px", background: "#FFF", border: "1px solid #CBD5E1", borderRadius: "3px" }}>↓</kbd> Navigate
+              <kbd style={{ padding: "1px 5px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: "3px", color: "var(--text)" }}>↑</kbd> <kbd style={{ padding: "1px 5px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: "3px", color: "var(--text)" }}>↓</kbd> Navigate
             </span>
             <span>
-              <kbd style={{ padding: "1px 4px", background: "#FFF", border: "1px solid #CBD5E1", borderRadius: "3px" }}>↵</kbd> Select
+              <kbd style={{ padding: "1px 5px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: "3px", color: "var(--text)" }}>↵</kbd> Select
             </span>
           </div>
           <span>New Age Command Bar</span>

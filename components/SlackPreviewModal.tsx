@@ -218,9 +218,10 @@ export default function SlackPreviewModal({
           transform: "translate(-50%, -50%)",
           width: "min(720px, 94vw)",
           maxHeight: "90vh",
-          background: "#FFFFFF",
+          background: "var(--surface-popover)",
           borderRadius: "16px",
-          boxShadow: "0 25px 60px -12px rgba(15, 27, 51, 0.35), 0 0 0 1px rgba(15, 27, 51, 0.08)",
+          border: "1px solid var(--border)",
+          boxShadow: "var(--shadow-popover)",
           zIndex: 70,
           display: "flex",
           flexDirection: "column",
@@ -318,8 +319,8 @@ export default function SlackPreviewModal({
         {/* Simulator Options Sub-Bar */}
         <div
           style={{
-            background: "#F8FAFC",
-            borderBottom: "1px solid #E2E8F0",
+            background: "var(--surface-subtle)",
+            borderBottom: "1px solid var(--border)",
             padding: "10px 18px",
             display: "flex",
             alignItems: "center",
@@ -330,7 +331,7 @@ export default function SlackPreviewModal({
         >
           {/* Request Selector */}
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <label style={{ fontSize: "12px", fontWeight: 600, color: "#475569" }}>
+            <label style={{ fontSize: "12px", fontWeight: 600, color: "var(--muted)" }}>
               Preview Request:
             </label>
             <select
@@ -343,10 +344,10 @@ export default function SlackPreviewModal({
                 height: "32px",
                 padding: "0 8px",
                 borderRadius: "6px",
-                border: "1px solid #CBD5E1",
+                border: "1px solid var(--border)",
                 fontSize: "12px",
-                background: "#FFFFFF",
-                color: "#0F1B33",
+                background: "var(--surface-input)",
+                color: "var(--text)",
                 outline: "none",
                 fontWeight: 600,
               }}
@@ -363,13 +364,13 @@ export default function SlackPreviewModal({
           </div>
 
           {/* View Mode Toggle (Visual vs JSON Payload) */}
-          <div style={{ display: "flex", gap: "4px", background: "#E2E8F0", padding: "2px", borderRadius: "6px" }}>
+          <div style={{ display: "flex", gap: "4px", background: "var(--surface-subtle)", border: "1px solid var(--border)", padding: "2px", borderRadius: "6px" }}>
             <button
               type="button"
               onClick={() => setActiveTab("preview")}
               style={{
-                background: activeTab === "preview" ? "#FFFFFF" : "transparent",
-                color: activeTab === "preview" ? "#0F1B33" : "#64748B",
+                background: activeTab === "preview" ? "var(--surface)" : "transparent",
+                color: activeTab === "preview" ? "var(--text)" : "var(--muted)",
                 border: "none",
                 borderRadius: "4px",
                 padding: "4px 10px",
@@ -379,7 +380,7 @@ export default function SlackPreviewModal({
                 display: "inline-flex",
                 alignItems: "center",
                 gap: "4px",
-                boxShadow: activeTab === "preview" ? "0 1px 2px rgba(0,0,0,0.08)" : "none",
+                boxShadow: activeTab === "preview" ? "var(--shadow-xs)" : "none",
               }}
             >
               <Eye size={12} /> Block-Kit Visual
@@ -388,8 +389,8 @@ export default function SlackPreviewModal({
               type="button"
               onClick={() => setActiveTab("payload")}
               style={{
-                background: activeTab === "payload" ? "#FFFFFF" : "transparent",
-                color: activeTab === "payload" ? "#0F1B33" : "#64748B",
+                background: activeTab === "payload" ? "var(--surface)" : "transparent",
+                color: activeTab === "payload" ? "var(--text)" : "var(--muted)",
                 border: "none",
                 borderRadius: "4px",
                 padding: "4px 10px",
@@ -399,7 +400,7 @@ export default function SlackPreviewModal({
                 display: "inline-flex",
                 alignItems: "center",
                 gap: "4px",
-                boxShadow: activeTab === "payload" ? "0 1px 2px rgba(0,0,0,0.08)" : "none",
+                boxShadow: activeTab === "payload" ? "var(--shadow-xs)" : "none",
               }}
             >
               <Code size={12} /> JSON Payload
@@ -413,19 +414,19 @@ export default function SlackPreviewModal({
             /* Slack Window Frame */
             <div
               style={{
-                background: "#FFFFFF",
-                border: "1px solid #D1D5DB",
+                background: "var(--surface)",
+                border: "1px solid var(--border)",
                 borderRadius: "12px",
                 overflow: "hidden",
-                boxShadow: "0 4px 14px rgba(0,0,0,0.06)",
-                fontFamily: "Slack-Lato, appleLogo, sans-serif",
+                boxShadow: "var(--shadow-card)",
+                fontFamily: "inherit",
               }}
             >
               {/* Channel Header */}
               <div
                 style={{
-                  background: "#F8F8F8",
-                  borderBottom: "1px solid #E5E7EB",
+                  background: "var(--surface-subtle)",
+                  borderBottom: "1px solid var(--border)",
                   padding: "10px 16px",
                   display: "flex",
                   alignItems: "center",
@@ -433,15 +434,15 @@ export default function SlackPreviewModal({
                 }}
               >
                 <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                  <Hash size={16} style={{ color: "#4B5563" }} />
-                  <span style={{ fontWeight: 800, fontSize: "14px", color: "#111827" }}>
+                  <Hash size={16} style={{ color: "var(--muted)" }} />
+                  <span style={{ fontWeight: 800, fontSize: "14px", color: "var(--text)" }}>
                     access-approvals
                   </span>
-                  <span style={{ color: "#9CA3AF", fontSize: "12px", marginLeft: "8px" }}>
+                  <span style={{ color: "var(--muted)", fontSize: "12px", marginLeft: "8px" }}>
                     🔒 Automated Access &amp; Exception Approvals • New Age Governance
                   </span>
                 </div>
-                <div style={{ fontSize: "11.5px", color: "#6B7280", fontWeight: 500 }}>
+                <div style={{ fontSize: "11.5px", color: "var(--muted)", fontWeight: 500 }}>
                   24 members
                 </div>
               </div>
@@ -472,13 +473,13 @@ export default function SlackPreviewModal({
                 <div style={{ flex: 1, minWidth: 0 }}>
                   {/* Sender line */}
                   <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "6px" }}>
-                    <span style={{ fontWeight: 800, fontSize: "14px", color: "#1D1C1D" }}>
+                    <span style={{ fontWeight: 800, fontSize: "14px", color: "var(--text)" }}>
                       New Age Access Bot
                     </span>
                     <span
                       style={{
-                        background: "#E8E8E8",
-                        color: "#616061",
+                        background: "var(--surface-subtle)",
+                        color: "var(--muted)",
                         fontSize: "10px",
                         fontWeight: 700,
                         padding: "1px 4px",
@@ -488,24 +489,22 @@ export default function SlackPreviewModal({
                     >
                       APP
                     </span>
-                    <span style={{ fontSize: "12px", color: "#616061" }}>Today at 2:48 PM</span>
+                    <span style={{ fontSize: "12px", color: "var(--muted)" }}>Today at 2:48 PM</span>
                   </div>
 
                   {/* Slack Attachment / Card Block */}
                   <div
                     style={{
-                      borderLeft: "4px solid #2563EB",
-                      paddingLeft: "14px",
-                      background: "#FAFAFA",
                       borderRadius: "0 8px 8px 0",
                       padding: "12px 14px",
-                      border: "1px solid #E5E7EB",
+                      background: "var(--surface-subtle)",
+                      border: "1px solid var(--border)",
                       borderLeftWidth: "4px",
-                      borderLeftColor: selectedReq.isException ? "#D97706" : "#2563EB",
+                      borderLeftColor: selectedReq.isException ? "#F59E0B" : "var(--accent)",
                     }}
                   >
                     {/* Header */}
-                    <div style={{ fontSize: "15px", fontWeight: 800, color: "#1D1C1D", marginBottom: "10px" }}>
+                    <div style={{ fontSize: "15px", fontWeight: 800, color: "var(--text)", marginBottom: "10px" }}>
                       🔔 New Access Request: {selectedReq.accessLabel}
                     </div>
 
@@ -520,49 +519,49 @@ export default function SlackPreviewModal({
                       }}
                     >
                       <div>
-                        <div style={{ color: "#616061", fontWeight: 700 }}>Request ID:</div>
-                        <div style={{ fontFamily: "monospace", color: "#1D1C1D", fontWeight: 600 }}>
+                        <div style={{ color: "var(--muted)", fontWeight: 700 }}>Request ID:</div>
+                        <div style={{ fontFamily: "monospace", color: "var(--text)", fontWeight: 600 }}>
                           `{selectedReq.id}`
                         </div>
                       </div>
 
                       <div>
-                        <div style={{ color: "#616061", fontWeight: 700 }}>Requester:</div>
-                        <div style={{ color: "#1D1C1D", fontWeight: 600 }}>
+                        <div style={{ color: "var(--muted)", fontWeight: 700 }}>Requester:</div>
+                        <div style={{ color: "var(--text)", fontWeight: 600 }}>
                           {selectedReq.requester?.name || selectedReq.beneficiaryName}
                         </div>
                       </div>
 
                       <div>
-                        <div style={{ color: "#616061", fontWeight: 700 }}>For Employee:</div>
-                        <div style={{ color: "#1D1C1D", fontWeight: 600 }}>
+                        <div style={{ color: "var(--muted)", fontWeight: 700 }}>For Employee:</div>
+                        <div style={{ color: "var(--text)", fontWeight: 600 }}>
                           {selectedReq.beneficiaryName}
                         </div>
                       </div>
 
                       <div>
-                        <div style={{ color: "#616061", fontWeight: 700 }}>Type:</div>
+                        <div style={{ color: "var(--muted)", fontWeight: 700 }}>Type:</div>
                         <div>
                           {selectedReq.isException ? (
-                            <span style={{ color: "#B45309", fontWeight: 700 }}>
+                            <span style={{ color: "#F59E0B", fontWeight: 700 }}>
                               ⚠️ Exception Request
                             </span>
                           ) : (
-                            <span style={{ color: "#15803D", fontWeight: 600 }}>Standard</span>
+                            <span style={{ color: "#4ADE80", fontWeight: 600 }}>Standard</span>
                           )}
                         </div>
                       </div>
 
                       <div>
-                        <div style={{ color: "#616061", fontWeight: 700 }}>Approver:</div>
-                        <div style={{ color: "#1D1C1D", fontWeight: 600 }}>
+                        <div style={{ color: "var(--muted)", fontWeight: 700 }}>Approver:</div>
+                        <div style={{ color: "var(--text)", fontWeight: 600 }}>
                           {selectedReq.approverName}
                         </div>
                       </div>
 
                       <div>
-                        <div style={{ color: "#616061", fontWeight: 700 }}>Provisioning:</div>
-                        <div style={{ color: "#1D1C1D", fontWeight: 600 }}>
+                        <div style={{ color: "var(--muted)", fontWeight: 700 }}>Provisioning:</div>
+                        <div style={{ color: "var(--text)", fontWeight: 600 }}>
                           {selectedReq.automation ? "⚡ Automated SCIM" : "🛠️ Manual IT"}
                         </div>
                       </div>
@@ -570,14 +569,14 @@ export default function SlackPreviewModal({
 
                     {/* Justification Blockquote */}
                     <div style={{ marginBottom: "14px" }}>
-                      <div style={{ color: "#616061", fontWeight: 700, fontSize: "12px", marginBottom: "4px" }}>
+                      <div style={{ color: "var(--muted)", fontWeight: 700, fontSize: "12px", marginBottom: "4px" }}>
                         Business Justification:
                       </div>
                       <div
                         style={{
-                          borderLeft: "3px solid #D1D5DB",
+                          borderLeft: "3px solid var(--border)",
                           paddingLeft: "10px",
-                          color: "#374151",
+                          color: "var(--text-secondary)",
                           fontSize: "12.5px",
                           lineHeight: "1.45",
                           fontStyle: "italic",
@@ -593,9 +592,9 @@ export default function SlackPreviewModal({
                         style={{
                           padding: "10px 14px",
                           borderRadius: "6px",
-                          background: actionState === "approved" ? "#ECFDF5" : "#FEF2F2",
-                          border: `1px solid ${actionState === "approved" ? "#A7F3D0" : "#FECACA"}`,
-                          color: actionState === "approved" ? "#065F46" : "#991B1B",
+                          background: actionState === "approved" ? "rgba(34, 197, 94, 0.15)" : "rgba(239, 68, 68, 0.15)",
+                          border: `1px solid ${actionState === "approved" ? "rgba(34, 197, 94, 0.3)" : "rgba(239, 68, 68, 0.3)"}`,
+                          color: actionState === "approved" ? "#4ADE80" : "#F87171",
                           fontSize: "12.5px",
                           fontWeight: 700,
                           display: "flex",
@@ -620,7 +619,7 @@ export default function SlackPreviewModal({
                           onClick={handleSimulatedApprove}
                           disabled={actionLoading !== null}
                           style={{
-                            background: "#007A5A",
+                            background: "#059669",
                             color: "#FFFFFF",
                             border: "none",
                             borderRadius: "5px",
@@ -643,7 +642,7 @@ export default function SlackPreviewModal({
                           onClick={handleSimulatedReject}
                           disabled={actionLoading !== null}
                           style={{
-                            background: "#E01E5A",
+                            background: "#DC2626",
                             color: "#FFFFFF",
                             border: "none",
                             borderRadius: "5px",
@@ -668,9 +667,9 @@ export default function SlackPreviewModal({
                             onTriggerToast?.("Navigating to request review drawer in portal...");
                           }}
                           style={{
-                            background: "#FFFFFF",
-                            color: "#1D1C1D",
-                            border: "1px solid #D1D5DB",
+                            background: "var(--surface)",
+                            color: "var(--text)",
+                            border: "1px solid var(--border)",
                             borderRadius: "5px",
                             padding: "6px 12px",
                             fontSize: "12.5px",
@@ -687,7 +686,7 @@ export default function SlackPreviewModal({
                     )}
 
                     {/* Context Footer */}
-                    <div style={{ marginTop: "12px", fontSize: "11px", color: "#9CA3AF" }}>
+                    <div style={{ marginTop: "12px", fontSize: "11px", color: "var(--muted)" }}>
                       New Age Access Management Portal • Status: <strong>{selectedReq.status}</strong>
                     </div>
                   </div>
@@ -698,7 +697,7 @@ export default function SlackPreviewModal({
             /* JSON Block-Kit Payload Inspector */
             <div
               style={{
-                background: "#0F172A",
+                background: "#090D16",
                 color: "#E2E8F0",
                 borderRadius: "10px",
                 padding: "16px",
@@ -706,11 +705,11 @@ export default function SlackPreviewModal({
                 fontSize: "12px",
                 maxHeight: "440px",
                 overflowY: "auto",
-                border: "1px solid #334155",
+                border: "1px solid var(--border)",
               }}
             >
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px" }}>
-                <span style={{ color: "#94A3B8" }}>// POST https://hooks.slack.com/services/...</span>
+                <span style={{ color: "var(--muted)" }}>// POST https://hooks.slack.com/services/...</span>
                 <button
                   type="button"
                   onClick={() => {
@@ -718,9 +717,9 @@ export default function SlackPreviewModal({
                     onTriggerToast?.("JSON Block-Kit payload copied to clipboard!");
                   }}
                   style={{
-                    background: "#1E293B",
-                    color: "#93C5FD",
-                    border: "1px solid #475569",
+                    background: "var(--surface-subtle)",
+                    color: "var(--text)",
+                    border: "1px solid var(--border)",
                     padding: "3px 8px",
                     borderRadius: "4px",
                     fontSize: "11px",
@@ -740,16 +739,16 @@ export default function SlackPreviewModal({
         {/* Modal Footer */}
         <div
           style={{
-            background: "#F8FAFC",
-            borderTop: "1px solid #E2E8F0",
+            background: "var(--surface-subtle)",
+            borderTop: "1px solid var(--border)",
             padding: "12px 20px",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
           }}
         >
-          <div style={{ fontSize: "12px", color: "#64748B", display: "flex", alignItems: "center", gap: "6px" }}>
-            <Sparkles size={14} style={{ color: "#2563EB" }} />
+          <div style={{ fontSize: "12px", color: "var(--muted)", display: "flex", alignItems: "center", gap: "6px" }}>
+            <Sparkles size={14} style={{ color: "var(--accent)" }} />
             Clicking simulated buttons tests real state changes with live toast notifications.
           </div>
           <button

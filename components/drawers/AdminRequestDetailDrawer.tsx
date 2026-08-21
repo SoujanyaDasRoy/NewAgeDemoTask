@@ -51,12 +51,12 @@ export default function AdminRequestDetailDrawer({
             <ServiceLogo tool={toolName} size={24} />
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
-                <h3 style={{ margin: 0, fontSize: "15px", fontWeight: 700, color: "#0F172A" }}>
+                <h3 style={{ margin: 0, fontSize: "15px", fontWeight: 700, color: "var(--text)" }}>
                   Manual IT Provisioning
                 </h3>
                 <StatusBadge status={request.status} />
               </div>
-              <div style={{ fontSize: "12px", color: "#64748B", marginTop: "1px" }}>
+              <div style={{ fontSize: "12px", color: "var(--muted)", marginTop: "1px" }}>
                 {request.accessLabel} · <span className="mono">{request.id}</span>
               </div>
             </div>
@@ -73,7 +73,7 @@ export default function AdminRequestDetailDrawer({
             style={{
               padding: "14px 16px",
               borderRadius: "10px",
-              background: "#F8FAFC",
+              background: "var(--surface-subtle)",
               border: "1px solid var(--border)",
               marginBottom: "18px",
             }}
@@ -82,15 +82,15 @@ export default function AdminRequestDetailDrawer({
               style={{
                 fontSize: "13px",
                 fontWeight: 700,
-                color: "#0F172A",
+                color: "var(--text)",
                 display: "flex",
                 alignItems: "center",
                 gap: "6px",
               }}
             >
-              <Package size={15} style={{ color: "#64748B" }} /> Ready for Manual Fulfillment
+              <Package size={15} style={{ color: "var(--muted)" }} /> Ready for Manual Fulfillment
             </div>
-            <div style={{ fontSize: "12px", color: "#64748B", marginTop: "3px", lineHeight: "1.45" }}>
+            <div style={{ fontSize: "12px", color: "var(--muted)", marginTop: "3px", lineHeight: "1.45" }}>
               Approved by <strong>{request.approverName}</strong>. Please create the account in {toolName} and confirm fulfillment below.
             </div>
 
@@ -149,11 +149,11 @@ export default function AdminRequestDetailDrawer({
                 style={{
                   marginTop: "4px",
                   padding: "10px 12px",
-                  background: "#F8FAFC",
+                  background: "var(--surface-subtle)",
                   border: "1px solid var(--border)",
                   borderRadius: "8px",
                   fontSize: "12.5px",
-                  color: "#334155",
+                  color: "var(--text-secondary)",
                   lineHeight: "1.45",
                 }}
               >
