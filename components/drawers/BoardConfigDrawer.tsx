@@ -80,7 +80,6 @@ export default function BoardConfigDrawer({
     }
   };
 
-  // Compile unique user names for selection
   const teamMemberOptions = Array.from(
     new Set([
       "Master Admin",
@@ -103,24 +102,24 @@ export default function BoardConfigDrawer({
       >
         {/* Drawer Header */}
         <div className="drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            <ServiceLogo tool={accessItem.tool} size={26} />
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <ServiceLogo tool={accessItem.tool} size={24} />
             <div>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                <h3 style={{ margin: 0, fontSize: "16px", fontWeight: 700, color: "#0F1B33" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                <h3 style={{ margin: 0, fontSize: "15px", fontWeight: 700, color: "#0F172A" }}>
                   Manage Configuration
                 </h3>
-                <span className="badge badge-gray" style={{ fontSize: "11px" }}>
+                <span className="badge badge-gray" style={{ fontSize: "10.5px" }}>
                   {accessItem.tool}
                 </span>
               </div>
-              <div className="sub" style={{ fontSize: "12.5px", color: "#64748B", marginTop: "2px" }}>
+              <div className="sub" style={{ fontSize: "12px", color: "#64748B", marginTop: "1px" }}>
                 {accessItem.name}
               </div>
             </div>
           </div>
           <button className="drawer-close" onClick={onClose} aria-label="Close drawer">
-            <X size={18} />
+            <X size={16} />
           </button>
         </div>
 
@@ -129,50 +128,26 @@ export default function BoardConfigDrawer({
           {/* Automated Provisioning Switch Card */}
           <div
             style={{
-              padding: "16px",
-              borderRadius: "12px",
-              background: automation
-                ? "linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%)"
-                : "#F8FAFC",
-              border: `1px solid ${automation ? "#BFDBFE" : "#E2E8F0"}`,
-              marginBottom: "24px",
-              boxShadow: automation ? "0 4px 14px rgba(37, 99, 235, 0.08)" : "none",
-              transition: "all 0.2s ease",
+              padding: "14px 16px",
+              borderRadius: "10px",
+              background: "#FFFFFF",
+              border: "1px solid var(--border)",
+              marginBottom: "20px",
+              boxShadow: "var(--shadow-xs)",
             }}
           >
             <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "12px" }}>
               <div style={{ flex: 1 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                  <span style={{ fontSize: "14px", fontWeight: 700, color: automation ? "#1E3A8A" : "#1E293B" }}>
-                    Automated Provisioning
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <span style={{ fontSize: "13.5px", fontWeight: 700, color: "#0F172A" }}>
+                    Automated SCIM Provisioning
                   </span>
                   {automation ? (
-                    <span
-                      style={{
-                        fontSize: "11px",
-                        fontWeight: 600,
-                        padding: "2px 8px",
-                        borderRadius: "999px",
-                        background: "#2563EB",
-                        color: "#FFFFFF",
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: "3px",
-                      }}
-                    >
+                    <span className="badge badge-blue">
                       <Zap size={10} /> Active
                     </span>
                   ) : (
-                    <span
-                      style={{
-                        fontSize: "11px",
-                        fontWeight: 600,
-                        padding: "2px 8px",
-                        borderRadius: "999px",
-                        background: "#E2E8F0",
-                        color: "#64748B",
-                      }}
-                    >
+                    <span className="badge badge-gray">
                       Manual Queue
                     </span>
                   )}
@@ -180,9 +155,9 @@ export default function BoardConfigDrawer({
                 <div
                   style={{
                     fontSize: "12px",
-                    color: automation ? "#1E40AF" : "#64748B",
-                    marginTop: "4px",
-                    lineHeight: 1.45,
+                    color: "#64748B",
+                    marginTop: "3px",
+                    lineHeight: 1.4,
                   }}
                 >
                   {automation
@@ -196,40 +171,39 @@ export default function BoardConfigDrawer({
                 style={{
                   border: "none",
                   background: "transparent",
-                  color: automation ? "#2563EB" : "#94A3B8",
+                  color: automation ? "#0F172A" : "#CBD5E1",
                   cursor: "pointer",
                   display: "flex",
                   alignItems: "center",
                   padding: "0",
-                  transition: "transform 0.15s ease",
                 }}
                 onClick={handleToggle}
                 title={automation ? "Disable automation" : "Enable automation"}
               >
-                {automation ? <ToggleRight size={38} /> : <ToggleLeft size={38} />}
+                {automation ? <ToggleRight size={34} style={{ color: "#2563EB" }} /> : <ToggleLeft size={34} />}
               </button>
             </div>
           </div>
 
           <form onSubmit={handleSave}>
-            <div className="divider-label" style={{ marginBottom: "14px" }}>
+            <div className="divider-label" style={{ marginBottom: "12px" }}>
               Role Assignments &amp; Workflow
             </div>
 
             {/* Primary Approver */}
-            <div className="form-group" style={{ marginBottom: "16px" }}>
-              <label className="form-label" style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                <User size={13} style={{ color: "#2563EB" }} /> Primary Approver
+            <div className="form-group" style={{ marginBottom: "14px" }}>
+              <label className="form-label" style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+                <User size={13} style={{ color: "#64748B" }} /> Primary Approver
               </label>
               <span className="form-sublabel">
                 First recipient of all incoming access requests for this board.
               </span>
-              <div style={{ position: "relative", marginTop: "6px" }}>
+              <div style={{ marginTop: "4px" }}>
                 <select
                   className="form-input"
                   value={approver}
                   onChange={(e) => setApprover(e.target.value)}
-                  style={{ cursor: "pointer", appearance: "auto" }}
+                  style={{ cursor: "pointer", height: "36px" }}
                   required
                 >
                   {teamMemberOptions.map((name) => (
@@ -242,19 +216,19 @@ export default function BoardConfigDrawer({
             </div>
 
             {/* Backup Approver */}
-            <div className="form-group" style={{ marginBottom: "16px" }}>
-              <label className="form-label" style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                <Shield size={13} style={{ color: "#D97706" }} /> Backup Approver
+            <div className="form-group" style={{ marginBottom: "14px" }}>
+              <label className="form-label" style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+                <Shield size={13} style={{ color: "#64748B" }} /> Backup Approver
               </label>
               <span className="form-sublabel">
-                Can step in to approve if the primary approver is out of office.
+                Can step in to approve if the primary approver is unavailable.
               </span>
-              <div style={{ position: "relative", marginTop: "6px" }}>
+              <div style={{ marginTop: "4px" }}>
                 <select
                   className="form-input"
                   value={backupApprover}
                   onChange={(e) => setBackupApprover(e.target.value)}
-                  style={{ cursor: "pointer", appearance: "auto" }}
+                  style={{ cursor: "pointer", height: "36px" }}
                   required
                 >
                   {teamMemberOptions.map((name) => (
@@ -267,19 +241,19 @@ export default function BoardConfigDrawer({
             </div>
 
             {/* Access Provider (IT Admin) */}
-            <div className="form-group" style={{ marginBottom: "20px" }}>
-              <label className="form-label" style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+            <div className="form-group" style={{ marginBottom: "18px" }}>
+              <label className="form-label" style={{ display: "flex", alignItems: "center", gap: "5px" }}>
                 <Building size={13} style={{ color: "#64748B" }} /> Access Provider (IT Admin)
               </label>
               <span className="form-sublabel">
                 Responsible for manual provisioning when automation is disabled.
               </span>
-              <div style={{ position: "relative", marginTop: "6px" }}>
+              <div style={{ marginTop: "4px" }}>
                 <select
                   className="form-input"
                   value={provider}
                   onChange={(e) => setProvider(e.target.value)}
-                  style={{ cursor: "pointer", appearance: "auto" }}
+                  style={{ cursor: "pointer", height: "36px" }}
                   required
                 >
                   {teamMemberOptions.map((name) => (
@@ -292,8 +266,8 @@ export default function BoardConfigDrawer({
             </div>
 
             {/* Metadata & Governance Card */}
-            <div style={{ marginTop: "24px", paddingTop: "18px", borderTop: "1px solid var(--border)" }}>
-              <div className="divider-label" style={{ marginBottom: "10px" }}>
+            <div style={{ marginTop: "20px", paddingTop: "16px", borderTop: "1px solid var(--border)" }}>
+              <div className="divider-label" style={{ marginBottom: "8px" }}>
                 Metadata &amp; Governance
               </div>
 
@@ -303,17 +277,17 @@ export default function BoardConfigDrawer({
                   gridTemplateColumns: "1fr 1fr",
                   gap: "10px",
                   background: "#F8FAFC",
-                  padding: "12px",
-                  borderRadius: "10px",
-                  border: "1px solid #E2E8F0",
+                  padding: "10px 12px",
+                  borderRadius: "8px",
+                  border: "1px solid var(--border)",
                 }}
               >
                 <div>
-                  <span style={{ fontSize: "11px", color: "#64748B", fontWeight: 500, display: "flex", alignItems: "center", gap: "4px" }}>
+                  <span style={{ fontSize: "10.5px", color: "#64748B", fontWeight: 600, display: "flex", alignItems: "center", gap: "4px", textTransform: "uppercase" }}>
                     <Key size={11} /> Access ID
                   </span>
-                  <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "4px" }}>
-                    <span className="mono" style={{ fontSize: "13px", fontWeight: 700, color: "#0F1B33" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "3px" }}>
+                    <span className="mono" style={{ fontSize: "12.5px", fontWeight: 700, color: "#0F172A" }}>
                       {accessItem.accessId || "Unassigned"}
                     </span>
                     {accessItem.accessId && (
@@ -331,27 +305,18 @@ export default function BoardConfigDrawer({
                         }}
                         title="Copy Access ID"
                       >
-                        {copied ? <CheckCheck size={13} /> : <Copy size={13} />}
+                        {copied ? <CheckCheck size={12} /> : <Copy size={12} />}
                       </button>
                     )}
                   </div>
                 </div>
 
                 <div>
-                  <span style={{ fontSize: "11px", color: "#64748B", fontWeight: 500, display: "flex", alignItems: "center", gap: "4px" }}>
+                  <span style={{ fontSize: "10.5px", color: "#64748B", fontWeight: 600, display: "flex", alignItems: "center", gap: "4px", textTransform: "uppercase" }}>
                     <Building size={11} /> Owning Group
                   </span>
-                  <div style={{ marginTop: "4px" }}>
-                    <span
-                      style={{
-                        fontSize: "12px",
-                        fontWeight: 600,
-                        padding: "2px 8px",
-                        borderRadius: "6px",
-                        background: "#F1F5F9",
-                        color: "#334155",
-                      }}
-                    >
+                  <div style={{ marginTop: "3px" }}>
+                    <span className="badge badge-gray" style={{ fontSize: "11px" }}>
                       {accessItem.group}
                     </span>
                   </div>
@@ -360,11 +325,11 @@ export default function BoardConfigDrawer({
             </div>
 
             {/* Drawer Actions Footer */}
-            <div style={{ display: "flex", gap: "10px", marginTop: "24px" }}>
+            <div style={{ display: "flex", gap: "8px", marginTop: "20px" }}>
               <button
                 type="button"
                 className="btn btn-secondary"
-                style={{ flex: 1, height: "40px" }}
+                style={{ flex: 1, height: "38px" }}
                 onClick={onClose}
               >
                 Cancel
@@ -372,10 +337,10 @@ export default function BoardConfigDrawer({
               <button
                 type="submit"
                 className="btn btn-primary"
-                style={{ flex: 1.5, height: "40px" }}
+                style={{ flex: 1.5, height: "38px" }}
                 disabled={loading}
               >
-                <Check size={16} /> {loading ? "Saving..." : "Save Configuration"}
+                <Check size={14} /> {loading ? "Saving..." : "Save Configuration"}
               </button>
             </div>
           </form>

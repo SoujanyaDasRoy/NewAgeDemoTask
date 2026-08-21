@@ -67,24 +67,24 @@ export default function AccessDetailsDrawer({
       >
         {/* Drawer Header */}
         <div className="drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            <ServiceLogo tool={accessItem.tool} size={28} />
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <ServiceLogo tool={accessItem.tool} size={24} />
             <div>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
-                <h3 style={{ margin: 0, fontSize: "16px", fontWeight: 700, color: "#0F1B33" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
+                <h3 style={{ margin: 0, fontSize: "15px", fontWeight: 700, color: "#0F172A" }}>
                   {accessItem.name}
                 </h3>
-                <span className="badge badge-gray" style={{ fontSize: "11px" }}>
+                <span className="badge badge-gray" style={{ fontSize: "10.5px" }}>
                   {accessItem.category}
                 </span>
               </div>
-              <div style={{ fontSize: "12.5px", color: "#64748B", marginTop: "2px" }}>
+              <div style={{ fontSize: "12px", color: "#64748B", marginTop: "1px" }}>
                 {accessItem.tool} · Owned by {accessItem.group}
               </div>
             </div>
           </div>
           <button className="drawer-close" onClick={onClose} aria-label="Close drawer">
-            <X size={18} />
+            <X size={16} />
           </button>
         </div>
 
@@ -93,39 +93,39 @@ export default function AccessDetailsDrawer({
           {/* Policy Matching Status Card */}
           <div
             style={{
-              padding: "14px",
-              borderRadius: "12px",
+              padding: "12px 14px",
+              borderRadius: "8px",
               background: isEligible ? "#F0FDF4" : "#FFFBEB",
-              border: `1px solid ${isEligible ? "#BBF7D0" : "#FDE68A"}`,
+              border: `1px solid ${isEligible ? "#DCFCE7" : "#FDE68A"}`,
               color: isEligible ? "#166534" : "#92400E",
-              fontSize: "12.5px",
+              fontSize: "12px",
               lineHeight: 1.45,
               display: "flex",
               alignItems: "flex-start",
-              gap: "10px",
-              marginBottom: "20px",
+              gap: "8px",
+              marginBottom: "16px",
             }}
           >
             {isEligible ? (
-              <Zap size={17} style={{ color: "#16A34A", flexShrink: 0, marginTop: "1px" }} />
+              <Zap size={15} style={{ color: "#16A34A", flexShrink: 0, marginTop: "1px" }} />
             ) : (
-              <AlertTriangle size={17} style={{ color: "#D97706", flexShrink: 0, marginTop: "1px" }} />
+              <AlertTriangle size={15} style={{ color: "#D97706", flexShrink: 0, marginTop: "1px" }} />
             )}
             <div>
               <strong>{isEligible ? "Standard Policy Match:" : "Cross-Department Exception:"}</strong>{" "}
               {isEligible
-                ? `You belong to an authorized department. Requests are fast-tracked to ${accessItem.approver}.`
-                : `This tool is restricted to ${accessItem.group}. You can submit a business exception request for review.`}
+                ? `You belong to an authorized department. Requests route directly to ${accessItem.approver}.`
+                : `This resource belongs to ${accessItem.group}. You can submit a business exception request for review.`}
             </div>
           </div>
 
-          <p style={{ fontSize: "13.5px", color: "#475569", lineHeight: "1.6", margin: "0 0 20px" }}>
+          <p style={{ fontSize: "13px", color: "#334155", lineHeight: "1.5", margin: "0 0 16px" }}>
             {accessItem.description}
           </p>
 
           {/* Access Details Metadata Grid */}
-          <div style={{ marginTop: "20px", paddingTop: "18px", borderTop: "1px solid var(--border)" }}>
-            <div className="divider-label" style={{ marginBottom: "12px" }}>
+          <div style={{ marginTop: "16px", paddingTop: "14px", borderTop: "1px solid var(--border)" }}>
+            <div className="divider-label" style={{ marginBottom: "10px" }}>
               Directory &amp; Policy Metadata
             </div>
             <div className="field-grid">
@@ -148,7 +148,7 @@ export default function AccessDetailsDrawer({
                         }}
                         title="Copy Access ID"
                       >
-                        {copied ? <CheckCheck size={13} /> : <Copy size={13} />}
+                        {copied ? <CheckCheck size={12} /> : <Copy size={12} />}
                       </button>
                     </>
                   ) : (
@@ -161,7 +161,7 @@ export default function AccessDetailsDrawer({
                 <span className="f-value">
                   {accessItem.automation ? (
                     <span style={{ color: "#2563EB", fontWeight: 600, display: "inline-flex", alignItems: "center", gap: "3px" }}>
-                      <Zap size={11} /> ⚡ Automated SCIM
+                      <Zap size={11} /> Automated SCIM
                     </span>
                   ) : (
                     "Manual IT Provisioning"
@@ -188,26 +188,24 @@ export default function AccessDetailsDrawer({
           </div>
 
           {/* Action CTA Button */}
-          <div style={{ marginTop: "28px" }}>
+          <div style={{ marginTop: "24px" }}>
             <button
               type="button"
-              className="btn btn-primary"
+              className="btn btn-primary btn-block"
               style={{
-                width: "100%",
-                height: "44px",
-                fontSize: "13.5px",
-                fontWeight: 600,
+                height: "40px",
+                fontSize: "13px",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                gap: "8px",
+                gap: "6px",
               }}
               onClick={() => {
                 onClose();
                 onRequestAccess(accessItem);
               }}
             >
-              Request Access to {accessItem.name} <ArrowRight size={15} />
+              Request Access to {accessItem.name} <ArrowRight size={14} />
             </button>
           </div>
         </div>

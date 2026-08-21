@@ -17,7 +17,6 @@ import {
   MessageSquare,
   Plus,
   ExternalLink,
-  AlignJustify,
   LogOut,
   Users,
   Shield,
@@ -577,7 +576,7 @@ function PortalDashboard() {
       {/* HEADER */}
       <header className="header">
         <div className="header-inner">
-          {/* Brand with Breadcrumb */}
+          {/* Brand */}
           <div className="brand" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
             <div className="brand-badge">NA</div>
             <div className="brand-title-wrap">
@@ -595,14 +594,13 @@ function PortalDashboard() {
                 className="badge badge-amber"
                 style={{
                   cursor: "pointer",
-                  fontWeight: 600,
-                  fontSize: "11.5px",
+                  fontSize: "11px",
                   display: "inline-flex",
                   alignItems: "center",
                   gap: "4px",
                 }}
                 onClick={() => {
-                  const el = document.querySelector(".card-tinted-amber");
+                  const el = document.getElementById("approvals-section");
                   el?.scrollIntoView({ behavior: "smooth" });
                 }}
                 title="Pending approvals requiring your action"
@@ -628,10 +626,8 @@ function PortalDashboard() {
                 display: "inline-flex",
                 alignItems: "center",
                 gap: "5px",
-                background: "#0F1B33",
-                boxShadow: "0 2px 6px rgba(15, 27, 51, 0.15)",
               }}
-              title="Submit a new access or board permission request"
+              title="Submit a new access request"
             >
               <Plus size={13} /> + Request Access
             </button>
@@ -649,9 +645,9 @@ function PortalDashboard() {
                 alignItems: "center",
                 gap: "5px",
               }}
-              title="Open Live Audit & Compliance Trail Stream"
+              title="Open Live Audit Trail"
             >
-              <Shield size={13} style={{ color: "#2563EB" }} /> Audit Trail
+              <Shield size={13} /> Audit Trail
             </button>
 
             <button
@@ -666,7 +662,7 @@ function PortalDashboard() {
                 alignItems: "center",
                 gap: "5px",
               }}
-              title="Interactive Slack Webhook & Block Kit Simulator"
+              title="Slack Webhook & Block Kit Simulator"
             >
               <MessageSquare size={13} style={{ color: "#E01E5A" }} /> Slack Preview
             </button>
@@ -683,9 +679,6 @@ function PortalDashboard() {
                   display: "inline-flex",
                   alignItems: "center",
                   gap: "5px",
-                  color: "#166534",
-                  borderColor: "#BBF7D0",
-                  background: "#F0FDF4",
                 }}
                 title="1-Click SOC2/ISO-27001 Access Compliance CSV Export"
               >
@@ -693,10 +686,10 @@ function PortalDashboard() {
               </button>
             )}
 
-            {/* Role Badge with Live Pulse Dot */}
+            {/* Role Badge */}
             <span
               className={isRoleAdmin ? "badge badge-blue" : "badge badge-gray"}
-              style={{ fontWeight: 600, fontSize: "12px", display: "inline-flex", alignItems: "center", gap: "6px" }}
+              style={{ fontSize: "11.5px", display: "inline-flex", alignItems: "center", gap: "5px" }}
             >
               <span className="live-pulse-dot" />
               {isRoleAdmin ? "Board Admin" : "Employee"}
@@ -705,7 +698,7 @@ function PortalDashboard() {
             {/* Notifications */}
             <div style={{ position: "relative" }}>
               <button className="icon-btn" onClick={handleNotifClick} title="Notifications">
-                <Bell size={18} />
+                <Bell size={16} />
                 {unreadCount > 0 && <span className="notif-dot">{unreadCount}</span>}
               </button>
 
@@ -714,7 +707,7 @@ function PortalDashboard() {
                 <div className="notif-panel-head">
                   <span>Notifications</span>
                   <span
-                    style={{ fontSize: "11px", color: "#9CA3AF", cursor: "pointer" }}
+                    style={{ fontSize: "11px", color: "#64748B", cursor: "pointer", fontWeight: 500 }}
                     onClick={async () => {
                       await markNotificationsRead(isRoleAdmin ? "admin" : "employee");
                       await loadData();
@@ -729,11 +722,11 @@ function PortalDashboard() {
                       style={{
                         padding: "24px",
                         textAlign: "center",
-                        color: "#9CA3AF",
-                        fontSize: "13px",
+                        color: "#94A3B8",
+                        fontSize: "12.5px",
                       }}
                     >
-                      No notifications
+                      No unread notifications
                     </div>
                   ) : (
                     notifications.map((n) => {
@@ -810,16 +803,16 @@ function PortalDashboard() {
                 <div
                   className="avatar"
                   style={{
-                    width: "32px",
-                    height: "32px",
+                    width: "28px",
+                    height: "28px",
                     fontSize: "11px",
-                    background: currentUser.avatarTone || "#0F1B33",
+                    background: currentUser.avatarTone || "#0F172A",
                   }}
                 >
                   {currentUser.initials}
                 </div>
                 <div style={{ display: "flex", flexDirection: "column" }}>
-                  <div className="name" style={{ fontSize: "12.5px", fontWeight: 600, color: "#0F1B33" }}>
+                  <div className="name" style={{ fontSize: "12px", fontWeight: 600, color: "#0F172A" }}>
                     {currentUser.name}
                   </div>
                   <div className="role" style={{ fontSize: "10.5px", color: "#64748B" }}>
@@ -827,7 +820,7 @@ function PortalDashboard() {
                   </div>
                 </div>
                 <ChevronDown
-                  size={13}
+                  size={12}
                   style={{
                     color: "#94A3B8",
                     transform: userMenuOpen ? "rotate(180deg)" : "rotate(0deg)",
@@ -846,7 +839,7 @@ function PortalDashboard() {
                       className="user-dropdown-badge"
                       style={{
                         background: isRoleAdmin ? "#EFF6FF" : "#F1F5F9",
-                        color: isRoleAdmin ? "#1D4ED8" : "#475569",
+                        color: isRoleAdmin ? "#1E40AF" : "#475569",
                       }}
                     >
                       <Shield size={10} /> {isRoleAdmin ? "Board Admin" : "Employee"} · {currentUser.department}
@@ -860,14 +853,14 @@ function PortalDashboard() {
                       setCmdPaletteOpen(true);
                     }}
                   >
-                    <Search size={14} /> Spotlight Search (⌘K)
+                    <Search size={13} /> Quick Search (⌘K)
                   </button>
                   <div className="user-dropdown-divider" />
                   <button
                     className="user-dropdown-item danger"
                     onClick={() => logout()}
                   >
-                    <LogOut size={14} /> Sign out
+                    <LogOut size={13} /> Sign out
                   </button>
                 </div>
               )}
@@ -878,37 +871,37 @@ function PortalDashboard() {
 
       {/* MAIN CONTENT */}
       <main className="main-container">
-        {/* Welcome Hero & Role Demarcation Banner */}
+        {/* Welcome & Context Header */}
         <div className="welcome">
-          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px", flexWrap: "wrap" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", flexWrap: "wrap" }}>
             <div>
               {isRoleAdmin ? (
                 <>
-                  <h1>Board Admin · {currentUser.name}</h1>
+                  <h1>Board Administration · {currentUser.name}</h1>
                   <p>
-                    Manage the boards you administer, provision access, govern Access IDs, and manage team member roles.
+                    Manage permissions, review pending approvals, provision manual access, and govern Access IDs.
                   </p>
                 </>
               ) : (
                 <>
                   <h1>Welcome back, {currentUser.name.split(" ")[0]}</h1>
                   <p>
-                    Search for access, track your requests, and act on anything awaiting your approval — all in one place.
+                    Discover tools, track your access requests, and act on items awaiting your approval.
                   </p>
                 </>
               )}
             </div>
 
-            {/* Quick Context Pill */}
-            <div className="role-banner" style={{ padding: "8px 14px", flexShrink: 0 }}>
+            {/* Role Context Pill */}
+            <div className="role-banner">
               <div className="role-banner-left">
-                <Shield size={16} style={{ color: isRoleAdmin ? "#2563EB" : "#16A34A" }} />
+                <Shield size={14} style={{ color: isRoleAdmin ? "#2563EB" : "#16A34A" }} />
                 <div>
-                  <div className="role-banner-title" style={{ fontSize: "12.5px" }}>
+                  <div className="role-banner-title">
                     {currentUser.department}
                   </div>
-                  <div className="role-banner-sub" style={{ fontSize: "11px" }}>
-                    {isRoleAdmin ? "Full Governance Permissions" : "Standard Employee Tier"}
+                  <div className="role-banner-sub">
+                    {isRoleAdmin ? "Full Administration Tier" : "Standard Employee"}
                   </div>
                 </div>
               </div>
@@ -916,52 +909,52 @@ function PortalDashboard() {
           </div>
         </div>
 
-        {/* ── 🌟 DRIBBLE-GRADE DASHBOARD METRICS HEADER ─────────────────── */}
+        {/* ── 🌟 TOP METRICS HEADER ─────────────────── */}
         <div className="metrics-grid">
           {/* 1. Directory Tools */}
           <div
-            className="metric-card metric-blue"
+            className="metric-card"
             onClick={() => {
-              const el = document.querySelector(".search-row");
+              const el = document.getElementById("search-directory-card");
               el?.scrollIntoView({ behavior: "smooth" });
             }}
             title="Browse all available tools and boards"
           >
             <div className="metric-top-row">
               <span className="metric-label">Directory Tools</span>
-              <div className="metric-icon-wrap metric-icon-blue">
-                <Package size={16} />
+              <div className="metric-icon-wrap">
+                <Package size={14} />
               </div>
             </div>
             <div className="metric-value-row">
               <span className="metric-number">{catalog.length}</span>
               <span className="metric-pill-sub" style={{ color: "#2563EB" }}>
-                <Zap size={11} /> {catalog.filter((c) => c.automation).length} Auto
+                <Zap size={10} /> {catalog.filter((c) => c.automation).length} Automated
               </span>
             </div>
           </div>
 
           {/* 2. Active Access Requests */}
           <div
-            className="metric-card metric-emerald"
+            className="metric-card"
             onClick={() => {
               setRequestFilter("ALL");
-              const el = document.querySelector(".filter-pills-row");
+              const el = document.getElementById("my-requests-section");
               el?.scrollIntoView({ behavior: "smooth" });
             }}
             title="View your active and past requests"
           >
             <div className="metric-top-row">
               <span className="metric-label">Active Requests</span>
-              <div className="metric-icon-wrap metric-icon-emerald">
-                <Activity size={16} />
+              <div className="metric-icon-wrap">
+                <Activity size={14} />
               </div>
             </div>
             <div className="metric-value-row">
               <span className="metric-number">
                 {requests.filter((r) => !["COMPLETED", "REJECTED", "EXPIRED"].includes(r.status)).length}
               </span>
-              <span className="metric-pill-sub" style={{ color: "#16A34A" }}>
+              <span className="metric-pill-sub" style={{ color: "#166534" }}>
                 {requests.filter((r) => r.status === "COMPLETED").length} Completed
               </span>
             </div>
@@ -969,17 +962,17 @@ function PortalDashboard() {
 
           {/* 3. Pending Approvals */}
           <div
-            className="metric-card metric-amber"
+            className="metric-card"
             onClick={() => {
-              const el = document.querySelector(".card-tinted-amber, .card-tinted-orange");
+              const el = document.getElementById("approvals-section");
               el?.scrollIntoView({ behavior: "smooth" });
             }}
             title="Items requiring immediate action"
           >
             <div className="metric-top-row">
               <span className="metric-label">Pending Approvals</span>
-              <div className="metric-icon-wrap metric-icon-amber">
-                <CheckSquare size={16} />
+              <div className="metric-icon-wrap">
+                <CheckSquare size={14} />
               </div>
             </div>
             <div className="metric-value-row">
@@ -987,27 +980,21 @@ function PortalDashboard() {
               <span
                 className="metric-pill-sub"
                 style={{
-                  color: pendingApprovals.length > 0 ? "#D97706" : "#16A34A",
+                  color: pendingApprovals.length > 0 ? "#D97706" : "#166534",
                   fontWeight: 600,
                 }}
               >
-                {pendingApprovals.length > 0 ? (
-                  <>
-                    <Zap size={11} /> Action Needed
-                  </>
-                ) : (
-                  "✓ All Clear"
-                )}
+                {pendingApprovals.length > 0 ? "Action Needed" : "✓ All Clear"}
               </span>
             </div>
           </div>
 
           {/* 4. Governed Access IDs */}
           <div
-            className="metric-card metric-violet"
+            className="metric-card"
             onClick={() => {
               if (isRoleAdmin) {
-                const el = document.querySelector(".card-tinted-violet");
+                const el = document.getElementById("governance-section");
                 el?.scrollIntoView({ behavior: "smooth" });
               } else if (catalog.length > 0) {
                 setAccessDetailsItem(catalog[0]);
@@ -1017,8 +1004,8 @@ function PortalDashboard() {
           >
             <div className="metric-top-row">
               <span className="metric-label">Governed Access IDs</span>
-              <div className="metric-icon-wrap metric-icon-violet">
-                <Key size={16} />
+              <div className="metric-icon-wrap">
+                <Key size={14} />
               </div>
             </div>
             <div className="metric-value-row">
@@ -1040,31 +1027,31 @@ function PortalDashboard() {
           </div>
         </div>
 
-        {/* SEARCH CARD WITH SPOTLIGHT SHORTCUT */}
-        <div className="card">
-          <div className="section-head" style={{ borderBottom: "none", paddingBottom: "4px" }}>
+        {/* ── SEARCH & DIRECTORY CARD ─────────────────── */}
+        <div className="card" id="search-directory-card">
+          <div className="section-head" style={{ borderBottom: "none", marginBottom: "8px" }}>
             <div className="section-head-left">
               <div className="section-icon">
-                <Search size={18} />
+                <Search size={15} />
               </div>
               <div>
-                <div className="section-title">Find access</div>
+                <div className="section-title">Find Access</div>
                 <div className="section-sub">
-                  Search by tool, board, or team — you don&apos;t need to know the exact internal name.
+                  Search across applications, boards, and tools available in the enterprise catalog.
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="search-row" style={{ marginTop: "12px" }}>
+          <div className="search-row" style={{ marginTop: "10px" }}>
             <div className="search-input-wrap">
               <div className="search-ico">
-                <Search size={16} />
+                <Search size={15} />
               </div>
               <input
                 type="text"
                 className="search-input"
-                placeholder="Search for an application, tool, account or board..."
+                placeholder="Search by tool, board, team, or Access ID..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -1080,52 +1067,20 @@ function PortalDashboard() {
             <button
               className="btn btn-primary"
               style={{
-                fontSize: "13px",
-                height: "38px",
+                fontSize: "12.5px",
+                height: "42px",
                 padding: "0 16px",
-                fontWeight: 700,
                 display: "flex",
                 alignItems: "center",
-                gap: "6px",
-                background: "#0F1B33",
+                gap: "5px",
                 flexShrink: 0,
               }}
               onClick={() => {
                 if (catalog.length > 0) setRequestFormItem(catalog[0]);
               }}
             >
-              <Zap size={14} style={{ color: "#60A5FA" }} /> + Request Access
+              <Plus size={14} /> + Request Access
             </button>
-          </div>
-
-          {/* Quick-Launch Preset Pills */}
-          <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "10px", flexWrap: "wrap" }}>
-            <span style={{ fontSize: "11.5px", fontWeight: 600, color: "#64748B" }}>Popular:</span>
-            {catalog.slice(0, 4).map((tool) => (
-              <button
-                key={tool.id}
-                type="button"
-                onClick={() => setRequestFormItem(tool)}
-                style={{
-                  border: "1px solid #E2E8F0",
-                  background: "#F8FAFC",
-                  color: "#0F1B33",
-                  padding: "3px 10px",
-                  borderRadius: "999px",
-                  fontSize: "11.5px",
-                  fontWeight: 600,
-                  cursor: "pointer",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "5px",
-                }}
-                className="hover-card-sm"
-              >
-                <ServiceLogo tool={tool.tool} size={13} />
-                <span>{tool.name}</span>
-                <span style={{ color: "#2563EB", fontSize: "10px" }}>+</span>
-              </button>
-            ))}
           </div>
 
           {/* Quick Category Filter Pills */}
@@ -1146,21 +1101,21 @@ function PortalDashboard() {
               className={`filter-pill ${directoryFilter === "BOARDS" ? "active" : ""}`}
               onClick={() => setDirectoryFilter("BOARDS")}
             >
-              📋 Boards ({catalog.filter((c) => c.category === "BOARD").length})
+              Boards ({catalog.filter((c) => c.category === "BOARD").length})
             </button>
             <button
               className={`filter-pill ${directoryFilter === "APPLICATIONS" ? "active" : ""}`}
               onClick={() => setDirectoryFilter("APPLICATIONS")}
             >
-              💻 Applications ({catalog.filter((c) => c.category === "APPLICATION").length})
+              Applications ({catalog.filter((c) => c.category === "APPLICATION").length})
             </button>
           </div>
 
           {/* Search Results */}
           {(searchQuery.trim() || directoryFilter !== "ALL") && searchResults.length === 0 ? (
-            <div className="empty-state" style={{ padding: "32px 20px" }}>
+            <div className="empty-state" style={{ padding: "28px 16px" }}>
               <div className="circle">
-                <Search size={20} />
+                <Search size={18} />
               </div>
               <div className="title">No matching tools or boards</div>
               <div className="sub">
@@ -1173,8 +1128,8 @@ function PortalDashboard() {
                 style={{
                   display: "flex",
                   flexDirection: "column",
-                  gap: "10px",
-                  marginTop: "16px",
+                  gap: "8px",
+                  marginTop: "12px",
                 }}
               >
                 {searchResults.map((item) => (
@@ -1188,28 +1143,26 @@ function PortalDashboard() {
                         style={{
                           display: "flex",
                           alignItems: "center",
-                          gap: "8px",
+                          gap: "6px",
                           flexWrap: "wrap",
                         }}
                       >
-                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                          <ServiceLogo tool={item.tool} size={18} />
-                          <span className="result-title">
-                            {item.name}
-                          </span>
-                          <span className="board-tool-chip" style={{ fontSize: "11px" }}>
-                            {item.tool}
-                          </span>
-                        </div>
-                        <span className="badge badge-gray" style={{ fontSize: "11px" }}>
+                        <ServiceLogo tool={item.tool} size={16} />
+                        <span className="result-title">
+                          {item.name}
+                        </span>
+                        <span className="board-tool-chip" style={{ fontSize: "10.5px" }}>
+                          {item.tool}
+                        </span>
+                        <span className="badge badge-gray" style={{ fontSize: "10.5px" }}>
                           {item.category === "APPLICATION" ? "Application" : "Board"}
                         </span>
                         {item.automation ? (
-                          <span className="badge badge-blue">
-                            <Zap size={10} /> Auto
+                          <span className="badge badge-blue" style={{ fontSize: "10.5px" }}>
+                            <Zap size={9} /> Auto
                           </span>
                         ) : (
-                          <span className="badge badge-gray">Manual</span>
+                          <span className="badge badge-gray" style={{ fontSize: "10.5px" }}>Manual</span>
                         )}
                       </div>
                       <div className="result-desc">{item.description}</div>
@@ -1219,19 +1172,19 @@ function PortalDashboard() {
                         {item.accessId && <span className="mono">ID: {item.accessId}</span>}
                         <span>
                           {item.isEligible ? (
-                            <span style={{ color: "#15803D", fontWeight: 600 }}>✓ Eligible</span>
+                            <span style={{ color: "#166534", fontWeight: 600 }}>✓ Eligible</span>
                           ) : (
-                            <span style={{ color: "#B45309", fontWeight: 600 }}>
+                            <span style={{ color: "#92400E", fontWeight: 600 }}>
                               Exception Required
                             </span>
                           )}
                         </span>
                       </div>
                     </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "6px", flexShrink: 0 }}>
                       <button
                         className="btn btn-secondary"
-                        style={{ fontSize: "12px", height: "34px", padding: "0 10px" }}
+                        style={{ fontSize: "11.5px", height: "32px", padding: "0 10px" }}
                         aria-label={`View details for ${item.name}`}
                         onClick={(e) => {
                           e.stopPropagation();
@@ -1244,43 +1197,43 @@ function PortalDashboard() {
                         <button
                           className="btn btn-primary"
                           style={{
-                            fontSize: "12px",
-                            height: "34px",
-                            padding: "0 14px",
+                            fontSize: "11.5px",
+                            height: "32px",
+                            padding: "0 12px",
                             fontWeight: 600,
                             display: "flex",
                             alignItems: "center",
-                            gap: "5px",
+                            gap: "4px",
                           }}
                           onClick={(e) => {
                             e.stopPropagation();
                             setRequestFormItem(item);
                           }}
                         >
-                          <Plus size={13} /> Request Access
+                          <Plus size={12} /> Request Access
                         </button>
                       ) : (
                         <button
                           type="button"
                           className="btn btn-secondary"
                           style={{
-                            fontSize: "12px",
-                            height: "34px",
-                            padding: "0 12px",
+                            fontSize: "11.5px",
+                            height: "32px",
+                            padding: "0 10px",
                             fontWeight: 600,
                             background: "#FEF3C7",
                             color: "#92400E",
-                            border: "1px solid #FDE68A",
+                            borderColor: "#FDE68A",
                             display: "flex",
                             alignItems: "center",
-                            gap: "5px",
+                            gap: "4px",
                           }}
                           onClick={(e) => {
                             e.stopPropagation();
                             setExceptionFormItem(item);
                           }}
                         >
-                          <AlertTriangle size={13} /> Request Exception
+                          <AlertTriangle size={12} /> Request Exception
                         </button>
                       )}
                     </div>
@@ -1291,802 +1244,418 @@ function PortalDashboard() {
           )}
         </div>
 
-        {/* ── EMPLOYEE VIEW ────────────────────────────────────────── */}
-        {!isRoleAdmin && (
-          <>
-            <div className="grid-2">
-              {/* My Requests */}
-              <div className="card">
-                <div className="section-head">
-                  <div className="section-head-left">
-                    <div className="section-icon">
-                      <Package size={18} />
-                    </div>
-                    <div>
-                      <div className="section-title">My Requests</div>
-                      <div className="section-sub">
-                        Requests you&apos;ve raised, for yourself or on behalf of other employees.
-                      </div>
-                    </div>
+        {/* ── EMPLOYEE & ADMIN WORKSPACE VIEWS ────────────────────────────────────────── */}
+        <div className="grid-2">
+          {/* My Requests */}
+          <div className="card" id="my-requests-section">
+            <div className="section-head">
+              <div className="section-head-left">
+                <div className="section-icon">
+                  <Package size={15} />
+                </div>
+                <div>
+                  <div className="section-title">My Requests</div>
+                  <div className="section-sub">
+                    Requests you have raised for yourself or on behalf of colleagues.
                   </div>
                 </div>
-
-                {/* Filter Pills */}
-                <div className="filter-pills-row">
-                  <button
-                    className={`filter-pill ${requestFilter === "ALL" ? "active" : ""}`}
-                    onClick={() => setRequestFilter("ALL")}
-                  >
-                    All ({allMyRequests.length})
-                  </button>
-                  <button
-                    className={`filter-pill ${requestFilter === "PENDING" ? "active" : ""}`}
-                    onClick={() => setRequestFilter("PENDING")}
-                  >
-                    Pending ({allMyRequests.filter((r) => ["PENDING_APPROVAL", "PENDING_EXCEPTION_APPROVAL"].includes(r.status)).length})
-                  </button>
-                  <button
-                    className={`filter-pill ${requestFilter === "APPROVED" ? "active" : ""}`}
-                    onClick={() => setRequestFilter("APPROVED")}
-                  >
-                    In-Progress ({allMyRequests.filter((r) => ["APPROVED", "PENDING_MANUAL_PROVISIONING", "PROVISIONING", "ACCESS_PROVISIONED"].includes(r.status)).length})
-                  </button>
-                  <button
-                    className={`filter-pill ${requestFilter === "COMPLETED" ? "active" : ""}`}
-                    onClick={() => setRequestFilter("COMPLETED")}
-                  >
-                    Completed ({allMyRequests.filter((r) => r.status === "COMPLETED").length})
-                  </button>
-                  <button
-                    className={`filter-pill ${requestFilter === "EXCEPTIONS" ? "active" : ""}`}
-                    onClick={() => setRequestFilter("EXCEPTIONS")}
-                  >
-                    Exceptions ({allMyRequests.filter((r) => r.isException).length})
-                  </button>
-                </div>
-
-                {myRequests.length === 0 ? (
-                  <div className="empty-state">
-                    <div className="circle">
-                      <Package size={20} />
-                    </div>
-                    <div className="title">No requests found</div>
-                    <div className="sub">
-                      {requestFilter === "ALL"
-                        ? "Search for a board or tool above to request access."
-                        : `No requests currently in '${requestFilter.toLowerCase()}' status.`}
-                    </div>
-                  </div>
-                ) : (
-                  <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                    {myRequests.map((req) => (
-                      <div
-                        key={req.id}
-                        className="list-row"
-                        onClick={() => setSelectedRequest(req)}
-                      >
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: "8px",
-                              flexWrap: "wrap",
-                            }}
-                          >
-                            <span
-                              style={{
-                                fontSize: "13.5px",
-                                fontWeight: 600,
-                                color: "#0F1B33",
-                              }}
-                            >
-                              {req.accessLabel}
-                            </span>
-                            <span className="badge badge-gray" style={{ fontSize: "11px" }}>
-                              {req.accessItem?.category === "APPLICATION" ? "Application" : "Board"}
-                            </span>
-                            <StatusBadge status={req.status} />
-                            {req.isException && (
-                              <span className="badge badge-amber">Exception</span>
-                            )}
-                          </div>
-                          <div
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "space-between",
-                              flexWrap: "wrap",
-                              gap: "12px",
-                              marginTop: "6px",
-                            }}
-                          >
-                            <div style={{ fontSize: "12px", color: "#64748B" }}>
-                              <span className="mono">{req.id}</span> · Updated{" "}
-                              {new Date(req.updatedAt || req.createdAt).toLocaleDateString("en-GB", {
-                                day: "numeric",
-                                month: "short",
-                                year: "numeric",
-                              })}
-                            </div>
-                            <RequestMiniStepper status={req.status} />
-                          </div>
-                        </div>
-                        {/* Quick-decision for on-behalf provisioned */}
-                        {req.status === "ACCESS_PROVISIONED" && req.onBehalf && (
-                          <button
-                            className="btn btn-primary"
-                            style={{
-                              fontSize: "12px",
-                              height: "30px",
-                              padding: "0 12px",
-                              background: "#0F1B33",
-                              marginLeft: "12px",
-                            }}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleCloseRequest(req.id);
-                            }}
-                          >
-                            Close
-                          </button>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Approvals Requiring My Action */}
-              <div className="card card-tinted-amber">
-                <div className="section-head">
-                  <div className="section-head-left">
-                    <div
-                      className="section-icon"
-                      style={{ background: "#FEF3C7", color: "#D97706" }}
-                    >
-                      <CheckSquare size={18} />
-                    </div>
-                    <div>
-                      <div className="section-title">Approvals Requiring My Action</div>
-                      <div className="section-sub">
-                        You&apos;re the configured approver (or backup) for these requests.
-                      </div>
-                    </div>
-                  </div>
-                  {pendingApprovals.length > 0 && (
-                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                      <button
-                        type="button"
-                        className="btn btn-secondary"
-                        onClick={handleSelectAllApprovals}
-                        style={{
-                          height: "26px",
-                          fontSize: "11px",
-                          padding: "0 8px",
-                          fontWeight: 600,
-                        }}
-                      >
-                        {selectedApprovalIds.length === pendingApprovals.length
-                          ? "Deselect All"
-                          : `Select All (${pendingApprovals.length})`}
-                      </button>
-                      <span className="badge badge-amber" style={{ fontWeight: 600 }}>
-                        {pendingApprovals.length} pending
-                      </span>
-                    </div>
-                  )}
-                </div>
-
-                {pendingApprovals.length === 0 ? (
-                  <div className="empty-state">
-                    <div className="circle">
-                      <CheckSquare size={20} />
-                    </div>
-                    <div className="title">All clear</div>
-                    <div className="sub">No requests pending your approval right now.</div>
-                  </div>
-                ) : (
-                  <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                    {pendingApprovals.map((req) => {
-                      const isSelected = selectedApprovalIds.includes(req.id);
-                      return (
-                        <div
-                          key={req.id}
-                          className="list-row"
-                          style={{
-                            borderLeft: isSelected ? "3px solid #16A34A" : "3px solid #D97706",
-                            background: isSelected ? "#F0FDF4" : undefined,
-                            transition: "all 0.15s ease",
-                          }}
-                          onClick={() => setApprovalRequest(req)}
-                        >
-                          {/* Multi-Select Checkbox */}
-                          <div
-                            onClick={(e) => toggleSelectApproval(req.id, e)}
-                            style={{
-                              width: "20px",
-                              height: "20px",
-                              borderRadius: "5px",
-                              border: isSelected ? "2px solid #16A34A" : "2px solid #CBD5E1",
-                              background: isSelected ? "#16A34A" : "#FFFFFF",
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              cursor: "pointer",
-                              flexShrink: 0,
-                              transition: "all 0.15s ease",
-                            }}
-                            title={isSelected ? "Deselect request" : "Select request for batch approval"}
-                          >
-                            {isSelected && <Check size={13} style={{ color: "#FFFFFF", strokeWidth: 3 }} />}
-                          </div>
-
-                          <div
-                            className="avatar"
-                            style={{
-                              width: "32px",
-                              height: "32px",
-                              fontSize: "11px",
-                              background: "#0F1B33",
-                              color: "#fff",
-                              fontWeight: 600,
-                              flexShrink: 0,
-                            }}
-                          >
-                            {(req.requester?.name || req.beneficiaryName || "NA")
-                              .split(" ")
-                              .map((n: string) => n[0])
-                              .join("")
-                              .slice(0, 2)
-                              .toUpperCase()}
-                          </div>
-                          <div style={{ flex: 1, minWidth: 0 }}>
-                            <div
-                              style={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: "8px",
-                                flexWrap: "wrap",
-                              }}
-                            >
-                              <span
-                                style={{
-                                  fontSize: "13.5px",
-                                  fontWeight: 600,
-                                  color: "#0F1B33",
-                                }}
-                              >
-                                {req.accessLabel}
-                              </span>
-                              <StatusBadge status={req.status} />
-                              {req.isException && (
-                                <span className="badge badge-amber" style={{ fontSize: "10.5px" }}>
-                                  Exception
-                                </span>
-                              )}
-                            </div>
-                            <div style={{ fontSize: "12px", color: "#64748B", marginTop: "4px" }}>
-                              <span className="mono">{req.id}</span> ·{" "}
-                              {req.requester?.name || req.beneficiaryName} ·{" "}
-                              {new Date(req.createdAt).toLocaleDateString("en-GB", {
-                                day: "numeric",
-                                month: "short",
-                                year: "numeric",
-                              })}
-                            </div>
-                          </div>
-
-                          {/* Inline Quick Action Buttons */}
-                          <div className="quick-action-wrap" onClick={(e) => e.stopPropagation()}>
-                            <button
-                              className="quick-action-btn quick-action-approve"
-                              title="1-Click Approve"
-                              onClick={() => handleApprove(req.id)}
-                            >
-                              ✓ Approve
-                            </button>
-                            <button
-                              className="quick-action-btn quick-action-reject"
-                              title="Reject"
-                              onClick={() => setApprovalRequest(req)}
-                            >
-                              ✕ Reject
-                            </button>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
               </div>
             </div>
 
-            {/* My Boards */}
-            <div className="card">
-              <div className="section-head">
-                <div className="section-head-left">
-                  <div className="section-icon">
-                    <LayoutDashboard size={18} />
-                  </div>
-                  <div>
-                    <div className="section-title">My Boards</div>
-                    <div className="section-sub">Boards and applications you have access to</div>
-                  </div>
+            {/* Filter Pills */}
+            <div className="filter-pills-row">
+              <button
+                className={`filter-pill ${requestFilter === "ALL" ? "active" : ""}`}
+                onClick={() => setRequestFilter("ALL")}
+              >
+                All ({allMyRequests.length})
+              </button>
+              <button
+                className={`filter-pill ${requestFilter === "PENDING" ? "active" : ""}`}
+                onClick={() => setRequestFilter("PENDING")}
+              >
+                Pending ({allMyRequests.filter((r) => ["PENDING_APPROVAL", "PENDING_EXCEPTION_APPROVAL"].includes(r.status)).length})
+              </button>
+              <button
+                className={`filter-pill ${requestFilter === "APPROVED" ? "active" : ""}`}
+                onClick={() => setRequestFilter("APPROVED")}
+              >
+                In-Progress ({allMyRequests.filter((r) => ["APPROVED", "PENDING_MANUAL_PROVISIONING", "PROVISIONING", "ACCESS_PROVISIONED"].includes(r.status)).length})
+              </button>
+              <button
+                className={`filter-pill ${requestFilter === "COMPLETED" ? "active" : ""}`}
+                onClick={() => setRequestFilter("COMPLETED")}
+              >
+                Completed ({allMyRequests.filter((r) => r.status === "COMPLETED").length})
+              </button>
+              <button
+                className={`filter-pill ${requestFilter === "EXCEPTIONS" ? "active" : ""}`}
+                onClick={() => setRequestFilter("EXCEPTIONS")}
+              >
+                Exceptions ({allMyRequests.filter((r) => r.isException).length})
+              </button>
+            </div>
+
+            {myRequests.length === 0 ? (
+              <div className="empty-state">
+                <div className="circle">
+                  <Package size={18} />
+                </div>
+                <div className="title">No requests found</div>
+                <div className="sub">
+                  {requestFilter === "ALL"
+                    ? "Search for a tool or board above to submit a request."
+                    : `No requests currently in '${requestFilter.toLowerCase()}' status.`}
                 </div>
               </div>
-              <div className="grid-3">
-                {catalog.slice(0, 3).map((item) => (
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                {myRequests.map((req) => (
                   <div
-                    key={item.id}
-                    className="board-card"
-                    onClick={() => setAccessDetailsItem(item)}
+                    key={req.id}
+                    className="list-row"
+                    onClick={() => setSelectedRequest(req)}
                   >
-                    <div className="board-card-body">
-                      {/* Top Row: Service Logo + Tool Name + Automation Pill */}
-                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: "7px" }}>
-                          <ServiceLogo tool={item.tool} size={18} />
-                          <span style={{ fontSize: "12px", fontWeight: 600, color: "#475569" }}>
-                            {item.tool}
-                          </span>
-                        </div>
-                        {item.automation ? (
-                          <span className="badge badge-blue">
-                            <Zap size={11} /> Automated
-                          </span>
-                        ) : (
-                          <span className="badge badge-gray">Manual</span>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "6px",
+                          flexWrap: "wrap",
+                        }}
+                      >
+                        <span
+                          style={{
+                            fontSize: "13px",
+                            fontWeight: 600,
+                            color: "#0F172A",
+                          }}
+                        >
+                          {req.accessLabel}
+                        </span>
+                        <StatusBadge status={req.status} />
+                        {req.isException && (
+                          <span className="badge badge-amber" style={{ fontSize: "10.5px" }}>Exception</span>
                         )}
                       </div>
-
-                      {/* Primary Board Title */}
-                      <div className="board-title-primary">
-                        {item.name}
-                      </div>
-
-                      {/* 2-Column Key Metadata Grid */}
-                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginTop: "14px" }}>
-                        <div style={{ background: "#F8FAFC", padding: "8px 10px", borderRadius: "8px", border: "1px solid #F1F5F9" }}>
-                          <div style={{ fontSize: "11px", color: "#64748B", fontWeight: 500 }}>
-                            Eligibility
-                          </div>
-                          <div style={{ fontSize: "12px", fontWeight: 600, marginTop: "3px" }}>
-                            {item.isEligible ? (
-                              <span style={{ color: "#15803D" }}>✓ Eligible</span>
-                            ) : (
-                              <span style={{ color: "#B45309" }}>Exception Req.</span>
-                            )}
-                          </div>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          flexWrap: "wrap",
+                          gap: "10px",
+                          marginTop: "5px",
+                        }}
+                      >
+                        <div style={{ fontSize: "11.5px", color: "#64748B" }}>
+                          <span className="mono">{req.id}</span> · Updated{" "}
+                          {new Date(req.updatedAt || req.createdAt).toLocaleDateString("en-GB", {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                          })}
                         </div>
-
-                        <div style={{ background: "#F8FAFC", padding: "8px 10px", borderRadius: "8px", border: "1px solid #F1F5F9" }}>
-                          <div style={{ fontSize: "11px", color: "#64748B", fontWeight: 500, display: "flex", alignItems: "center", gap: "4px" }}>
-                            <Key size={11} /> Access ID
-                          </div>
-                          <div style={{ fontSize: "12.5px", fontWeight: 600, color: "#0F1B33", marginTop: "3px" }} className="mono">
-                            {item.accessId || <span style={{ color: "#94A3B8" }}>—</span>}
-                          </div>
-                        </div>
+                        <RequestMiniStepper status={req.status} />
                       </div>
                     </div>
-
-                    {/* Action Footer */}
-                    <div className="manage-link">
-                      <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                        <ExternalLink size={13} /> View Board Details
-                      </span>
-                      <ChevronRight size={14} />
-                    </div>
+                    {/* Quick-decision for on-behalf provisioned */}
+                    {req.status === "ACCESS_PROVISIONED" && req.onBehalf && (
+                      <button
+                        className="btn btn-primary"
+                        style={{
+                          fontSize: "11px",
+                          height: "28px",
+                          padding: "0 10px",
+                          marginLeft: "8px",
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleCloseRequest(req.id);
+                        }}
+                      >
+                        Close
+                      </button>
+                    )}
                   </div>
                 ))}
               </div>
+            )}
+          </div>
+
+          {/* Approvals Requiring My Action */}
+          <div className="card" id="approvals-section">
+            <div className="section-head">
+              <div className="section-head-left">
+                <div className="section-icon">
+                  <CheckSquare size={15} />
+                </div>
+                <div>
+                  <div className="section-title">Approvals Requiring Action</div>
+                  <div className="section-sub">
+                    Requests waiting for your decision as designated approver.
+                  </div>
+                </div>
+              </div>
+              {pendingApprovals.length > 0 && (
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={handleSelectAllApprovals}
+                    style={{
+                      height: "26px",
+                      fontSize: "11px",
+                      padding: "0 8px",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {selectedApprovalIds.length === pendingApprovals.length
+                      ? "Deselect All"
+                      : `Select All (${pendingApprovals.length})`}
+                  </button>
+                  <span className="badge badge-amber">
+                    {pendingApprovals.length} pending
+                  </span>
+                </div>
+              )}
             </div>
-          </>
-        )}
 
-        {/* ── ADMIN VIEW ──────────────────────────────────────────── */}
-        {isRoleAdmin && (
-          <>
-          <div className="grid-2">
-            {/* 1. Admin's My Requests */}
-            <div className="card">
-              <div className="section-head">
-                <div className="section-head-left">
-                  <div className="section-icon">
-                    <Package size={18} />
-                  </div>
-                  <div>
-                    <div className="section-title">My Requests</div>
-                    <div className="section-sub">
-                      Requests you&apos;ve raised, for yourself or on behalf of other employees.
-                    </div>
-                  </div>
+            {pendingApprovals.length === 0 ? (
+              <div className="empty-state">
+                <div className="circle">
+                  <CheckSquare size={18} />
                 </div>
+                <div className="title">All clear</div>
+                <div className="sub">No requests pending your approval right now.</div>
               </div>
-
-              {/* Filter Pills */}
-              <div className="filter-pills-row">
-                <button
-                  className={`filter-pill ${requestFilter === "ALL" ? "active" : ""}`}
-                  onClick={() => setRequestFilter("ALL")}
-                >
-                  All ({allMyRequests.length})
-                </button>
-                <button
-                  className={`filter-pill ${requestFilter === "PENDING" ? "active" : ""}`}
-                  onClick={() => setRequestFilter("PENDING")}
-                >
-                  Pending ({allMyRequests.filter((r) => ["PENDING_APPROVAL", "PENDING_EXCEPTION_APPROVAL"].includes(r.status)).length})
-                </button>
-                <button
-                  className={`filter-pill ${requestFilter === "APPROVED" ? "active" : ""}`}
-                  onClick={() => setRequestFilter("APPROVED")}
-                >
-                  In-Progress ({allMyRequests.filter((r) => ["APPROVED", "PENDING_MANUAL_PROVISIONING", "PROVISIONING", "ACCESS_PROVISIONED"].includes(r.status)).length})
-                </button>
-                <button
-                  className={`filter-pill ${requestFilter === "COMPLETED" ? "active" : ""}`}
-                  onClick={() => setRequestFilter("COMPLETED")}
-                >
-                  Completed ({allMyRequests.filter((r) => r.status === "COMPLETED").length})
-                </button>
-                <button
-                  className={`filter-pill ${requestFilter === "EXCEPTIONS" ? "active" : ""}`}
-                  onClick={() => setRequestFilter("EXCEPTIONS")}
-                >
-                  Exceptions ({allMyRequests.filter((r) => r.isException).length})
-                </button>
-              </div>
-
-              {myRequests.length === 0 ? (
-                <div className="empty-state">
-                  <div className="circle">
-                    <Package size={20} />
-                  </div>
-                  <div className="title">No requests found</div>
-                  <div className="sub">
-                    {requestFilter === "ALL"
-                      ? "Search for a board or tool above to request access."
-                      : `No requests currently in '${requestFilter.toLowerCase()}' status.`}
-                  </div>
-                </div>
-              ) : (
-                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                  {myRequests.map((req) => (
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                {pendingApprovals.map((req) => {
+                  const isSelected = selectedApprovalIds.includes(req.id);
+                  return (
                     <div
                       key={req.id}
                       className="list-row"
-                      onClick={() => setSelectedRequest(req)}
+                      style={{
+                        background: isSelected ? "#F0FDF4" : "#FFFFFF",
+                        borderColor: isSelected ? "#BBF7D0" : "var(--border)",
+                      }}
+                      onClick={() => setApprovalRequest(req)}
                     >
+                      {/* Multi-Select Checkbox */}
+                      <div
+                        onClick={(e) => toggleSelectApproval(req.id, e)}
+                        style={{
+                          width: "18px",
+                          height: "18px",
+                          borderRadius: "4px",
+                          border: isSelected ? "1.5px solid #16A34A" : "1.5px solid #CBD5E1",
+                          background: isSelected ? "#16A34A" : "#FFFFFF",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          cursor: "pointer",
+                          flexShrink: 0,
+                        }}
+                        title={isSelected ? "Deselect request" : "Select request for batch approval"}
+                      >
+                        {isSelected && <Check size={12} style={{ color: "#FFFFFF", strokeWidth: 3 }} />}
+                      </div>
+
+                      <div
+                        className="avatar"
+                        style={{
+                          width: "28px",
+                          height: "28px",
+                          fontSize: "10.5px",
+                          fontWeight: 600,
+                          flexShrink: 0,
+                        }}
+                      >
+                        {(req.requester?.name || req.beneficiaryName || "NA")
+                          .split(" ")
+                          .map((n: string) => n[0])
+                          .join("")
+                          .slice(0, 2)
+                          .toUpperCase()}
+                      </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div
                           style={{
                             display: "flex",
                             alignItems: "center",
-                            gap: "8px",
+                            gap: "6px",
                             flexWrap: "wrap",
                           }}
                         >
                           <span
                             style={{
-                              fontSize: "13.5px",
+                              fontSize: "13px",
                               fontWeight: 600,
-                              color: "#0F1B33",
+                              color: "#0F172A",
                             }}
                           >
                             {req.accessLabel}
                           </span>
-                          <span className="badge badge-gray" style={{ fontSize: "11px" }}>
-                            {req.accessItem?.category === "APPLICATION" ? "Application" : "Board"}
-                          </span>
                           <StatusBadge status={req.status} />
                           {req.isException && (
-                            <span className="badge badge-amber">Exception</span>
+                            <span className="badge badge-amber" style={{ fontSize: "10px" }}>
+                              Exception
+                            </span>
                           )}
                         </div>
-                        <div
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "space-between",
-                            flexWrap: "wrap",
-                            gap: "12px",
-                            marginTop: "6px",
-                          }}
-                        >
-                          <div style={{ fontSize: "12px", color: "#64748B" }}>
-                            <span className="mono">{req.id}</span> · Updated{" "}
-                            {new Date(req.updatedAt || req.createdAt).toLocaleDateString("en-GB", {
-                              day: "numeric",
-                              month: "short",
-                              year: "numeric",
-                            })}
-                          </div>
-                          <RequestMiniStepper status={req.status} />
+                        <div style={{ fontSize: "11.5px", color: "#64748B", marginTop: "3px" }}>
+                          <span className="mono">{req.id}</span> ·{" "}
+                          {req.requester?.name || req.beneficiaryName} ·{" "}
+                          {new Date(req.createdAt).toLocaleDateString("en-GB", {
+                            day: "numeric",
+                            month: "short",
+                          })}
                         </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
 
-            {/* Approvals Requiring My Action (Admin View with Batch Select) */}
-            <div className="card card-tinted-amber">
-              <div className="section-head">
-                <div className="section-head-left">
-                  <div
-                    className="section-icon"
-                    style={{ background: "#FEF3C7", color: "#D97706" }}
-                  >
-                    <CheckSquare size={18} />
-                  </div>
-                  <div>
-                    <div className="section-title">Approvals Requiring My Action</div>
-                    <div className="section-sub">
-                      Pending employee requests waiting for approval decisions.
+                      {/* Inline Quick Action Buttons */}
+                      <div className="quick-action-wrap" onClick={(e) => e.stopPropagation()}>
+                        <button
+                          className="quick-action-btn quick-action-approve"
+                          title="1-Click Approve"
+                          onClick={() => handleApprove(req.id)}
+                        >
+                          ✓ Approve
+                        </button>
+                        <button
+                          className="quick-action-btn quick-action-reject"
+                          title="Reject"
+                          onClick={() => setApprovalRequest(req)}
+                        >
+                          ✕ Reject
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                </div>
-                {pendingApprovals.length > 0 && (
-                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                    <button
-                      type="button"
-                      className="btn btn-secondary"
-                      onClick={handleSelectAllApprovals}
-                      style={{
-                        height: "26px",
-                        fontSize: "11px",
-                        padding: "0 8px",
-                        fontWeight: 600,
-                      }}
-                    >
-                      {selectedApprovalIds.length === pendingApprovals.length
-                        ? "Deselect All"
-                        : `Select All (${pendingApprovals.length})`}
-                    </button>
-                    <span className="badge badge-amber" style={{ fontWeight: 600 }}>
-                      {pendingApprovals.length} pending
-                    </span>
-                  </div>
-                )}
+                  );
+                })}
               </div>
+            )}
+          </div>
+        </div>
 
-              {pendingApprovals.length === 0 ? (
-                <div className="empty-state">
-                  <div className="circle">
-                    <CheckSquare size={20} />
-                  </div>
-                  <div className="title">All clear</div>
-                  <div className="sub">No requests pending your approval right now.</div>
+        {/* ── MY BOARDS / ACCESSIBLE SERVICES ─────────────────────────────────── */}
+        <div className="card">
+          <div className="section-head">
+            <div className="section-head-left">
+              <div className="section-icon">
+                <LayoutDashboard size={15} />
+              </div>
+              <div>
+                <div className="section-title">
+                  {isRoleAdmin ? "Managed Boards & Accounts" : "My Boards & Access"}
                 </div>
-              ) : (
-                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                  {pendingApprovals.map((req) => {
-                    const isSelected = selectedApprovalIds.includes(req.id);
-                    return (
-                      <div
-                        key={req.id}
-                        className="list-row"
-                        style={{
-                          borderLeft: isSelected ? "3px solid #16A34A" : "3px solid #D97706",
-                          background: isSelected ? "#F0FDF4" : undefined,
-                          transition: "all 0.15s ease",
-                        }}
-                        onClick={() => setApprovalRequest(req)}
-                      >
-                        {/* Multi-Select Checkbox */}
-                        <div
-                          onClick={(e) => toggleSelectApproval(req.id, e)}
-                          style={{
-                            width: "20px",
-                            height: "20px",
-                            borderRadius: "5px",
-                            border: isSelected ? "2px solid #16A34A" : "2px solid #CBD5E1",
-                            background: isSelected ? "#16A34A" : "#FFFFFF",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            cursor: "pointer",
-                            flexShrink: 0,
-                            transition: "all 0.15s ease",
-                          }}
-                          title={isSelected ? "Deselect request" : "Select request for batch approval"}
-                        >
-                          {isSelected && <Check size={13} style={{ color: "#FFFFFF", strokeWidth: 3 }} />}
-                        </div>
-
-                        <div
-                          className="avatar"
-                          style={{
-                            width: "32px",
-                            height: "32px",
-                            fontSize: "11px",
-                            background: "#0F1B33",
-                            color: "#fff",
-                            fontWeight: 600,
-                            flexShrink: 0,
-                          }}
-                        >
-                          {(req.requester?.name || req.beneficiaryName || "NA")
-                            .split(" ")
-                            .map((n: string) => n[0])
-                            .join("")
-                            .slice(0, 2)
-                            .toUpperCase()}
-                        </div>
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: "8px",
-                              flexWrap: "wrap",
-                            }}
-                          >
-                            <span
-                              style={{
-                                fontSize: "13.5px",
-                                fontWeight: 600,
-                                color: "#0F1B33",
-                              }}
-                            >
-                              {req.accessLabel}
-                            </span>
-                            <StatusBadge status={req.status} />
-                            {req.isException && (
-                              <span className="badge badge-amber" style={{ fontSize: "10.5px" }}>
-                                Exception
-                              </span>
-                            )}
-                          </div>
-                          <div style={{ fontSize: "12px", color: "#64748B", marginTop: "4px" }}>
-                            <span className="mono">{req.id}</span> ·{" "}
-                            {req.requester?.name || req.beneficiaryName} ·{" "}
-                            {new Date(req.createdAt).toLocaleDateString("en-GB", {
-                              day: "numeric",
-                              month: "short",
-                              year: "numeric",
-                            })}
-                          </div>
-                        </div>
-
-                        {/* Inline Quick Action Buttons */}
-                        <div className="quick-action-wrap" onClick={(e) => e.stopPropagation()}>
-                          <button
-                            className="quick-action-btn quick-action-approve"
-                            title="1-Click Approve"
-                            onClick={() => handleApprove(req.id)}
-                          >
-                            ✓ Approve
-                          </button>
-                          <button
-                            className="quick-action-btn quick-action-reject"
-                            title="Reject"
-                            onClick={() => setApprovalRequest(req)}
-                          >
-                            ✕ Reject
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })}
+                <div className="section-sub">
+                  {isRoleAdmin
+                    ? "Boards and applications configured under your administration."
+                    : "Boards and applications you have active permissions for."}
                 </div>
-              )}
+              </div>
             </div>
           </div>
-
-            {/* 2. My Boards / Access */}
-            <div className="card">
-              <div className="section-head">
-                <div className="section-head-left">
-                  <div className="section-icon">
-                    <LayoutDashboard size={18} />
+          <div className="grid-3">
+            {catalog.slice(0, 3).map((item) => (
+              <div
+                key={item.id}
+                className="board-card"
+                onClick={() => {
+                  if (isRoleAdmin) {
+                    setBoardConfigItem(item);
+                  } else {
+                    setAccessDetailsItem(item);
+                  }
+                }}
+              >
+                <div className="board-card-body">
+                  {/* Top Row: Service Logo + Tool Name + Automation Pill */}
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                      <ServiceLogo tool={item.tool} size={16} />
+                      <span style={{ fontSize: "11.5px", fontWeight: 600, color: "#475569" }}>
+                        {item.tool}
+                      </span>
+                    </div>
+                    {item.automation ? (
+                      <span className="badge badge-blue" style={{ fontSize: "10.5px" }}>
+                        <Zap size={10} /> Auto
+                      </span>
+                    ) : (
+                      <span className="badge badge-gray" style={{ fontSize: "10.5px" }}>Manual</span>
+                    )}
                   </div>
-                  <div>
-                    <div className="section-title">My Boards / Access</div>
-                    <div className="section-sub">
-                      Boards and accounts you administer as the access provider.
+
+                  {/* Primary Board Title */}
+                  <div className="board-title-primary">
+                    {item.name}
+                  </div>
+
+                  {/* 2-Column Key Metadata Grid */}
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px", marginTop: "10px" }}>
+                    <div style={{ background: "#F8FAFC", padding: "6px 8px", borderRadius: "6px", border: "1px solid var(--border)" }}>
+                      <div style={{ fontSize: "10px", color: "#64748B", fontWeight: 600, textTransform: "uppercase" }}>
+                        Eligibility
+                      </div>
+                      <div style={{ fontSize: "11.5px", fontWeight: 600, marginTop: "2px" }}>
+                        {item.isEligible ? (
+                          <span style={{ color: "#166534" }}>✓ Eligible</span>
+                        ) : (
+                          <span style={{ color: "#92400E" }}>Exception Req.</span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div style={{ background: "#F8FAFC", padding: "6px 8px", borderRadius: "6px", border: "1px solid var(--border)" }}>
+                      <div style={{ fontSize: "10px", color: "#64748B", fontWeight: 600, textTransform: "uppercase", display: "flex", alignItems: "center", gap: "3px" }}>
+                        <Key size={10} /> Access ID
+                      </div>
+                      <div style={{ fontSize: "11.5px", fontWeight: 600, color: "#0F172A", marginTop: "2px" }} className="mono">
+                        {item.accessId || <span style={{ color: "#94A3B8" }}>—</span>}
+                      </div>
                     </div>
                   </div>
                 </div>
+
+                {/* Action Footer */}
+                <div className="manage-link">
+                  <span style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+                    {isRoleAdmin ? <Settings size={12} /> : <ExternalLink size={12} />}
+                    {isRoleAdmin ? "Manage Configuration" : "View Board Details"}
+                  </span>
+                  <ChevronRight size={13} />
+                </div>
               </div>
-              <div className="grid-3">
-                {catalog.slice(0, 3).map((item) => (
-                  <div key={item.id} className="board-card" onClick={() => setBoardConfigItem(item)}>
-                    <div className="board-card-body">
-                      {/* Top Row: Service Logo + Tool Name + Automation Pill */}
-                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: "7px" }}>
-                          <ServiceLogo tool={item.tool} size={18} />
-                          <span style={{ fontSize: "12px", fontWeight: 600, color: "#475569" }}>
-                            {item.tool}
-                          </span>
-                        </div>
-                        {item.automation ? (
-                          <span className="badge badge-blue">
-                            <Zap size={11} /> Automated
-                          </span>
-                        ) : (
-                          <span className="badge badge-gray">Manual</span>
-                        )}
-                      </div>
+            ))}
+          </div>
+        </div>
 
-                      {/* Primary Board Title */}
-                      <div className="board-title-primary">
-                        {item.name}
-                      </div>
-
-                      {/* 2-Column Key Metadata Grid */}
-                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginTop: "14px" }}>
-                        <div style={{ background: "#F8FAFC", padding: "8px 10px", borderRadius: "8px", border: "1px solid #F1F5F9" }}>
-                          <div style={{ fontSize: "11px", color: "#64748B", fontWeight: 500, display: "flex", alignItems: "center", gap: "4px" }}>
-                            <Key size={11} /> Access ID
-                          </div>
-                          <div style={{ fontSize: "12.5px", fontWeight: 600, color: "#0F1B33", marginTop: "3px" }} className="mono">
-                            {item.accessId ? (
-                              item.accessId
-                            ) : (
-                              <span style={{ color: "#D97706", fontSize: "11px" }}>Needs Issue</span>
-                            )}
-                          </div>
-                        </div>
-
-                        <div style={{ background: "#F8FAFC", padding: "8px 10px", borderRadius: "8px", border: "1px solid #F1F5F9" }}>
-                          <div style={{ fontSize: "11px", color: "#64748B", fontWeight: 500, display: "flex", alignItems: "center", gap: "4px" }}>
-                            <User size={11} /> Approver
-                          </div>
-                          <div
-                            style={{
-                              fontSize: "12.5px",
-                              fontWeight: 600,
-                              color: "#0F1B33",
-                              marginTop: "3px",
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
-                              whiteSpace: "nowrap",
-                            }}
-                            title={item.approver}
-                          >
-                            {item.approver}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Clean Action Footer */}
-                    <div className="manage-link">
-                      <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                        <Settings size={13} /> Manage configuration
-                      </span>
-                      <ChevronRight size={14} />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* 3. Requests Requiring Admin Action & Access ID Governance */}
-            <div className="grid-2">
-              <div className="card card-tinted-orange">
+        {/* ── ADMIN ONLY SECTIONS ──────────────────────────────────────────── */}
+        {isRoleAdmin && (
+          <>
+            {/* Provisioning Queue & Access ID Governance */}
+            <div className="grid-2" id="governance-section">
+              {/* Requests Requiring Admin Provisioning */}
+              <div className="card">
                 <div className="section-head">
                   <div className="section-head-left">
-                    <div
-                      className="section-icon"
-                      style={{ background: "#FFF0E6", color: "#C2410C" }}
-                    >
-                      <Package size={18} />
+                    <div className="section-icon">
+                      <Package size={15} />
                     </div>
                     <div>
-                      <div className="section-title">Requests Requiring Admin Action</div>
+                      <div className="section-title">Manual Provisioning Queue</div>
                       <div className="section-sub">
-                        Approved requests that need manual provisioning.
+                        Approved requests waiting for manual IT account creation.
                       </div>
                     </div>
                   </div>
                   {manualProvisionQueue.length > 0 && (
-                    <span className="badge badge-orange" style={{ fontWeight: 600 }}>
+                    <span className="badge badge-orange">
                       {manualProvisionQueue.length} pending
                     </span>
                   )}
@@ -2095,7 +1664,7 @@ function PortalDashboard() {
                 {manualProvisionQueue.length === 0 ? (
                   <div className="empty-state">
                     <div className="circle">
-                      <Package size={20} />
+                      <Package size={18} />
                     </div>
                     <div className="title">Queue is empty</div>
                     <div className="sub">
@@ -2103,7 +1672,7 @@ function PortalDashboard() {
                     </div>
                   </div>
                 ) : (
-                  <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                     {manualProvisionQueue.map((req) => (
                       <div
                         key={req.id}
@@ -2115,32 +1684,31 @@ function PortalDashboard() {
                             style={{
                               display: "flex",
                               alignItems: "center",
-                              gap: "8px",
+                              gap: "6px",
                               flexWrap: "wrap",
                             }}
                           >
                             <span
                               style={{
-                                fontSize: "13.5px",
+                                fontSize: "13px",
                                 fontWeight: 600,
-                                color: "#0F1B33",
+                                color: "#0F172A",
                               }}
                             >
                               {req.accessLabel}
                             </span>
                             <StatusBadge status={req.status} />
                           </div>
-                          <div style={{ fontSize: "12px", color: "#64748B", marginTop: "4px" }}>
+                          <div style={{ fontSize: "11.5px", color: "#64748B", marginTop: "3px" }}>
                             <span className="mono">{req.id}</span> · For: {req.beneficiaryName}
                           </div>
                         </div>
                         <button
                           className="btn btn-primary"
                           style={{
-                            fontSize: "11.5px",
+                            fontSize: "11px",
                             height: "28px",
                             padding: "0 10px",
-                            background: "#0F1B33",
                             flexShrink: 0,
                           }}
                           onClick={(e) => {
@@ -2157,20 +1725,17 @@ function PortalDashboard() {
               </div>
 
               {/* Access ID Governance */}
-              <div className="card card-tinted-violet">
+              <div className="card">
                 <div className="section-head">
                   <div className="section-head-left">
-                    <div
-                      className="section-icon"
-                      style={{ background: "#EDE9FE", color: "#6D28D9" }}
-                    >
-                      <Key size={18} />
+                    <div className="section-icon">
+                      <Key size={15} />
                     </div>
                     <div>
                       <div className="section-title">Access ID Governance</div>
                       <div className="section-sub">
                         {accessIdQueue.filter((q) => q.status === "Pending Governance Review").length}{" "}
-                        pending review
+                        pending reviews
                       </div>
                     </div>
                   </div>
@@ -2179,13 +1744,13 @@ function PortalDashboard() {
                 {accessIdQueue.filter((q) => q.status === "Pending Governance Review").length === 0 ? (
                   <div className="empty-state">
                     <div className="circle">
-                      <Key size={20} />
+                      <Key size={18} />
                     </div>
                     <div className="title">All clear</div>
                     <div className="sub">No Access ID creations currently pending review.</div>
                   </div>
                 ) : (
-                  <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                     {accessIdQueue
                       .filter((q) => q.status === "Pending Governance Review")
                       .map((item) => (
@@ -2193,14 +1758,14 @@ function PortalDashboard() {
                           <div style={{ flex: 1, minWidth: 0 }}>
                             <div
                               style={{
-                                fontSize: "13.5px",
+                                fontSize: "13px",
                                 fontWeight: 600,
-                                color: "#0F1B33",
+                                color: "#0F172A",
                               }}
                             >
                               {item.accessItem?.name || item.accessItemId}
                             </div>
-                            <div style={{ fontSize: "12px", color: "#64748B", marginTop: "3px" }}>
+                            <div style={{ fontSize: "11.5px", color: "#64748B", marginTop: "2px" }}>
                               Requested by: {item.requestedBy}
                             </div>
                           </div>
@@ -2210,12 +1775,11 @@ function PortalDashboard() {
                               fontSize: "11px",
                               height: "28px",
                               padding: "0 10px",
-                              background: "#6D28D9",
                               flexShrink: 0,
                             }}
                             onClick={() => handleApproveAccessId(item.id)}
                           >
-                            Approve & Issue ID
+                            Issue ID
                           </button>
                         </div>
                       ))}
@@ -2224,66 +1788,45 @@ function PortalDashboard() {
               </div>
             </div>
 
-            {/* 4. 👥 USER & ROLE MANAGEMENT (Admin Only) */}
+            {/* User & Role Management */}
             <div className="card">
               <div className="section-head">
                 <div className="section-head-left">
-                  <div className="section-icon" style={{ background: "#EEF2FF", color: "#4F46E5" }}>
-                    <Users size={18} />
+                  <div className="section-icon">
+                    <Users size={15} />
                   </div>
                   <div>
                     <div className="section-title">User &amp; Role Management</div>
                     <div className="section-sub">
-                      Control employee access tiers and assign Board Admin permissions ({allUsers.length} registered users)
+                      Manage team roles, departments, and administrative permissions ({allUsers.length} total users).
                     </div>
                   </div>
                 </div>
 
-                <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "center" }}>
+                <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", alignItems: "center" }}>
                   <button
                     type="button"
                     className="btn btn-secondary"
                     onClick={handleExportComplianceCSV}
                     style={{
-                      fontSize: "12px",
-                      height: "32px",
-                      padding: "0 12px",
+                      fontSize: "11.5px",
+                      height: "30px",
+                      padding: "0 10px",
                       display: "inline-flex",
                       alignItems: "center",
-                      gap: "6px",
-                      color: "#166534",
-                      background: "#F0FDF4",
-                      borderColor: "#BBF7D0",
-                      fontWeight: 600,
+                      gap: "5px",
                     }}
-                    title="Generate & Download 1-Click SOC2/ISO-27001 Access Compliance CSV"
+                    title="Export Compliance CSV"
                   >
-                    <FileSpreadsheet size={14} style={{ color: "#16A34A" }} /> Export Compliance CSV
-                  </button>
-
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    onClick={() => setAuditDrawerOpen(true)}
-                    style={{
-                      fontSize: "12px",
-                      height: "32px",
-                      padding: "0 12px",
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: "6px",
-                      fontWeight: 600,
-                    }}
-                  >
-                    <Shield size={14} style={{ color: "#2563EB" }} /> View Audit Trail
+                    <FileSpreadsheet size={13} style={{ color: "#16A34A" }} /> Export CSV
                   </button>
                 </div>
               </div>
 
-              {/* User Search & Department Filter Toolbar */}
-              <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", alignItems: "center", marginBottom: "16px" }}>
-                <div style={{ flex: 1, minWidth: "220px", position: "relative", display: "flex", alignItems: "center" }}>
-                  <Search size={15} style={{ position: "absolute", left: "12px", color: "#94A3B8" }} />
+              {/* Toolbar */}
+              <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "center", marginBottom: "12px" }}>
+                <div style={{ flex: 1, minWidth: "200px", position: "relative", display: "flex", alignItems: "center" }}>
+                  <Search size={14} style={{ position: "absolute", left: "10px", color: "#94A3B8" }} />
                   <input
                     type="text"
                     placeholder="Search users by name or email..."
@@ -2291,24 +1834,23 @@ function PortalDashboard() {
                     onChange={(e) => setUserSearchQuery(e.target.value)}
                     style={{
                       width: "100%",
-                      height: "38px",
-                      padding: "0 12px 0 34px",
-                      borderRadius: "8px",
-                      border: "1px solid #CBD5E1",
-                      fontSize: "12.5px",
+                      height: "34px",
+                      padding: "0 10px 0 30px",
+                      borderRadius: "6px",
+                      border: "1px solid var(--border)",
+                      fontSize: "12px",
                       outline: "none",
                       background: "#FFFFFF",
-                      boxShadow: "0 1px 2px rgba(15, 27, 51, 0.03)",
                     }}
                   />
                 </div>
-                <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+                <div style={{ display: "flex", gap: "5px", flexWrap: "wrap" }}>
                   {["ALL", "IT Support", "Engineering", "Product", "Marketing", "Sales", "Security & Compliance"].map((dept) => (
                     <button
                       key={dept}
                       type="button"
                       className={`filter-pill ${userDeptFilter === dept ? "active" : ""}`}
-                      style={{ fontSize: "11.5px", padding: "5px 11px" }}
+                      style={{ fontSize: "11px", padding: "4px 9px" }}
                       onClick={() => setUserDeptFilter(dept)}
                     >
                       {dept === "ALL" ? "All Departments" : dept}
@@ -2320,27 +1862,26 @@ function PortalDashboard() {
               <div
                 style={{
                   overflowX: "auto",
-                  border: "1px solid #E2E8F0",
-                  borderRadius: "10px",
+                  border: "1px solid var(--border)",
+                  borderRadius: "8px",
                   background: "#FFFFFF",
-                  boxShadow: "0 1px 2px rgba(15, 27, 51, 0.02)",
                 }}
               >
                 <table
                   style={{
                     width: "100%",
                     borderCollapse: "collapse",
-                    fontSize: "13px",
+                    fontSize: "12.5px",
                     textAlign: "left",
                   }}
                 >
                   <thead>
-                    <tr style={{ background: "#F8FAFC", borderBottom: "1px solid #E2E8F0", color: "#475569" }}>
-                      <th style={{ padding: "12px 16px", fontWeight: 700, fontSize: "11.5px", textTransform: "uppercase", letterSpacing: "0.04em" }}>User</th>
-                      <th style={{ padding: "12px 16px", fontWeight: 700, fontSize: "11.5px", textTransform: "uppercase", letterSpacing: "0.04em" }}>Email</th>
-                      <th style={{ padding: "12px 16px", fontWeight: 700, fontSize: "11.5px", textTransform: "uppercase", letterSpacing: "0.04em" }}>Department</th>
-                      <th style={{ padding: "12px 16px", fontWeight: 700, fontSize: "11.5px", textTransform: "uppercase", letterSpacing: "0.04em" }}>Role</th>
-                      <th style={{ padding: "12px 16px", fontWeight: 700, fontSize: "11.5px", textTransform: "uppercase", letterSpacing: "0.04em", textAlign: "right" }}>Actions</th>
+                    <tr style={{ background: "#F8FAFC", borderBottom: "1px solid var(--border)", color: "#64748B" }}>
+                      <th style={{ padding: "10px 14px", fontWeight: 600, fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.04em" }}>User</th>
+                      <th style={{ padding: "10px 14px", fontWeight: 600, fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.04em" }}>Email</th>
+                      <th style={{ padding: "10px 14px", fontWeight: 600, fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.04em" }}>Department</th>
+                      <th style={{ padding: "10px 14px", fontWeight: 600, fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.04em" }}>Role</th>
+                      <th style={{ padding: "10px 14px", fontWeight: 600, fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.04em", textAlign: "right" }}>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -2356,42 +1897,41 @@ function PortalDashboard() {
                         key={u.id}
                         style={{
                           borderBottom: "1px solid #F1F5F9",
-                          transition: "background 0.15s ease",
                         }}
                       >
-                        <td style={{ padding: "12px 16px", display: "flex", alignItems: "center", gap: "10px" }}>
+                        <td style={{ padding: "10px 14px", display: "flex", alignItems: "center", gap: "8px" }}>
                           <div
                             className="avatar"
                             style={{
-                              width: "30px",
-                              height: "30px",
-                              fontSize: "11px",
-                              background: u.avatarTone || "#0F1B33",
+                              width: "26px",
+                              height: "26px",
+                              fontSize: "10px",
+                              background: u.avatarTone || "#0F172A",
                             }}
                           >
                             {u.initials || "U"}
                           </div>
                           <div>
-                            <div style={{ fontWeight: 600, color: "#0F1B33" }}>{u.name}</div>
+                            <div style={{ fontWeight: 600, color: "#0F172A" }}>{u.name}</div>
                             {u.id === currentUser.id && (
-                              <span className="badge badge-blue" style={{ fontSize: "10px", padding: "1px 6px", marginTop: "2px" }}>
+                              <span className="badge badge-blue" style={{ fontSize: "9.5px", padding: "1px 5px", marginTop: "1px" }}>
                                 Current User
                               </span>
                             )}
                           </div>
                         </td>
-                        <td style={{ padding: "12px 16px", color: "#64748B" }}>{u.email}</td>
-                        <td style={{ padding: "12px 16px" }}>
+                        <td style={{ padding: "10px 14px", color: "#64748B" }}>{u.email}</td>
+                        <td style={{ padding: "10px 14px" }}>
                           <select
                             value={u.department}
                             onChange={(e) => handleUserDeptChange(u.id, e.target.value, u.role)}
                             style={{
-                              padding: "5px 10px",
-                              borderRadius: "6px",
-                              border: "1px solid #CBD5E1",
-                              fontSize: "12px",
+                              padding: "4px 8px",
+                              borderRadius: "5px",
+                              border: "1px solid var(--border)",
+                              fontSize: "11.5px",
                               background: "#F8FAFC",
-                              color: "#0F1B33",
+                              color: "#0F172A",
                               outline: "none",
                               cursor: "pointer",
                             }}
@@ -2402,20 +1942,25 @@ function PortalDashboard() {
                             <option value="Support Team">Support Team</option>
                             <option value="Finance Team">Finance Team</option>
                             <option value="IT Support">IT Support</option>
+                            <option value="Engineering">Engineering</option>
+                            <option value="Product">Product</option>
+                            <option value="Marketing">Marketing</option>
+                            <option value="Sales">Sales</option>
+                            <option value="Security & Compliance">Security &amp; Compliance</option>
                           </select>
                         </td>
-                        <td style={{ padding: "12px 16px" }}>
+                        <td style={{ padding: "10px 14px" }}>
                           <select
                             value={u.role}
                             onChange={(e) => handleUserRoleChange(u.id, e.target.value as any)}
                             style={{
-                              padding: "5px 10px",
-                              borderRadius: "6px",
-                              border: `1px solid ${u.role === "ADMIN" ? "#BFDBFE" : "#CBD5E1"}`,
-                              fontSize: "12px",
+                              padding: "4px 8px",
+                              borderRadius: "5px",
+                              border: `1px solid ${u.role === "ADMIN" ? "#BFDBFE" : "var(--border)"}`,
+                              fontSize: "11.5px",
                               fontWeight: 600,
                               background: u.role === "ADMIN" ? "#EFF6FF" : "#F8FAFC",
-                              color: u.role === "ADMIN" ? "#1D4ED8" : "#334155",
+                              color: u.role === "ADMIN" ? "#1E40AF" : "#334155",
                               outline: "none",
                               cursor: "pointer",
                             }}
@@ -2424,7 +1969,7 @@ function PortalDashboard() {
                             <option value="ADMIN">Board Admin</option>
                           </select>
                         </td>
-                        <td style={{ padding: "12px 16px", textAlign: "right" }}>
+                        <td style={{ padding: "10px 14px", textAlign: "right" }}>
                           {u.id !== currentUser.id && (
                             <button
                               onClick={() => handleUserDelete(u.id)}
@@ -2434,15 +1979,14 @@ function PortalDashboard() {
                                 background: "#FEF2F2",
                                 color: "#DC2626",
                                 cursor: "pointer",
-                                padding: "6px 8px",
-                                borderRadius: "6px",
+                                padding: "4px 6px",
+                                borderRadius: "5px",
                                 display: "inline-flex",
                                 alignItems: "center",
                                 justifyContent: "center",
-                                transition: "all 0.15s ease",
                               }}
                             >
-                              <Trash2 size={13} />
+                              <Trash2 size={12} />
                             </button>
                           )}
                         </td>
@@ -2622,44 +2166,42 @@ function PortalDashboard() {
           className="floating-batch-bar"
           style={{
             position: "fixed",
-            bottom: "28px",
+            bottom: "24px",
             left: "50%",
             transform: "translateX(-50%)",
             zIndex: 50,
-            background: "rgba(15, 23, 42, 0.96)",
-            backdropFilter: "blur(20px)",
+            background: "#0F172A",
             color: "#FFFFFF",
-            padding: "10px 18px",
-            borderRadius: "14px",
-            boxShadow: "0 20px 45px -10px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.15)",
+            padding: "8px 14px",
+            borderRadius: "10px",
+            boxShadow: "0 16px 36px -4px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.12)",
             display: "flex",
             alignItems: "center",
-            gap: "14px",
-            animation: "fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
+            gap: "12px",
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
             <div
               style={{
                 background: "#2563EB",
-                borderRadius: "6px",
-                width: "24px",
-                height: "24px",
+                borderRadius: "5px",
+                width: "22px",
+                height: "22px",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                fontSize: "12px",
-                fontWeight: 800,
+                fontSize: "11px",
+                fontWeight: 700,
               }}
             >
               {selectedApprovalIds.length}
             </div>
-            <span style={{ fontSize: "13px", fontWeight: 600, color: "#E2E8F0" }}>
-              Selected {selectedApprovalIds.length} of {pendingApprovals.length} requests
+            <span style={{ fontSize: "12.5px", fontWeight: 600, color: "#E2E8F0" }}>
+              {selectedApprovalIds.length} selected
             </span>
           </div>
 
-          <div style={{ width: "1px", height: "20px", background: "rgba(255, 255, 255, 0.2)" }} />
+          <div style={{ width: "1px", height: "18px", background: "rgba(255, 255, 255, 0.2)" }} />
 
           <button
             type="button"
@@ -2668,11 +2210,11 @@ function PortalDashboard() {
               background: "rgba(255, 255, 255, 0.08)",
               border: "1px solid rgba(255, 255, 255, 0.15)",
               color: "#CBD5E1",
-              fontSize: "12px",
+              fontSize: "11.5px",
               fontWeight: 600,
-              borderRadius: "6px",
+              borderRadius: "5px",
               cursor: "pointer",
-              padding: "4px 10px",
+              padding: "4px 8px",
             }}
           >
             {selectedApprovalIds.length === pendingApprovals.length ? "Deselect All" : "Select All"}
@@ -2684,22 +2226,21 @@ function PortalDashboard() {
             onClick={handleBatchApprove}
             className="btn btn-primary"
             style={{
-              background: "linear-gradient(135deg, #16A34A 0%, #15803D 100%)",
+              background: "#16A34A",
               color: "#FFFFFF",
               border: "none",
-              borderRadius: "8px",
-              padding: "7px 16px",
-              fontSize: "13px",
-              fontWeight: 700,
+              borderRadius: "6px",
+              padding: "6px 14px",
+              fontSize: "12px",
+              fontWeight: 600,
               cursor: "pointer",
               display: "inline-flex",
               alignItems: "center",
-              gap: "6px",
-              boxShadow: "0 4px 12px rgba(22, 163, 74, 0.35)",
+              gap: "5px",
             }}
           >
-            <Zap size={14} className={batchApproving ? "animate-spin" : ""} />
-            {batchApproving ? "Approving Batch..." : `⚡ Approve Selected (${selectedApprovalIds.length})`}
+            <Zap size={13} className={batchApproving ? "animate-spin" : ""} />
+            {batchApproving ? "Approving..." : `Approve Selected (${selectedApprovalIds.length})`}
           </button>
 
           <button
@@ -2710,13 +2251,13 @@ function PortalDashboard() {
               border: "none",
               color: "#94A3B8",
               cursor: "pointer",
-              padding: "4px",
+              padding: "3px",
               display: "flex",
               alignItems: "center",
             }}
             title="Dismiss selection"
           >
-            <X size={16} />
+            <X size={15} />
           </button>
         </div>
       )}
@@ -2749,42 +2290,6 @@ function PortalDashboard() {
         onSelectRequest={(req) => setSelectedRequest(req)}
         isAdmin={isRoleAdmin}
       />
-
-      {/* ── PERSISTENT 1-CLICK QUICK REQUEST FLOATING ACTION BUTTON ── */}
-      <div
-        style={{
-          position: "fixed",
-          bottom: "24px",
-          right: "24px",
-          zIndex: 40,
-        }}
-      >
-        <button
-          type="button"
-          onClick={() => {
-            if (catalog.length > 0) setRequestFormItem(catalog[0]);
-          }}
-          style={{
-            background: "linear-gradient(135deg, #0F172A 0%, #1E293B 100%)",
-            color: "#FFFFFF",
-            border: "1px solid rgba(255, 255, 255, 0.15)",
-            borderRadius: "999px",
-            padding: "12px 20px",
-            fontSize: "13px",
-            fontWeight: 700,
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
-            boxShadow: "0 10px 25px -5px rgba(15, 23, 42, 0.4), 0 0 0 1px rgba(255,255,255,0.1)",
-            cursor: "pointer",
-            transition: "all 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
-          }}
-          title="Quickly request access to any tool or board"
-        >
-          <Zap size={16} style={{ color: "#60A5FA" }} />
-          <span>+ Quick Request</span>
-        </button>
-      </div>
 
       {/* TOAST CONTAINER */}
       <div className="toast-container" role="status" aria-live="polite">

@@ -3,13 +3,8 @@
 import React, { useState } from "react";
 import {
   X,
-  CheckCircle2,
   Package,
   Check,
-  Zap,
-  Key,
-  ShieldCheck,
-  ArrowRight,
 } from "lucide-react";
 import StatusBadge from "../StatusBadge";
 import Timeline from "../Timeline";
@@ -52,22 +47,22 @@ export default function AdminRequestDetailDrawer({
       >
         {/* Drawer Header */}
         <div className="drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            <ServiceLogo tool={toolName} size={28} />
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <ServiceLogo tool={toolName} size={24} />
             <div>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
-                <h3 style={{ margin: 0, fontSize: "16px", fontWeight: 700, color: "#0F1B33" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
+                <h3 style={{ margin: 0, fontSize: "15px", fontWeight: 700, color: "#0F172A" }}>
                   Manual IT Provisioning
                 </h3>
                 <StatusBadge status={request.status} />
               </div>
-              <div style={{ fontSize: "12.5px", color: "#64748B", marginTop: "2px" }}>
+              <div style={{ fontSize: "12px", color: "#64748B", marginTop: "1px" }}>
                 {request.accessLabel} · <span className="mono">{request.id}</span>
               </div>
             </div>
           </div>
           <button className="drawer-close" onClick={onClose} aria-label="Close drawer">
-            <X size={18} />
+            <X size={16} />
           </button>
         </div>
 
@@ -76,38 +71,35 @@ export default function AdminRequestDetailDrawer({
           {/* Action Callout Card */}
           <div
             style={{
-              padding: "16px",
-              borderRadius: "12px",
-              background: "linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 100%)",
-              border: "1px solid #FED7AA",
-              marginBottom: "22px",
+              padding: "14px 16px",
+              borderRadius: "10px",
+              background: "#F8FAFC",
+              border: "1px solid var(--border)",
+              marginBottom: "18px",
             }}
           >
             <div
               style={{
-                fontSize: "13.5px",
+                fontSize: "13px",
                 fontWeight: 700,
-                color: "#C2410C",
+                color: "#0F172A",
                 display: "flex",
                 alignItems: "center",
-                gap: "8px",
+                gap: "6px",
               }}
             >
-              <Package size={17} /> Ready for Manual Fulfillment
+              <Package size={15} style={{ color: "#64748B" }} /> Ready for Manual Fulfillment
             </div>
-            <div style={{ fontSize: "12px", color: "#9A3412", marginTop: "4px", lineHeight: "1.45" }}>
-              This request was approved by <strong>{request.approverName}</strong>. Please create the user account in {toolName} and mark this task completed.
+            <div style={{ fontSize: "12px", color: "#64748B", marginTop: "3px", lineHeight: "1.45" }}>
+              Approved by <strong>{request.approverName}</strong>. Please create the account in {toolName} and confirm fulfillment below.
             </div>
 
             <button
-              className="btn btn-primary"
+              className="btn btn-primary btn-block"
               style={{
-                marginTop: "14px",
-                width: "100%",
-                height: "40px",
-                background: "#0F1B33",
-                fontSize: "13px",
-                fontWeight: 600,
+                marginTop: "12px",
+                height: "38px",
+                fontSize: "12.5px",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -116,20 +108,20 @@ export default function AdminRequestDetailDrawer({
               onClick={handleProvision}
               disabled={loading}
             >
-              <Check size={16} /> {loading ? "Provisioning..." : "✓ Confirm & Complete Provisioning"}
+              <Check size={14} /> {loading ? "Provisioning..." : "Confirm Provisioning Complete"}
             </button>
           </div>
 
           {/* Workflow Journey */}
-          <div className="divider-label" style={{ marginBottom: "12px" }}>
-            Multi-Step Workflow Journey
+          <div className="divider-label" style={{ marginBottom: "10px" }}>
+            Workflow Journey
           </div>
           <Timeline steps={request.timeline || []} />
 
           {/* Provisioning Target Grid */}
-          <div style={{ marginTop: "24px", paddingTop: "18px", borderTop: "1px solid var(--border)" }}>
-            <div className="divider-label" style={{ marginBottom: "12px" }}>
-              Provisioning Targets &amp; Details
+          <div style={{ marginTop: "20px", paddingTop: "16px", borderTop: "1px solid var(--border)" }}>
+            <div className="divider-label" style={{ marginBottom: "10px" }}>
+              Provisioning Details
             </div>
             <div className="field-grid">
               <div className="field">
@@ -151,18 +143,18 @@ export default function AdminRequestDetailDrawer({
             </div>
 
             {/* Justification Box */}
-            <div style={{ marginTop: "16px" }}>
+            <div style={{ marginTop: "14px" }}>
               <span className="f-label">Business Justification</span>
               <div
                 style={{
-                  marginTop: "6px",
-                  padding: "12px",
+                  marginTop: "4px",
+                  padding: "10px 12px",
                   background: "#F8FAFC",
-                  border: "1px solid #E2E8F0",
+                  border: "1px solid var(--border)",
                   borderRadius: "8px",
-                  fontSize: "13px",
+                  fontSize: "12.5px",
                   color: "#334155",
-                  lineHeight: "1.5",
+                  lineHeight: "1.45",
                 }}
               >
                 {request.justification}

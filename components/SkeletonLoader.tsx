@@ -16,7 +16,7 @@ export default function SkeletonLoader() {
       {/* Header Skeleton */}
       <div
         style={{
-          height: "64px",
+          height: "60px",
           background: "#FFFFFF",
           borderBottom: "1px solid #E2E8F0",
           padding: "0 24px",
@@ -26,25 +26,44 @@ export default function SkeletonLoader() {
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <div className="skeleton" style={{ width: "36px", height: "36px", borderRadius: "10px" }} />
+          <div className="skeleton" style={{ width: "32px", height: "32px", borderRadius: "8px" }} />
           <div>
-            <div className="skeleton" style={{ width: "90px", height: "14px", borderRadius: "4px", marginBottom: "4px" }} />
-            <div className="skeleton" style={{ width: "140px", height: "10px", borderRadius: "4px" }} />
+            <div className="skeleton" style={{ width: "80px", height: "13px", borderRadius: "4px", marginBottom: "4px" }} />
+            <div className="skeleton" style={{ width: "120px", height: "10px", borderRadius: "4px" }} />
           </div>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <div className="skeleton" style={{ width: "70px", height: "24px", borderRadius: "999px" }} />
-          <div className="skeleton" style={{ width: "32px", height: "32px", borderRadius: "999px" }} />
-          <div className="skeleton" style={{ width: "120px", height: "32px", borderRadius: "8px" }} />
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <div className="skeleton" style={{ width: "64px", height: "24px", borderRadius: "999px" }} />
+          <div className="skeleton" style={{ width: "32px", height: "32px", borderRadius: "8px" }} />
+          <div className="skeleton" style={{ width: "110px", height: "32px", borderRadius: "6px" }} />
         </div>
       </div>
 
       {/* Main Container Skeleton */}
-      <div style={{ maxWidth: "1200px", width: "100%", margin: "0 auto", padding: "32px 24px" }}>
+      <div style={{ maxWidth: "1680px", width: "92%", margin: "0 auto", padding: "24px 0" }}>
         {/* Hero Skeleton */}
-        <div style={{ marginBottom: "28px" }}>
-          <div className="skeleton" style={{ width: "260px", height: "24px", borderRadius: "6px", marginBottom: "8px" }} />
-          <div className="skeleton" style={{ width: "480px", height: "14px", borderRadius: "4px" }} />
+        <div style={{ marginBottom: "20px" }}>
+          <div className="skeleton" style={{ width: "240px", height: "22px", borderRadius: "6px", marginBottom: "6px" }} />
+          <div className="skeleton" style={{ width: "420px", height: "13px", borderRadius: "4px" }} />
+        </div>
+
+        {/* 4 Metrics Grid Skeleton */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "12px", marginBottom: "16px" }}>
+          {[1, 2, 3, 4].map((i) => (
+            <div
+              key={i}
+              style={{
+                background: "#FFFFFF",
+                border: "1px solid #E2E8F0",
+                borderRadius: "10px",
+                padding: "16px",
+                height: "90px",
+              }}
+            >
+              <div className="skeleton" style={{ width: "80px", height: "11px", borderRadius: "4px", marginBottom: "12px" }} />
+              <div className="skeleton" style={{ width: "45px", height: "22px", borderRadius: "4px" }} />
+            </div>
+          ))}
         </div>
 
         {/* Search Card Skeleton */}
@@ -52,68 +71,45 @@ export default function SkeletonLoader() {
           style={{
             background: "#FFFFFF",
             border: "1px solid #E2E8F0",
-            borderRadius: "14px",
-            padding: "24px",
-            marginBottom: "24px",
+            borderRadius: "12px",
+            padding: "20px",
+            marginBottom: "16px",
           }}
         >
-          <div className="skeleton" style={{ width: "120px", height: "16px", borderRadius: "4px", marginBottom: "6px" }} />
-          <div className="skeleton" style={{ width: "320px", height: "12px", borderRadius: "4px", marginBottom: "16px" }} />
+          <div className="skeleton" style={{ width: "100px", height: "15px", borderRadius: "4px", marginBottom: "6px" }} />
+          <div className="skeleton" style={{ width: "280px", height: "12px", borderRadius: "4px", marginBottom: "14px" }} />
           <div className="skeleton" style={{ width: "100%", height: "42px", borderRadius: "8px" }} />
         </div>
 
         {/* 2-Column Grid Skeleton */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px", marginBottom: "24px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1.8fr 1.2fr", gap: "16px", marginBottom: "16px" }}>
           <div
             style={{
               background: "#FFFFFF",
               border: "1px solid #E2E8F0",
-              borderRadius: "14px",
-              padding: "24px",
+              borderRadius: "12px",
+              padding: "20px",
               minHeight: "220px",
             }}
           >
-            <div className="skeleton" style={{ width: "140px", height: "16px", borderRadius: "4px", marginBottom: "16px" }} />
-            <div className="skeleton" style={{ width: "100%", height: "48px", borderRadius: "8px", marginBottom: "10px" }} />
-            <div className="skeleton" style={{ width: "100%", height: "48px", borderRadius: "8px" }} />
+            <div className="skeleton" style={{ width: "120px", height: "15px", borderRadius: "4px", marginBottom: "14px" }} />
+            <div className="skeleton" style={{ width: "100%", height: "44px", borderRadius: "8px", marginBottom: "8px" }} />
+            <div className="skeleton" style={{ width: "100%", height: "44px", borderRadius: "8px" }} />
           </div>
 
           <div
             style={{
-              background: "#FFFCF5",
-              border: "1px solid #FDE7B8",
-              borderRadius: "14px",
-              padding: "24px",
+              background: "#FFFFFF",
+              border: "1px solid #E2E8F0",
+              borderRadius: "12px",
+              padding: "20px",
               minHeight: "220px",
             }}
           >
-            <div className="skeleton" style={{ width: "180px", height: "16px", borderRadius: "4px", marginBottom: "16px" }} />
-            <div className="skeleton" style={{ width: "100%", height: "48px", borderRadius: "8px", marginBottom: "10px" }} />
-            <div className="skeleton" style={{ width: "100%", height: "48px", borderRadius: "8px" }} />
+            <div className="skeleton" style={{ width: "150px", height: "15px", borderRadius: "4px", marginBottom: "14px" }} />
+            <div className="skeleton" style={{ width: "100%", height: "44px", borderRadius: "8px", marginBottom: "8px" }} />
+            <div className="skeleton" style={{ width: "100%", height: "44px", borderRadius: "8px" }} />
           </div>
-        </div>
-
-        {/* 3-Column Grid Skeleton */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px" }}>
-          {[1, 2, 3].map((i) => (
-            <div
-              key={i}
-              style={{
-                background: "#FFFFFF",
-                border: "1px solid #E2E8F0",
-                borderRadius: "12px",
-                padding: "20px",
-                height: "170px",
-              }}
-            >
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "14px" }}>
-                <div className="skeleton" style={{ width: "80px", height: "18px", borderRadius: "6px" }} />
-                <div className="skeleton" style={{ width: "60px", height: "18px", borderRadius: "999px" }} />
-              </div>
-              <div className="skeleton" style={{ width: "160px", height: "16px", borderRadius: "4px", marginBottom: "16px" }} />
-              <div className="skeleton" style={{ width: "100%", height: "32px", borderRadius: "6px" }} />
-            </div>
-          ))}
         </div>
       </div>
     </div>

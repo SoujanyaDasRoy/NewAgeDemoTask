@@ -41,7 +41,6 @@ export default function RequestDetailDrawer({
 
   if (!isOpen || !request) return null;
 
-  // Calculate days left if requiredUntil is set
   let daysRemaining: number | null = null;
   let isExpired = false;
   if (request.requiredUntil) {
@@ -99,17 +98,17 @@ export default function RequestDetailDrawer({
       >
         {/* Drawer Header */}
         <div className="drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            <ServiceLogo tool={toolName} size={26} />
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <ServiceLogo tool={toolName} size={24} />
             <div>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
-                <h3 style={{ margin: 0, fontSize: "16px", fontWeight: 700, color: "#0F1B33" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
+                <h3 style={{ margin: 0, fontSize: "15px", fontWeight: 700, color: "#0F172A" }}>
                   {request.accessLabel}
                 </h3>
                 <StatusBadge status={request.status} />
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "3px" }}>
-                <span className="mono" style={{ fontSize: "12px", color: "#64748B", fontWeight: 600 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "2px" }}>
+                <span className="mono" style={{ fontSize: "11.5px", color: "#64748B", fontWeight: 600 }}>
                   {request.id}
                 </span>
                 <button
@@ -127,15 +126,15 @@ export default function RequestDetailDrawer({
                 >
                   {copied ? <CheckCheck size={12} /> : <Copy size={12} />}
                 </button>
-                <span style={{ fontSize: "12px", color: "#94A3B8" }}>·</span>
-                <span style={{ fontSize: "12px", color: "#64748B" }}>
+                <span style={{ fontSize: "11px", color: "#CBD5E1" }}>·</span>
+                <span style={{ fontSize: "11.5px", color: "#64748B" }}>
                   Submitted {new Date(request.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
                 </span>
               </div>
             </div>
           </div>
           <button className="drawer-close" onClick={onClose} aria-label="Close drawer">
-            <X size={18} />
+            <X size={16} />
           </button>
         </div>
 
@@ -144,22 +143,22 @@ export default function RequestDetailDrawer({
           {isPendingApproval && (
             <div
               style={{
-                marginBottom: "20px",
-                padding: "14px",
-                borderRadius: "10px",
+                marginBottom: "16px",
+                padding: "12px",
+                borderRadius: "8px",
                 background: "#FFFBEB",
                 border: "1px solid #FDE68A",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
-                gap: "12px",
+                gap: "10px",
               }}
             >
               <div>
-                <div style={{ fontSize: "13px", fontWeight: 700, color: "#92400E", display: "flex", alignItems: "center", gap: "6px" }}>
-                  <Clock size={14} /> Awaiting {request.approverName}&apos;s Approval
+                <div style={{ fontSize: "12.5px", fontWeight: 700, color: "#92400E", display: "flex", alignItems: "center", gap: "5px" }}>
+                  <Clock size={13} /> Awaiting {request.approverName}&apos;s Decision
                 </div>
-                <div style={{ fontSize: "11.5px", color: "#B45309", marginTop: "2px" }}>
+                <div style={{ fontSize: "11.5px", color: "#B45309", marginTop: "1px" }}>
                   Estimated Turnaround: Typically reviewed within 2 hours.
                 </div>
               </div>
@@ -168,11 +167,11 @@ export default function RequestDetailDrawer({
                 type="button"
                 onClick={handleSlackNudge}
                 style={{
-                  border: "1px solid #F59E0B",
+                  border: "1px solid #FDE68A",
                   background: nudged ? "#FEF3C7" : "#FFFFFF",
                   color: "#92400E",
                   borderRadius: "6px",
-                  padding: "5px 10px",
+                  padding: "4px 8px",
                   fontSize: "11.5px",
                   fontWeight: 600,
                   cursor: "pointer",
@@ -182,7 +181,7 @@ export default function RequestDetailDrawer({
                   flexShrink: 0,
                 }}
               >
-                <MessageSquare size={12} /> {nudged ? "Nudge Sent via Slack!" : "Ping on Slack"}
+                <MessageSquare size={12} /> {nudged ? "Ping Sent!" : "Ping on Slack"}
               </button>
             </div>
           )}
@@ -191,32 +190,32 @@ export default function RequestDetailDrawer({
           {request.requiredUntil && (
             <div
               style={{
-                marginBottom: "20px",
-                padding: "14px",
-                borderRadius: "10px",
+                marginBottom: "16px",
+                padding: "12px",
+                borderRadius: "8px",
                 background: isExpired ? "#FEF2F2" : "#F0FDF4",
-                border: `1px solid ${isExpired ? "#FECACA" : "#BBF7D0"}`,
+                border: `1px solid ${isExpired ? "#FECACA" : "#DCFCE7"}`,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
-                gap: "12px",
+                gap: "10px",
               }}
             >
               <div>
                 <div
                   style={{
-                    fontSize: "13px",
+                    fontSize: "12.5px",
                     fontWeight: 700,
                     color: isExpired ? "#991B1B" : "#166534",
                     display: "flex",
                     alignItems: "center",
-                    gap: "6px",
+                    gap: "5px",
                   }}
                 >
-                  <Calendar size={15} />
-                  {isExpired ? "Access Expired" : `Access Valid Until ${request.requiredUntil}`}
+                  <Calendar size={14} />
+                  {isExpired ? "Access Expired" : `Valid Until ${request.requiredUntil}`}
                 </div>
-                <div style={{ fontSize: "11.5px", color: isExpired ? "#B91C1C" : "#15803D", marginTop: "2px" }}>
+                <div style={{ fontSize: "11.5px", color: isExpired ? "#B91C1C" : "#15803D", marginTop: "1px" }}>
                   {isExpired
                     ? "This temporary exception has elapsed."
                     : `${daysRemaining} day${daysRemaining === 1 ? "" : "s"} remaining before auto-expiry.`}
@@ -226,7 +225,7 @@ export default function RequestDetailDrawer({
               {onRequestExtension && !isExpired && (
                 <button
                   className="btn btn-secondary"
-                  style={{ fontSize: "12px", height: "32px", padding: "0 12px" }}
+                  style={{ fontSize: "11.5px", height: "30px", padding: "0 10px" }}
                   onClick={handleExtension}
                   disabled={extending}
                 >
@@ -240,39 +239,39 @@ export default function RequestDetailDrawer({
           {isAwaitingClosure && (
             <div
               style={{
-                marginBottom: "20px",
-                padding: "14px",
-                borderRadius: "10px",
-                background: "#F5F3FF",
-                border: "1px solid #DDD6FE",
+                marginBottom: "16px",
+                padding: "12px",
+                borderRadius: "8px",
+                background: "#F8FAFC",
+                border: "1px solid var(--border)",
               }}
             >
-              <div style={{ fontSize: "13px", fontWeight: 700, color: "#5B21B6" }}>
+              <div style={{ fontSize: "12.5px", fontWeight: 700, color: "#0F172A" }}>
                 Access Provisioned for {request.beneficiaryName}
               </div>
-              <div style={{ fontSize: "12px", color: "#6D28D9", marginTop: "2px" }}>
-                Please confirm with the colleague that their account access is active, then close this ticket.
+              <div style={{ fontSize: "11.5px", color: "#64748B", marginTop: "2px" }}>
+                Please confirm with the colleague that access is active, then close this ticket.
               </div>
               <button
-                className="btn btn-primary"
-                style={{ marginTop: "12px", width: "100%", background: "#6D28D9" }}
+                className="btn btn-primary btn-block"
+                style={{ marginTop: "10px", height: "36px" }}
                 onClick={handleClose}
                 disabled={closing}
               >
-                <CheckSquare size={16} /> {closing ? "Closing..." : "Confirm & Close Request"}
+                <CheckSquare size={14} /> {closing ? "Closing..." : "Confirm & Close Request"}
               </button>
             </div>
           )}
 
           {/* Progress Timeline */}
-          <div className="divider-label" style={{ marginBottom: "12px" }}>
-            Multi-Step Audit Journey
+          <div className="divider-label" style={{ marginBottom: "10px" }}>
+            Audit Journey
           </div>
           <Timeline steps={request.timeline || []} />
 
           {/* Detailed Metadata Grid */}
-          <div style={{ marginTop: "24px", paddingTop: "18px", borderTop: "1px solid var(--border)" }}>
-            <div className="divider-label" style={{ marginBottom: "12px" }}>
+          <div style={{ marginTop: "20px", paddingTop: "16px", borderTop: "1px solid var(--border)" }}>
+            <div className="divider-label" style={{ marginBottom: "10px" }}>
               Request Metadata
             </div>
             <div className="field-grid">
@@ -300,31 +299,31 @@ export default function RequestDetailDrawer({
                       <Zap size={11} /> Automated SCIM
                     </span>
                   ) : (
-                    "Manual IT Provisioning"
+                    "Manual IT"
                   )}
                 </span>
               </div>
               <div className="field">
                 <span className="f-label">Request Type</span>
                 <span className="f-value">
-                  {request.isException ? "Exception Request" : request.onBehalf ? "On-Behalf Request" : "Direct Request"}
+                  {request.isException ? "Exception" : request.onBehalf ? "On-Behalf" : "Direct"}
                 </span>
               </div>
             </div>
 
             {/* Justification Box */}
-            <div style={{ marginTop: "16px" }}>
+            <div style={{ marginTop: "14px" }}>
               <span className="f-label">Business Justification</span>
               <div
                 style={{
-                  marginTop: "6px",
-                  padding: "12px",
+                  marginTop: "4px",
+                  padding: "10px 12px",
                   background: "#F8FAFC",
-                  border: "1px solid #E2E8F0",
+                  border: "1px solid var(--border)",
                   borderRadius: "8px",
-                  fontSize: "13px",
+                  fontSize: "12.5px",
                   color: "#334155",
-                  lineHeight: "1.5",
+                  lineHeight: "1.45",
                 }}
               >
                 {request.justification}
@@ -333,16 +332,16 @@ export default function RequestDetailDrawer({
 
             {/* Rejection Reason if any */}
             {request.rejectionReason && (
-              <div style={{ marginTop: "16px" }}>
+              <div style={{ marginTop: "14px" }}>
                 <span className="f-label" style={{ color: "#DC2626" }}>Rejection Feedback</span>
                 <div
                   style={{
-                    marginTop: "6px",
-                    padding: "12px",
+                    marginTop: "4px",
+                    padding: "10px 12px",
                     background: "#FEF2F2",
                     border: "1px solid #FECACA",
                     borderRadius: "8px",
-                    fontSize: "13px",
+                    fontSize: "12.5px",
                     color: "#991B1B",
                   }}
                 >

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { X, CheckCircle2, AlertTriangle } from "lucide-react";
+import { X, CheckCircle2, AlertTriangle, Send } from "lucide-react";
 import StatusBadge from "../StatusBadge";
 
 interface ExceptionFormDrawerProps {
@@ -80,16 +80,18 @@ export default function ExceptionFormDrawer({
       >
         <div className="drawer-head">
           <div>
-            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              <h3>{submittedId ? "Exception Request Submitted" : "Request Access Exception"}</h3>
-              <span className="badge badge-amber">Exception</span>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+              <h3 style={{ margin: 0, fontSize: "15px", fontWeight: 700, color: "#0F172A" }}>
+                {submittedId ? "Exception Request Submitted" : "Request Access Exception"}
+              </h3>
+              <span className="badge badge-amber" style={{ fontSize: "10.5px" }}>Exception</span>
             </div>
-            <div className="sub">
+            <div className="sub" style={{ fontSize: "12px", color: "#64748B", marginTop: "1px" }}>
               {accessItem.tool} – {accessItem.name}
             </div>
           </div>
           <button className="drawer-close" onClick={handleResetAndClose} aria-label="Close drawer">
-            <X size={18} />
+            <X size={16} />
           </button>
         </div>
 
@@ -98,58 +100,59 @@ export default function ExceptionFormDrawer({
             <div style={{ textAlign: "center", padding: "14px 0" }}>
               <div
                 style={{
-                  width: "56px",
-                  height: "56px",
+                  width: "48px",
+                  height: "48px",
                   borderRadius: "999px",
                   background: "#FFFBEB",
+                  border: "1px solid #FDE68A",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  margin: "0 auto 16px",
+                  margin: "0 auto 12px",
                   color: "#D97706",
                 }}
               >
-                <AlertTriangle size={32} />
+                <AlertTriangle size={24} />
               </div>
-              <h3 style={{ fontSize: "17px", fontWeight: 800, margin: 0, color: "#111827" }}>
-                Exception request submitted
-              </h3>
-              <p style={{ fontSize: "13px", color: "#6B7280", marginTop: "5px" }}>
-                Routed to the designated approver for exception evaluation.
+              <h4 style={{ fontSize: "16px", fontWeight: 700, margin: 0, color: "#0F172A" }}>
+                Exception Request Submitted
+              </h4>
+              <p style={{ fontSize: "12.5px", color: "#64748B", marginTop: "4px" }}>
+                Routed to {accessItem.approver} for exception evaluation.
               </p>
 
               <div
                 style={{
-                  marginTop: "24px",
-                  padding: "16px",
+                  marginTop: "20px",
+                  padding: "12px 14px",
                   background: "#F8FAFC",
-                  borderRadius: "10px",
+                  borderRadius: "8px",
                   border: "1px solid var(--border)",
                   textAlign: "left",
                   display: "flex",
                   flexDirection: "column",
-                  gap: "12px",
+                  gap: "10px",
                 }}
               >
-                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px" }}>
-                  <span style={{ color: "#6B7280" }}>Request ID</span>
-                  <span className="mono font-bold text-[#111827]">{submittedId}</span>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12.5px" }}>
+                  <span style={{ color: "#64748B" }}>Request ID</span>
+                  <span className="mono font-bold text-[#0F172A]">{submittedId}</span>
                 </div>
-                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px" }}>
-                  <span style={{ color: "#6B7280" }}>Status</span>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12.5px" }}>
+                  <span style={{ color: "#64748B" }}>Status</span>
                   <StatusBadge status="Pending Exception Approval" />
                 </div>
-                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px" }}>
-                  <span style={{ color: "#6B7280" }}>Approver</span>
-                  <span style={{ fontWeight: 600, color: "#111827" }}>{accessItem.approver}</span>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12.5px" }}>
+                  <span style={{ color: "#64748B" }}>Approver</span>
+                  <span style={{ fontWeight: 600, color: "#0F172A" }}>{accessItem.approver}</span>
                 </div>
-                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px" }}>
-                  <span style={{ color: "#6B7280" }}>Required Until</span>
-                  <span style={{ fontWeight: 600, color: "#111827" }}>{requiredUntil}</span>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12.5px" }}>
+                  <span style={{ color: "#64748B" }}>Required Until</span>
+                  <span style={{ fontWeight: 600, color: "#0F172A" }}>{requiredUntil}</span>
                 </div>
-                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px" }}>
-                  <span style={{ color: "#6B7280" }}>Urgency</span>
-                  <span style={{ fontWeight: 600, color: urgency === "CRITICAL" ? "#DC2626" : urgency === "URGENT" ? "#D97706" : "#4B5563" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12.5px" }}>
+                  <span style={{ color: "#64748B" }}>Urgency</span>
+                  <span style={{ fontWeight: 600, color: urgency === "CRITICAL" ? "#DC2626" : urgency === "URGENT" ? "#D97706" : "#475569" }}>
                     {urgency}
                   </span>
                 </div>
@@ -157,7 +160,7 @@ export default function ExceptionFormDrawer({
 
               <button
                 className="btn btn-primary btn-block"
-                style={{ marginTop: "24px" }}
+                style={{ marginTop: "20px", height: "38px" }}
                 onClick={handleResetAndClose}
               >
                 Done
@@ -165,14 +168,14 @@ export default function ExceptionFormDrawer({
             </div>
           ) : (
             <form onSubmit={handleSubmit}>
-              <div className="warn-box" style={{ marginBottom: "20px" }}>
-                <AlertTriangle size={16} style={{ marginTop: "2px", flexShrink: 0 }} />
+              <div className="warn-box" style={{ marginBottom: "16px" }}>
+                <AlertTriangle size={15} style={{ marginTop: "1px", flexShrink: 0 }} />
                 <div>
                   <div style={{ fontWeight: 700, color: "#92400E" }}>
-                    Out-of-Department Request
+                    Out-of-Department Resource
                   </div>
                   <div style={{ color: "#B45309", marginTop: "2px" }}>
-                    You are requesting access to a resource outside your normal department ({accessItem.group}). This will require specific exception review.
+                    This resource belongs to {accessItem.group}. A justified exception review is required.
                   </div>
                 </div>
               </div>
@@ -183,6 +186,7 @@ export default function ExceptionFormDrawer({
                   className="form-select"
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
+                  style={{ height: "36px" }}
                 >
                   <option value="Cross-team Project Collaboration">
                     Cross-team Project Collaboration
@@ -197,22 +201,24 @@ export default function ExceptionFormDrawer({
                 </select>
               </div>
 
-              <div className="field-grid" style={{ marginBottom: "16px" }}>
-                <div className="form-group">
+              <div className="field-grid" style={{ marginBottom: "14px" }}>
+                <div className="form-group" style={{ marginBottom: 0 }}>
                   <label className="form-label">Access Required Until</label>
                   <input
                     type="date"
                     className="form-input"
                     value={requiredUntil}
                     onChange={(e) => setRequiredUntil(e.target.value)}
+                    style={{ height: "36px" }}
                   />
                 </div>
-                <div className="form-group">
+                <div className="form-group" style={{ marginBottom: 0 }}>
                   <label className="form-label">Urgency Level</label>
                   <select
                     className="form-select"
                     value={urgency}
                     onChange={(e) => setUrgency(e.target.value as any)}
+                    style={{ height: "36px" }}
                   >
                     <option value="STANDARD">Standard</option>
                     <option value="URGENT">Urgent (Blocked)</option>
@@ -224,37 +230,37 @@ export default function ExceptionFormDrawer({
               <div className="form-group">
                 <label className="form-label">Business Justification</label>
                 <span className="form-sublabel">
-                  Detail the project scope, deliverables, and why this exception is needed.
+                  Explain the project scope and why this exception is needed.
                 </span>
                 <textarea
-                  className={`form-textarea ${error ? "input-error" : ""}`}
-                  rows={4}
-                  placeholder="Explain why standard departmental access is insufficient..."
+                  className="form-textarea"
+                  rows={3}
+                  placeholder="Detail project deliverables and rationale..."
                   value={justification}
                   onChange={(e) => {
                     setJustification(e.target.value);
                     if (error) setError("");
                   }}
                 />
-                {error && <div className="field-error">{error}</div>}
+                {error && <div style={{ color: "#DC2626", fontSize: "11.5px", marginTop: "4px" }}>{error}</div>}
               </div>
 
-              <div style={{ display: "flex", gap: "10px", marginTop: "24px" }}>
+              <div style={{ display: "flex", gap: "8px", marginTop: "20px" }}>
                 <button
                   type="button"
                   className="btn btn-secondary"
-                  style={{ flex: 1 }}
+                  style={{ flex: 1, height: "38px" }}
                   onClick={handleResetAndClose}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="btn btn-block"
-                  style={{ flex: 2, background: "#B45309", color: "#fff" }}
+                  className="btn btn-primary"
+                  style={{ flex: 1.5, height: "38px" }}
                   disabled={loading}
                 >
-                  {loading ? "Submitting..." : "Submit Exception Request"}
+                  <Send size={13} /> {loading ? "Submitting..." : "Submit Exception"}
                 </button>
               </div>
             </form>
