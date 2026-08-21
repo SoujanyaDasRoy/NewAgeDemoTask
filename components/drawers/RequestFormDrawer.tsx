@@ -392,18 +392,52 @@ export default function RequestFormDrawer({
                 </div>
               </div>
 
-              {/* Justification Textarea */}
+              {/* Justification Textarea with 1-Click Quick Fill Chips */}
               <div style={{ marginBottom: "20px" }}>
                 <label className="form-label" style={{ marginBottom: "4px" }}>
                   Business Justification <span style={{ color: "#DC2626" }}>*</span>
                 </label>
                 <span className="form-sublabel" style={{ display: "block", marginBottom: "6px" }}>
-                  Explain why you or your team requires access to this tool.
+                  Click a quick-fill preset or type your custom justification:
                 </span>
+
+                {/* 1-Click Quick Chips */}
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginBottom: "8px" }}>
+                  {[
+                    "🎯 Sprint & Project Delivery",
+                    "📊 Cross-Team Collaboration",
+                    "🚀 Client Deliverable",
+                    "🔍 Audit & Governance Review",
+                  ].map((chip) => {
+                    const cleanText = chip.slice(2).trim();
+                    const isSelected = justification === cleanText;
+                    return (
+                      <button
+                        key={chip}
+                        type="button"
+                        onClick={() => setJustification(cleanText)}
+                        style={{
+                          border: isSelected ? "1px solid #93C5FD" : "1px solid #E2E8F0",
+                          background: isSelected ? "#EFF6FF" : "#F8FAFC",
+                          color: isSelected ? "#1D4ED8" : "#475569",
+                          padding: "4px 8px",
+                          borderRadius: "6px",
+                          fontSize: "11px",
+                          cursor: "pointer",
+                          fontWeight: isSelected ? 600 : 500,
+                          transition: "all 0.1s ease",
+                        }}
+                      >
+                        {chip}
+                      </button>
+                    );
+                  })}
+                </div>
+
                 <textarea
                   className="form-textarea"
-                  rows={3}
-                  placeholder="e.g. Collaborating with marketing on Q3 field campaign assets and sprint sign-offs..."
+                  rows={2}
+                  placeholder="e.g. Sprint and project delivery..."
                   value={justification}
                   onChange={(e) => setJustification(e.target.value)}
                   required

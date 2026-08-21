@@ -1078,13 +1078,54 @@ function PortalDashboard() {
               </button>
             </div>
             <button
-              className="btn btn-secondary"
+              className="btn btn-primary"
+              style={{
+                fontSize: "13px",
+                height: "38px",
+                padding: "0 16px",
+                fontWeight: 700,
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+                background: "#0F1B33",
+                flexShrink: 0,
+              }}
               onClick={() => {
-                if (catalog.length > 0) setAccessDetailsItem(catalog[0]);
+                if (catalog.length > 0) setRequestFormItem(catalog[0]);
               }}
             >
-              Browse directory
+              <Zap size={14} style={{ color: "#60A5FA" }} /> + Request Access
             </button>
+          </div>
+
+          {/* Quick-Launch Preset Pills */}
+          <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "10px", flexWrap: "wrap" }}>
+            <span style={{ fontSize: "11.5px", fontWeight: 600, color: "#64748B" }}>Popular:</span>
+            {catalog.slice(0, 4).map((tool) => (
+              <button
+                key={tool.id}
+                type="button"
+                onClick={() => setRequestFormItem(tool)}
+                style={{
+                  border: "1px solid #E2E8F0",
+                  background: "#F8FAFC",
+                  color: "#0F1B33",
+                  padding: "3px 10px",
+                  borderRadius: "999px",
+                  fontSize: "11.5px",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "5px",
+                }}
+                className="hover-card-sm"
+              >
+                <ServiceLogo tool={tool.tool} size={13} />
+                <span>{tool.name}</span>
+                <span style={{ color: "#2563EB", fontSize: "10px" }}>+</span>
+              </button>
+            ))}
           </div>
 
           {/* Quick Category Filter Pills */}
@@ -2708,6 +2749,42 @@ function PortalDashboard() {
         onSelectRequest={(req) => setSelectedRequest(req)}
         isAdmin={isRoleAdmin}
       />
+
+      {/* ── PERSISTENT 1-CLICK QUICK REQUEST FLOATING ACTION BUTTON ── */}
+      <div
+        style={{
+          position: "fixed",
+          bottom: "24px",
+          right: "24px",
+          zIndex: 40,
+        }}
+      >
+        <button
+          type="button"
+          onClick={() => {
+            if (catalog.length > 0) setRequestFormItem(catalog[0]);
+          }}
+          style={{
+            background: "linear-gradient(135deg, #0F172A 0%, #1E293B 100%)",
+            color: "#FFFFFF",
+            border: "1px solid rgba(255, 255, 255, 0.15)",
+            borderRadius: "999px",
+            padding: "12px 20px",
+            fontSize: "13px",
+            fontWeight: 700,
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            boxShadow: "0 10px 25px -5px rgba(15, 23, 42, 0.4), 0 0 0 1px rgba(255,255,255,0.1)",
+            cursor: "pointer",
+            transition: "all 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
+          }}
+          title="Quickly request access to any tool or board"
+        >
+          <Zap size={16} style={{ color: "#60A5FA" }} />
+          <span>+ Quick Request</span>
+        </button>
+      </div>
 
       {/* TOAST CONTAINER */}
       <div className="toast-container" role="status" aria-live="polite">
