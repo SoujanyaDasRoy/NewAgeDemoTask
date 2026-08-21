@@ -635,32 +635,180 @@ export default function PortalPage() {
 
       {/* MAIN CONTENT */}
       <main className="main-container">
-        {/* Welcome Hero */}
+        {/* Welcome Hero & Role Demarcation Banner */}
         <div className="welcome">
-          {isRoleAdmin ? (
-            <>
-              <h1>Board Admin · {currentUser.name}</h1>
-              <p>
-                Manage the boards you administer, provision access, govern Access IDs, and manage team member roles.
-              </p>
-            </>
-          ) : (
-            <>
-              <h1>Welcome back, {currentUser.name.split(" ")[0]}</h1>
-              <p>
-                Search for access, track your requests, and act on anything awaiting your approval — all in one place.
-              </p>
-            </>
-          )}
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px", flexWrap: "wrap" }}>
+            <div>
+              {isRoleAdmin ? (
+                <>
+                  <h1>Board Admin · {currentUser.name}</h1>
+                  <p>
+                    Manage the boards you administer, provision access, govern Access IDs, and manage team member roles.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <h1>Welcome back, {currentUser.name.split(" ")[0]}</h1>
+                  <p>
+                    Search for access, track your requests, and act on anything awaiting your approval — all in one place.
+                  </p>
+                </>
+              )}
+            </div>
+
+            {/* Quick Context Pill */}
+            <div className="role-banner" style={{ padding: "8px 14px", flexShrink: 0 }}>
+              <div className="role-banner-left">
+                <Shield size={16} style={{ color: isRoleAdmin ? "#2563EB" : "#16A34A" }} />
+                <div>
+                  <div className="role-banner-title" style={{ fontSize: "12.5px" }}>
+                    {currentUser.department}
+                  </div>
+                  <div className="role-banner-sub" style={{ fontSize: "11px" }}>
+                    {isRoleAdmin ? "Full Governance Permissions" : "Standard Employee Tier"}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ── 🌟 DRIBBLE-GRADE DASHBOARD METRICS HEADER ─────────────────── */}
+        <div className="metrics-grid">
+          {/* 1. Directory Tools */}
+          <div
+            className="metric-card metric-blue"
+            onClick={() => {
+              const el = document.querySelector(".search-row");
+              el?.scrollIntoView({ behavior: "smooth" });
+            }}
+            title="Browse all available tools and boards"
+          >
+            <div className="metric-top-row">
+              <span className="metric-label">Directory Tools</span>
+              <div className="metric-icon-wrap metric-icon-blue">
+                <Package size={16} />
+              </div>
+            </div>
+            <div className="metric-value-row">
+              <span className="metric-number">{catalog.length}</span>
+              <span className="metric-pill-sub" style={{ color: "#2563EB" }}>
+                <Zap size={11} /> {catalog.filter((c) => c.automation).length} Auto
+              </span>
+            </div>
+          </div>
+
+          {/* 2. Active Access Requests */}
+          <div
+            className="metric-card metric-emerald"
+            onClick={() => {
+              setRequestFilter("ALL");
+              const el = document.querySelector(".filter-pills-row");
+              el?.scrollIntoView({ behavior: "smooth" });
+            }}
+            title="View your active and past requests"
+          >
+            <div className="metric-top-row">
+              <span className="metric-label">Active Requests</span>
+              <div className="metric-icon-wrap metric-icon-emerald">
+                <Activity size={16} />
+              </div>
+            </div>
+            <div className="metric-value-row">
+              <span className="metric-number">
+                {requests.filter((r) => !["COMPLETED", "REJECTED", "EXPIRED"].includes(r.status)).length}
+              </span>
+              <span className="metric-pill-sub" style={{ color: "#16A34A" }}>
+                {requests.filter((r) => r.status === "COMPLETED").length} Completed
+              </span>
+            </div>
+          </div>
+
+          {/* 3. Pending Approvals */}
+          <div
+            className="metric-card metric-amber"
+            onClick={() => {
+              const el = document.querySelector(".card-tinted-amber, .card-tinted-orange");
+              el?.scrollIntoView({ behavior: "smooth" });
+            }}
+            title="Items requiring immediate action"
+          >
+            <div className="metric-top-row">
+              <span className="metric-label">Pending Approvals</span>
+              <div className="metric-icon-wrap metric-icon-amber">
+                <CheckSquare size={16} />
+              </div>
+            </div>
+            <div className="metric-value-row">
+              <span className="metric-number">{pendingApprovals.length}</span>
+              <span
+                className="metric-pill-sub"
+                style={{
+                  color: pendingApprovals.length > 0 ? "#D97706" : "#16A34A",
+                  fontWeight: 600,
+                }}
+              >
+                {pendingApprovals.length > 0 ? (
+                  <>
+                    <Zap size={11} /> Action Needed
+                  </>
+                ) : (
+                  "✓ All Clear"
+                )}
+              </span>
+            </div>
+          </div>
+
+          {/* 4. Governed Access IDs */}
+          <div
+            className="metric-card metric-violet"
+            onClick={() => {
+              if (isRoleAdmin) {
+                const el = document.querySelector(".card-tinted-violet");
+                el?.scrollIntoView({ behavior: "smooth" });
+              } else if (catalog.length > 0) {
+                setAccessDetailsItem(catalog[0]);
+              }
+            }}
+            title="Policy-governed and bound Access IDs"
+          >
+            <div className="metric-top-row">
+              <span className="metric-label">Governed Access IDs</span>
+              <div className="metric-icon-wrap metric-icon-violet">
+                <Key size={16} />
+              </div>
+            </div>
+            <div className="metric-value-row">
+              <span className="metric-number">{catalog.filter((c) => c.accessId).length}</span>
+              <span
+                className="metric-pill-sub"
+                style={{
+                  color:
+                    accessIdQueue.filter((q) => q.status === "Pending Governance Review").length > 0
+                      ? "#7C3AED"
+                      : "#64748B",
+                }}
+              >
+                {accessIdQueue.filter((q) => q.status === "Pending Governance Review").length > 0
+                  ? `${accessIdQueue.filter((q) => q.status === "Pending Governance Review").length} Queued`
+                  : "✓ 100% Policy Bound"}
+              </span>
+            </div>
+          </div>
         </div>
 
         {/* SEARCH CARD WITH SPOTLIGHT SHORTCUT */}
         <div className="card">
           <div className="section-head" style={{ borderBottom: "none", paddingBottom: "4px" }}>
-            <div>
-              <div className="section-title">Find access</div>
-              <div className="section-sub">
-                Search by tool, board, or team — you don&apos;t need to know the exact internal name.
+            <div className="section-head-left">
+              <div className="section-icon">
+                <Search size={18} />
+              </div>
+              <div>
+                <div className="section-title">Find access</div>
+                <div className="section-sub">
+                  Search by tool, board, or team — you don&apos;t need to know the exact internal name.
+                </div>
               </div>
             </div>
           </div>
@@ -1549,7 +1697,8 @@ export default function PortalPage() {
 
               {/* User Search & Department Filter Toolbar */}
               <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", alignItems: "center", marginBottom: "16px" }}>
-                <div style={{ flex: 1, minWidth: "200px" }}>
+                <div style={{ flex: 1, minWidth: "220px", position: "relative", display: "flex", alignItems: "center" }}>
+                  <Search size={15} style={{ position: "absolute", left: "12px", color: "#94A3B8" }} />
                   <input
                     type="text"
                     placeholder="Search users by name or email..."
@@ -1557,13 +1706,14 @@ export default function PortalPage() {
                     onChange={(e) => setUserSearchQuery(e.target.value)}
                     style={{
                       width: "100%",
-                      height: "36px",
-                      padding: "0 12px",
+                      height: "38px",
+                      padding: "0 12px 0 34px",
                       borderRadius: "8px",
                       border: "1px solid #CBD5E1",
                       fontSize: "12.5px",
                       outline: "none",
-                      background: "#F8FAFC",
+                      background: "#FFFFFF",
+                      boxShadow: "0 1px 2px rgba(15, 27, 51, 0.03)",
                     }}
                   />
                 </div>
@@ -1573,7 +1723,7 @@ export default function PortalPage() {
                       key={dept}
                       type="button"
                       className={`filter-pill ${userDeptFilter === dept ? "active" : ""}`}
-                      style={{ fontSize: "11.5px", padding: "4px 10px" }}
+                      style={{ fontSize: "11.5px", padding: "5px 11px" }}
                       onClick={() => setUserDeptFilter(dept)}
                     >
                       {dept === "ALL" ? "All Departments" : dept}
@@ -1582,7 +1732,15 @@ export default function PortalPage() {
                 </div>
               </div>
 
-              <div style={{ overflowX: "auto" }}>
+              <div
+                style={{
+                  overflowX: "auto",
+                  border: "1px solid #E2E8F0",
+                  borderRadius: "10px",
+                  background: "#FFFFFF",
+                  boxShadow: "0 1px 2px rgba(15, 27, 51, 0.02)",
+                }}
+              >
                 <table
                   style={{
                     width: "100%",
@@ -1592,12 +1750,12 @@ export default function PortalPage() {
                   }}
                 >
                   <thead>
-                    <tr style={{ borderBottom: "1px solid #E2E8F0", color: "#64748B" }}>
-                      <th style={{ padding: "10px 12px", fontWeight: 600 }}>User</th>
-                      <th style={{ padding: "10px 12px", fontWeight: 600 }}>Email</th>
-                      <th style={{ padding: "10px 12px", fontWeight: 600 }}>Department</th>
-                      <th style={{ padding: "10px 12px", fontWeight: 600 }}>Role</th>
-                      <th style={{ padding: "10px 12px", fontWeight: 600, textAlign: "right" }}>Actions</th>
+                    <tr style={{ background: "#F8FAFC", borderBottom: "1px solid #E2E8F0", color: "#475569" }}>
+                      <th style={{ padding: "12px 16px", fontWeight: 700, fontSize: "11.5px", textTransform: "uppercase", letterSpacing: "0.04em" }}>User</th>
+                      <th style={{ padding: "12px 16px", fontWeight: 700, fontSize: "11.5px", textTransform: "uppercase", letterSpacing: "0.04em" }}>Email</th>
+                      <th style={{ padding: "12px 16px", fontWeight: 700, fontSize: "11.5px", textTransform: "uppercase", letterSpacing: "0.04em" }}>Department</th>
+                      <th style={{ padding: "12px 16px", fontWeight: 700, fontSize: "11.5px", textTransform: "uppercase", letterSpacing: "0.04em" }}>Role</th>
+                      <th style={{ padding: "12px 16px", fontWeight: 700, fontSize: "11.5px", textTransform: "uppercase", letterSpacing: "0.04em", textAlign: "right" }}>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1609,34 +1767,48 @@ export default function PortalPage() {
                         return matchesQ && matchesDept;
                       })
                       .map((u) => (
-                      <tr key={u.id} style={{ borderBottom: "1px solid #F1F5F9" }}>
-                        <td style={{ padding: "12px", display: "flex", alignItems: "center", gap: "8px" }}>
+                      <tr
+                        key={u.id}
+                        style={{
+                          borderBottom: "1px solid #F1F5F9",
+                          transition: "background 0.15s ease",
+                        }}
+                      >
+                        <td style={{ padding: "12px 16px", display: "flex", alignItems: "center", gap: "10px" }}>
                           <div
                             className="avatar"
                             style={{
-                              width: "28px",
-                              height: "28px",
+                              width: "30px",
+                              height: "30px",
                               fontSize: "11px",
                               background: u.avatarTone || "#0F1B33",
                             }}
                           >
                             {u.initials || "U"}
                           </div>
-                          <span style={{ fontWeight: 600, color: "#0F1B33" }}>{u.name}</span>
+                          <div>
+                            <div style={{ fontWeight: 600, color: "#0F1B33" }}>{u.name}</div>
+                            {u.id === currentUser.id && (
+                              <span className="badge badge-blue" style={{ fontSize: "10px", padding: "1px 6px", marginTop: "2px" }}>
+                                Current User
+                              </span>
+                            )}
+                          </div>
                         </td>
-                        <td style={{ padding: "12px", color: "#64748B" }}>{u.email}</td>
-                        <td style={{ padding: "12px" }}>
+                        <td style={{ padding: "12px 16px", color: "#64748B" }}>{u.email}</td>
+                        <td style={{ padding: "12px 16px" }}>
                           <select
                             value={u.department}
                             onChange={(e) => handleUserDeptChange(u.id, e.target.value, u.role)}
                             style={{
-                              padding: "4px 8px",
+                              padding: "5px 10px",
                               borderRadius: "6px",
                               border: "1px solid #CBD5E1",
                               fontSize: "12px",
-                              background: "#fff",
+                              background: "#F8FAFC",
                               color: "#0F1B33",
                               outline: "none",
+                              cursor: "pointer",
                             }}
                           >
                             <option value="Product Team">Product Team</option>
@@ -1647,39 +1819,45 @@ export default function PortalPage() {
                             <option value="IT Support">IT Support</option>
                           </select>
                         </td>
-                        <td style={{ padding: "12px" }}>
+                        <td style={{ padding: "12px 16px" }}>
                           <select
                             value={u.role}
                             onChange={(e) => handleUserRoleChange(u.id, e.target.value as any)}
                             style={{
-                              padding: "4px 8px",
+                              padding: "5px 10px",
                               borderRadius: "6px",
-                              border: "1px solid #CBD5E1",
+                              border: `1px solid ${u.role === "ADMIN" ? "#BFDBFE" : "#CBD5E1"}`,
                               fontSize: "12px",
                               fontWeight: 600,
                               background: u.role === "ADMIN" ? "#EFF6FF" : "#F8FAFC",
                               color: u.role === "ADMIN" ? "#1D4ED8" : "#334155",
                               outline: "none",
+                              cursor: "pointer",
                             }}
                           >
                             <option value="EMPLOYEE">Employee</option>
                             <option value="ADMIN">Board Admin</option>
                           </select>
                         </td>
-                        <td style={{ padding: "12px", textAlign: "right" }}>
+                        <td style={{ padding: "12px 16px", textAlign: "right" }}>
                           {u.id !== currentUser.id && (
                             <button
                               onClick={() => handleUserDelete(u.id)}
-                              title="Delete user"
+                              title="Delete user account"
                               style={{
-                                border: "none",
-                                background: "transparent",
-                                color: "#EF4444",
+                                border: "1px solid #FECACA",
+                                background: "#FEF2F2",
+                                color: "#DC2626",
                                 cursor: "pointer",
-                                padding: "4px",
+                                padding: "6px 8px",
+                                borderRadius: "6px",
+                                display: "inline-flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                transition: "all 0.15s ease",
                               }}
                             >
-                              <Trash2 size={15} />
+                              <Trash2 size={13} />
                             </button>
                           )}
                         </td>
