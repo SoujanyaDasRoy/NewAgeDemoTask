@@ -1,9 +1,21 @@
 "use client";
 
 import React, { useState } from "react";
-import { X, CheckCircle2, Clock, Calendar, CheckSquare } from "lucide-react";
+import {
+  X,
+  CheckCircle2,
+  Clock,
+  Calendar,
+  CheckSquare,
+  MessageSquare,
+  Zap,
+  AlertCircle,
+  Copy,
+  CheckCheck,
+} from "lucide-react";
 import StatusBadge from "../StatusBadge";
 import Timeline from "../Timeline";
+import ServiceLogo from "../ServiceLogo";
 
 interface RequestDetailDrawerProps {
   isOpen: boolean;
@@ -24,6 +36,8 @@ export default function RequestDetailDrawer({
 }: RequestDetailDrawerProps) {
   const [extending, setExtending] = useState(false);
   const [closing, setClosing] = useState(false);
+  const [nudged, setNudged] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   if (!isOpen || !request) return null;
 
@@ -43,6 +57,10 @@ export default function RequestDetailDrawer({
     request.status === "ACCESS_PROVISIONED" &&
     request.requester?.name === currentUserName;
 
+  const isPendingApproval = ["PENDING_APPROVAL", "PENDING_EXCEPTION_APPROVAL"].includes(
+    request.status
+  );
+
   const handleClose = async () => {
     if (!onCloseRequest) return;
     setClosing(true);
@@ -57,6 +75,19 @@ export default function RequestDetailDrawer({
     setExtending(false);
   };
 
+  const handleSlackNudge = () => {
+    setNudged(true);
+    setTimeout(() => setNudged(false), 3000);
+  };
+
+  const copyRequestId = () => {
+    navigator.clipboard.writeText(request.id);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const toolName = request.accessItem?.tool || request.accessLabel.split(" – ")[0] || "Tool";
+
   return (
     <>
       <div className={`overlay ${isOpen ? "show" : ""}`} onClick={onClose} aria-hidden="true" />
@@ -66,14 +97,41 @@ export default function RequestDetailDrawer({
         aria-modal="true"
         aria-label="Request Details Drawer"
       >
+        {/* Drawer Header */}
         <div className="drawer-head">
-          <div>
-            <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
-              <h3>{request.accessLabel}</h3>
-              <StatusBadge status={request.status} />
-            </div>
-            <div className="sub mono">
-              {request.id} · Submitted {new Date(request.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <ServiceLogo tool={toolName} size={26} />
+            <div>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                <h3 style={{ margin: 0, fontSize: "16px", fontWeight: 700, color: "#0F1B33" }}>
+                  {request.accessLabel}
+                </h3>
+                <StatusBadge status={request.status} />
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "3px" }}>
+                <span className="mono" style={{ fontSize: "12px", color: "#64748B", fontWeight: 600 }}>
+                  {request.id}
+                </span>
+                <button
+                  type="button"
+                  onClick={copyRequestId}
+                  style={{
+                    border: "none",
+                    background: "transparent",
+                    cursor: "pointer",
+                    color: copied ? "#16A34A" : "#94A3B8",
+                    padding: "0",
+                    display: "flex",
+                  }}
+                  title="Copy Request ID"
+                >
+                  {copied ? <CheckCheck size={12} /> : <Copy size={12} />}
+                </button>
+                <span style={{ fontSize: "12px", color: "#94A3B8" }}>·</span>
+                <span style={{ fontSize: "12px", color: "#64748B" }}>
+                  Submitted {new Date(request.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
+                </span>
+              </div>
             </div>
           </div>
           <button className="drawer-close" onClick={onClose} aria-label="Close drawer">
@@ -82,7 +140,54 @@ export default function RequestDetailDrawer({
         </div>
 
         <div className="drawer-body">
-          {/* Part 4: Auto-Expiry and Extension Alert */}
+          {/* SLA / Nudge Status Banner (If Pending) */}
+          {isPendingApproval && (
+            <div
+              style={{
+                marginBottom: "20px",
+                padding: "14px",
+                borderRadius: "10px",
+                background: "#FFFBEB",
+                border: "1px solid #FDE68A",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: "12px",
+              }}
+            >
+              <div>
+                <div style={{ fontSize: "13px", fontWeight: 700, color: "#92400E", display: "flex", alignItems: "center", gap: "6px" }}>
+                  <Clock size={14} /> Awaiting {request.approverName}&apos;s Approval
+                </div>
+                <div style={{ fontSize: "11.5px", color: "#B45309", marginTop: "2px" }}>
+                  Estimated Turnaround: Typically reviewed within 2 hours.
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleSlackNudge}
+                style={{
+                  border: "1px solid #F59E0B",
+                  background: nudged ? "#FEF3C7" : "#FFFFFF",
+                  color: "#92400E",
+                  borderRadius: "6px",
+                  padding: "5px 10px",
+                  fontSize: "11.5px",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "4px",
+                  flexShrink: 0,
+                }}
+              >
+                <MessageSquare size={12} /> {nudged ? "Nudge Sent via Slack!" : "Ping on Slack"}
+              </button>
+            </div>
+          )}
+
+          {/* Auto-Expiry and Extension Alert */}
           {request.requiredUntil && (
             <div
               style={{
@@ -118,7 +223,7 @@ export default function RequestDetailDrawer({
                 </div>
               </div>
 
-              {onRequestExtension && (
+              {onRequestExtension && !isExpired && (
                 <button
                   className="btn btn-secondary"
                   style={{ fontSize: "12px", height: "32px", padding: "0 12px" }}
@@ -146,7 +251,7 @@ export default function RequestDetailDrawer({
                 Access Provisioned for {request.beneficiaryName}
               </div>
               <div style={{ fontSize: "12px", color: "#6D28D9", marginTop: "2px" }}>
-                Please confirm with the beneficiary that their access is working, then close this request.
+                Please confirm with the colleague that their account access is active, then close this ticket.
               </div>
               <button
                 className="btn btn-primary"
@@ -159,11 +264,17 @@ export default function RequestDetailDrawer({
             </div>
           )}
 
-          <div className="divider-label">Request Progress</div>
+          {/* Progress Timeline */}
+          <div className="divider-label" style={{ marginBottom: "12px" }}>
+            Multi-Step Audit Journey
+          </div>
           <Timeline steps={request.timeline || []} />
 
-          <div style={{ marginTop: "24px", paddingTop: "20px", borderTop: "1px solid var(--border)" }}>
-            <div className="divider-label">Request Details</div>
+          {/* Detailed Metadata Grid */}
+          <div style={{ marginTop: "24px", paddingTop: "18px", borderTop: "1px solid var(--border)" }}>
+            <div className="divider-label" style={{ marginBottom: "12px" }}>
+              Request Metadata
+            </div>
             <div className="field-grid">
               <div className="field">
                 <span className="f-label">Requester</span>
@@ -184,7 +295,13 @@ export default function RequestDetailDrawer({
               <div className="field">
                 <span className="f-label">Provisioning Mode</span>
                 <span className="f-value">
-                  {request.automation ? "Automated" : "Manual Provisioning"}
+                  {request.automation ? (
+                    <span style={{ color: "#2563EB", fontWeight: 600, display: "inline-flex", alignItems: "center", gap: "3px" }}>
+                      <Zap size={11} /> Automated SCIM
+                    </span>
+                  ) : (
+                    "Manual IT Provisioning"
+                  )}
                 </span>
               </div>
               <div className="field">
@@ -195,13 +312,15 @@ export default function RequestDetailDrawer({
               </div>
             </div>
 
+            {/* Justification Box */}
             <div style={{ marginTop: "16px" }}>
-              <span className="f-label">Justification</span>
+              <span className="f-label">Business Justification</span>
               <div
                 style={{
                   marginTop: "6px",
                   padding: "12px",
                   background: "#F8FAFC",
+                  border: "1px solid #E2E8F0",
                   borderRadius: "8px",
                   fontSize: "13px",
                   color: "#334155",
@@ -212,6 +331,7 @@ export default function RequestDetailDrawer({
               </div>
             </div>
 
+            {/* Rejection Reason if any */}
             {request.rejectionReason && (
               <div style={{ marginTop: "16px" }}>
                 <span className="f-label" style={{ color: "#DC2626" }}>Rejection Feedback</span>

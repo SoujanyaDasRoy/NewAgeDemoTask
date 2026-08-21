@@ -103,6 +103,9 @@ export default function PortalPage() {
   const [cmdPaletteOpen, setCmdPaletteOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [requestFilter, setRequestFilter] = useState<"ALL" | "PENDING" | "APPROVED" | "COMPLETED" | "EXCEPTIONS">("ALL");
+  const [directoryFilter, setDirectoryFilter] = useState<"ALL" | "AUTOMATED" | "BOARDS" | "APPLICATIONS">("ALL");
+  const [userSearchQuery, setUserSearchQuery] = useState("");
+  const [userDeptFilter, setUserDeptFilter] = useState("ALL");
 
   // Active drawers
   const [accessDetailsItem, setAccessDetailsItem] = useState<any>(null);
@@ -183,20 +186,27 @@ export default function PortalPage() {
 
   // ── SEARCH HANDLER ────────────────────────────────────────────────────────
   useEffect(() => {
-    if (!searchQuery.trim()) {
+    const q = searchQuery.toLowerCase().trim();
+    if (!q && directoryFilter === "ALL") {
       setSearchResults([]);
       return;
     }
-    const q = searchQuery.toLowerCase();
-    const results = catalog.filter(
-      (item) =>
+    const results = catalog.filter((item) => {
+      const matchesText =
+        !q ||
         item.name.toLowerCase().includes(q) ||
         item.tool.toLowerCase().includes(q) ||
         item.group.toLowerCase().includes(q) ||
-        (item.accessId && item.accessId.toLowerCase().includes(q))
-    );
+        (item.accessId && item.accessId.toLowerCase().includes(q));
+
+      if (!matchesText) return false;
+      if (directoryFilter === "AUTOMATED") return item.automation;
+      if (directoryFilter === "BOARDS") return item.category === "BOARD";
+      if (directoryFilter === "APPLICATIONS") return item.category === "APPLICATION";
+      return true;
+    });
     setSearchResults(results);
-  }, [searchQuery, catalog]);
+  }, [searchQuery, catalog, directoryFilter]);
 
   // ── NOTIFICATIONS ─────────────────────────────────────────────────────────
   const unreadCount = notifications.filter((n) => !n.read).length;
@@ -686,8 +696,36 @@ export default function PortalPage() {
             </button>
           </div>
 
+          {/* Quick Category Filter Pills */}
+          <div className="filter-pills-row" style={{ marginTop: "12px", marginBottom: "4px" }}>
+            <button
+              className={`filter-pill ${directoryFilter === "ALL" ? "active" : ""}`}
+              onClick={() => setDirectoryFilter("ALL")}
+            >
+              All ({catalog.length})
+            </button>
+            <button
+              className={`filter-pill ${directoryFilter === "AUTOMATED" ? "active" : ""}`}
+              onClick={() => setDirectoryFilter("AUTOMATED")}
+            >
+              ⚡ Automated ({catalog.filter((c) => c.automation).length})
+            </button>
+            <button
+              className={`filter-pill ${directoryFilter === "BOARDS" ? "active" : ""}`}
+              onClick={() => setDirectoryFilter("BOARDS")}
+            >
+              📋 Boards ({catalog.filter((c) => c.category === "BOARD").length})
+            </button>
+            <button
+              className={`filter-pill ${directoryFilter === "APPLICATIONS" ? "active" : ""}`}
+              onClick={() => setDirectoryFilter("APPLICATIONS")}
+            >
+              💻 Applications ({catalog.filter((c) => c.category === "APPLICATION").length})
+            </button>
+          </div>
+
           {/* Search Results */}
-          {searchQuery.trim() && searchResults.length === 0 ? (
+          {(searchQuery.trim() || directoryFilter !== "ALL") && searchResults.length === 0 ? (
             <div className="empty-state" style={{ padding: "32px 20px" }}>
               <div className="circle">
                 <Search size={20} />
@@ -1501,11 +1539,46 @@ export default function PortalPage() {
                     <Users size={18} />
                   </div>
                   <div>
-                    <div className="section-title">User & Role Management</div>
+                    <div className="section-title">User &amp; Role Management</div>
                     <div className="section-sub">
                       Control employee access tiers and assign Board Admin permissions ({allUsers.length} registered users)
                     </div>
                   </div>
+                </div>
+              </div>
+
+              {/* User Search & Department Filter Toolbar */}
+              <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", alignItems: "center", marginBottom: "16px" }}>
+                <div style={{ flex: 1, minWidth: "200px" }}>
+                  <input
+                    type="text"
+                    placeholder="Search users by name or email..."
+                    value={userSearchQuery}
+                    onChange={(e) => setUserSearchQuery(e.target.value)}
+                    style={{
+                      width: "100%",
+                      height: "36px",
+                      padding: "0 12px",
+                      borderRadius: "8px",
+                      border: "1px solid #CBD5E1",
+                      fontSize: "12.5px",
+                      outline: "none",
+                      background: "#F8FAFC",
+                    }}
+                  />
+                </div>
+                <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+                  {["ALL", "IT Support", "Engineering", "Product", "Marketing", "Sales", "Security & Compliance"].map((dept) => (
+                    <button
+                      key={dept}
+                      type="button"
+                      className={`filter-pill ${userDeptFilter === dept ? "active" : ""}`}
+                      style={{ fontSize: "11.5px", padding: "4px 10px" }}
+                      onClick={() => setUserDeptFilter(dept)}
+                    >
+                      {dept === "ALL" ? "All Departments" : dept}
+                    </button>
+                  ))}
                 </div>
               </div>
 
@@ -1528,7 +1601,14 @@ export default function PortalPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {allUsers.map((u) => (
+                    {allUsers
+                      .filter((u) => {
+                        const q = userSearchQuery.toLowerCase().trim();
+                        const matchesQ = !q || u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q);
+                        const matchesDept = userDeptFilter === "ALL" || u.department.toLowerCase().includes(userDeptFilter.toLowerCase());
+                        return matchesQ && matchesDept;
+                      })
+                      .map((u) => (
                       <tr key={u.id} style={{ borderBottom: "1px solid #F1F5F9" }}>
                         <td style={{ padding: "12px", display: "flex", alignItems: "center", gap: "8px" }}>
                           <div
@@ -1644,19 +1724,33 @@ export default function PortalPage() {
           isOpen={!!requestFormItem}
           accessItem={requestFormItem}
           currentUserName={currentUser.name}
+          users={allUsers}
           onClose={() => setRequestFormItem(null)}
           onSubmit={async (data) => {
-            const res = await submitRequest({
-              accessItemId: data.accessItemId,
-              beneficiary: data.beneficiary,
-              onBehalf: data.onBehalf,
-              justification: data.justification,
-              requesterName: currentUser.name,
-              requesterEmail: currentUser.email,
-            });
+            let res;
+            if (data.isException) {
+              res = await submitExceptionRequest({
+                accessItemId: data.accessItemId,
+                reason: data.exceptionReason || "Cross-department exception",
+                justification: data.justification,
+                requiredUntil: data.requiredUntil || new Date(Date.now() + 90 * 86400000).toISOString().split("T")[0],
+                urgency: data.urgency || "STANDARD",
+                requesterName: currentUser.name,
+                requesterEmail: currentUser.email,
+              });
+            } else {
+              res = await submitRequest({
+                accessItemId: data.accessItemId,
+                beneficiary: data.beneficiary,
+                onBehalf: data.onBehalf,
+                justification: data.justification,
+                requesterName: currentUser.name,
+                requesterEmail: currentUser.email,
+              });
+            }
+
             if (res.success) {
-              pushToast("Access request submitted successfully!");
-              setRequestFormItem(null);
+              pushToast(data.isException ? "Exception request submitted for review!" : "Access request submitted successfully!");
               await loadData();
               return res.requestId || null;
             } else {

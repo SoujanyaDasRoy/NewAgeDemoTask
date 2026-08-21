@@ -3,7 +3,17 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { login, signup } from "@/lib/actions/auth";
-import { Lock, AlertCircle, CheckCircle2 } from "lucide-react";
+import {
+  Lock,
+  AlertCircle,
+  CheckCircle2,
+  Eye,
+  EyeOff,
+  Zap,
+  ShieldCheck,
+  Layers,
+  ArrowRight,
+} from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -12,12 +22,13 @@ export default function LoginPage() {
   // Login form state
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   // Signup form state
   const [signupName, setSignupName] = useState("");
   const [signupEmail, setSignupEmail] = useState("");
   const [signupPassword, setSignupPassword] = useState("");
-  const [signupDepartment, setSignupDepartment] = useState("Product Team");
+  const [signupDepartment, setSignupDepartment] = useState("Engineering");
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -59,7 +70,7 @@ export default function LoginPage() {
       email: signupEmail,
       password: signupPassword,
       department: signupDepartment,
-      role: "EMPLOYEE", // Every new user starts as Employee until Admin elevates them
+      role: "EMPLOYEE",
     });
     setLoading(false);
 
@@ -74,86 +85,183 @@ export default function LoginPage() {
     }
   };
 
+  const quickFill = (userEmail: string) => {
+    setEmail(userEmail);
+    setPassword("password123");
+    setTab("login");
+    setError("");
+  };
+
   return (
     <div
       style={{
         minHeight: "100vh",
-        background: "#F8FAFC",
+        background: "linear-gradient(135deg, #F8FAFC 0%, #EFF6FF 100%)",
         display: "flex",
-        flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
         padding: "24px",
-        fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+        fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
       }}
     >
       <div
         style={{
           width: "100%",
-          maxWidth: "400px",
+          maxWidth: "880px",
           background: "#FFFFFF",
-          borderRadius: "14px",
+          borderRadius: "18px",
           border: "1px solid #E2E8F0",
-          boxShadow: "0 4px 20px -2px rgba(15, 27, 51, 0.05), 0 2px 6px -1px rgba(15, 27, 51, 0.03)",
+          boxShadow: "0 20px 50px -10px rgba(15, 27, 51, 0.12), 0 0 0 1px rgba(15, 27, 51, 0.03)",
           overflow: "hidden",
+          display: "grid",
+          gridTemplateColumns: "1fr 1.15fr",
         }}
       >
-        {/* Brand Header */}
+        {/* Left Feature Showcase Pane */}
         <div
           style={{
-            padding: "32px 32px 20px",
-            textAlign: "center",
-            borderBottom: "1px solid #F1F5F9",
+            background: "linear-gradient(145deg, #0F172A 0%, #1E293B 50%, #1E3A8A 100%)",
+            padding: "36px 32px",
+            color: "#FFFFFF",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between",
           }}
         >
-          <div
-            style={{
-              width: "42px",
-              height: "42px",
-              borderRadius: "10px",
-              background: "#0F1B33",
-              color: "#FFFFFF",
-              fontWeight: 700,
-              fontSize: "15px",
-              letterSpacing: "0.02em",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              margin: "0 auto 12px",
-            }}
-          >
-            NA
-          </div>
-          <h1
-            style={{
-              fontSize: "20px",
-              fontWeight: 700,
-              color: "#0F1B33",
-              margin: 0,
-              letterSpacing: "-0.01em",
-            }}
-          >
-            New Age
-          </h1>
-          <p
-            style={{
-              fontSize: "13px",
-              color: "#64748B",
-              margin: "4px 0 0",
-            }}
-          >
-            Access Management Portal
-          </p>
+          <div>
+            {/* Brand Logo */}
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              <div
+                style={{
+                  width: "36px",
+                  height: "36px",
+                  borderRadius: "10px",
+                  background: "#2563EB",
+                  color: "#FFF",
+                  fontWeight: 800,
+                  fontSize: "14px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  boxShadow: "0 4px 12px rgba(37, 99, 235, 0.4)",
+                }}
+              >
+                NA
+              </div>
+              <div>
+                <div style={{ fontSize: "16px", fontWeight: 700, letterSpacing: "-0.01em" }}>New Age</div>
+                <div style={{ fontSize: "11.5px", color: "#94A3B8" }}>Access Management Portal</div>
+              </div>
+            </div>
 
-          {/* Segmented Tab Switcher */}
+            {/* Value Props */}
+            <div style={{ marginTop: "36px" }}>
+              <h2 style={{ fontSize: "19px", fontWeight: 700, lineHeight: 1.3, margin: "0 0 8px" }}>
+                Enterprise Access Governance, Automated.
+              </h2>
+              <p style={{ fontSize: "12.5px", color: "#94A3B8", lineHeight: 1.5, margin: "0 0 24px" }}>
+                Instant self-service requests, automated SCIM provisioning, and multi-step policy enforcement.
+              </p>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                  <div style={{ width: "24px", height: "24px", borderRadius: "6px", background: "rgba(37, 99, 235, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", color: "#60A5FA" }}>
+                    <Zap size={14} />
+                  </div>
+                  <div style={{ fontSize: "12.5px", color: "#E2E8F0" }}>
+                    <strong>Zero-Touch Provisioning</strong> via SCIM Webhooks
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                  <div style={{ width: "24px", height: "24px", borderRadius: "6px", background: "rgba(34, 197, 94, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", color: "#4ADE80" }}>
+                    <ShieldCheck size={14} />
+                  </div>
+                  <div style={{ fontSize: "12.5px", color: "#E2E8F0" }}>
+                    <strong>Multi-Step Audit Trail</strong> &amp; SLA Tracking
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                  <div style={{ width: "24px", height: "24px", borderRadius: "6px", background: "rgba(168, 85, 247, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", color: "#C084FC" }}>
+                    <Layers size={14} />
+                  </div>
+                  <div style={{ fontSize: "12.5px", color: "#E2E8F0" }}>
+                    <strong>Cross-Department</strong> Exception Policies
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Demo Fill Buttons */}
+          <div style={{ marginTop: "32px", paddingTop: "18px", borderTop: "1px solid rgba(255, 255, 255, 0.1)" }}>
+            <div style={{ fontSize: "11px", color: "#94A3B8", textTransform: "uppercase", letterSpacing: "0.05em", fontWeight: 700, marginBottom: "8px" }}>
+              Quick Demo Personas (1-Click Fill)
+            </div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+              <button
+                type="button"
+                onClick={() => quickFill("soujanyadasroy@gmail.com")}
+                style={{
+                  padding: "4px 9px",
+                  borderRadius: "6px",
+                  background: "rgba(255, 255, 255, 0.1)",
+                  border: "1px solid rgba(255, 255, 255, 0.15)",
+                  color: "#FFF",
+                  fontSize: "11px",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                }}
+              >
+                👑 Soujanya (Admin)
+              </button>
+              <button
+                type="button"
+                onClick={() => quickFill("arjun.mehta@newage.com")}
+                style={{
+                  padding: "4px 9px",
+                  borderRadius: "6px",
+                  background: "rgba(255, 255, 255, 0.1)",
+                  border: "1px solid rgba(255, 255, 255, 0.15)",
+                  color: "#FFF",
+                  fontSize: "11px",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                }}
+              >
+                💻 Arjun (Eng)
+              </button>
+              <button
+                type="button"
+                onClick={() => quickFill("priya.sharma@newage.com")}
+                style={{
+                  padding: "4px 9px",
+                  borderRadius: "6px",
+                  background: "rgba(255, 255, 255, 0.1)",
+                  border: "1px solid rgba(255, 255, 255, 0.15)",
+                  color: "#FFF",
+                  fontSize: "11px",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                }}
+              >
+                📊 Priya (Product)
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Form Pane */}
+        <div style={{ padding: "36px 36px" }}>
+          {/* Tab Switcher */}
           <div
             style={{
               display: "flex",
               background: "#F1F5F9",
-              borderRadius: "8px",
-              padding: "3px",
-              marginTop: "20px",
-              gap: "2px",
+              borderRadius: "10px",
+              padding: "4px",
+              marginBottom: "24px",
             }}
           >
             <button
@@ -165,15 +273,15 @@ export default function LoginPage() {
               }}
               style={{
                 flex: 1,
-                padding: "7px 0",
+                padding: "8px 12px",
                 border: "none",
-                borderRadius: "6px",
                 background: tab === "login" ? "#FFFFFF" : "transparent",
                 color: tab === "login" ? "#0F1B33" : "#64748B",
                 fontWeight: 600,
                 fontSize: "13px",
+                borderRadius: "7px",
                 cursor: "pointer",
-                boxShadow: tab === "login" ? "0 1px 2px rgba(0,0,0,0.06)" : "none",
+                boxShadow: tab === "login" ? "0 1px 3px rgba(0,0,0,0.08)" : "none",
                 transition: "all 0.15s ease",
               }}
             >
@@ -188,135 +296,135 @@ export default function LoginPage() {
               }}
               style={{
                 flex: 1,
-                padding: "7px 0",
+                padding: "8px 12px",
                 border: "none",
-                borderRadius: "6px",
                 background: tab === "signup" ? "#FFFFFF" : "transparent",
                 color: tab === "signup" ? "#0F1B33" : "#64748B",
                 fontWeight: 600,
                 fontSize: "13px",
+                borderRadius: "7px",
                 cursor: "pointer",
-                boxShadow: tab === "signup" ? "0 1px 2px rgba(0,0,0,0.06)" : "none",
+                boxShadow: tab === "signup" ? "0 1px 3px rgba(0,0,0,0.08)" : "none",
                 transition: "all 0.15s ease",
               }}
             >
               Create Account
             </button>
           </div>
-        </div>
 
-        {/* Content Body */}
-        <div style={{ padding: "26px 32px 32px" }}>
+          {/* Error / Success Feedback */}
           {error && (
             <div
               style={{
-                marginBottom: "18px",
-                padding: "10px 14px",
-                borderRadius: "8px",
-                background: "#FEF2F2",
-                border: "1px solid #FEE2E2",
                 display: "flex",
                 alignItems: "center",
                 gap: "8px",
-                fontSize: "13px",
-                color: "#DC2626",
+                padding: "10px 14px",
+                borderRadius: "8px",
+                background: "#FEF2F2",
+                border: "1px solid #FCA5A5",
+                color: "#991B1B",
+                fontSize: "12.5px",
+                marginBottom: "16px",
               }}
             >
               <AlertCircle size={15} style={{ flexShrink: 0 }} />
-              <span>{error}</span>
+              <div>{error}</div>
             </div>
           )}
 
           {successMsg && (
             <div
               style={{
-                marginBottom: "18px",
-                padding: "10px 14px",
-                borderRadius: "8px",
-                background: "#F0FDF4",
-                border: "1px solid #DCFCE7",
                 display: "flex",
                 alignItems: "center",
                 gap: "8px",
-                fontSize: "13px",
-                color: "#16A34A",
-                fontWeight: 500,
+                padding: "10px 14px",
+                borderRadius: "8px",
+                background: "#F0FDF4",
+                border: "1px solid #86EFAC",
+                color: "#166534",
+                fontSize: "12.5px",
+                marginBottom: "16px",
               }}
             >
               <CheckCircle2 size={15} style={{ flexShrink: 0 }} />
-              <span>{successMsg}</span>
+              <div>{successMsg}</div>
             </div>
           )}
 
-          {/* TAB 1: SIGN IN */}
-          {tab === "login" && (
+          {/* SIGN IN FORM */}
+          {tab === "login" ? (
             <form onSubmit={handleLogin}>
               <div style={{ marginBottom: "16px" }}>
-                <label
-                  htmlFor="login-email"
-                  style={{
-                    display: "block",
-                    fontSize: "12.5px",
-                    fontWeight: 600,
-                    color: "#334155",
-                    marginBottom: "6px",
-                  }}
-                >
-                  Work Email
+                <label style={{ display: "block", fontSize: "12.5px", fontWeight: 600, color: "#334155", marginBottom: "6px" }}>
+                  Work Email Address
                 </label>
                 <input
-                  id="login-email"
                   type="email"
                   required
+                  placeholder="e.g. soujanyadasroy@gmail.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="name@company.com"
                   style={{
                     width: "100%",
-                    height: "38px",
-                    padding: "0 12px",
+                    height: "42px",
+                    padding: "0 14px",
                     borderRadius: "8px",
                     border: "1px solid #CBD5E1",
                     fontSize: "13.5px",
-                    color: "#0F1B33",
                     outline: "none",
+                    background: "#F8FAFC",
                     boxSizing: "border-box",
                   }}
                 />
               </div>
 
               <div style={{ marginBottom: "22px" }}>
-                <label
-                  htmlFor="login-password"
-                  style={{
-                    display: "block",
-                    fontSize: "12.5px",
-                    fontWeight: 600,
-                    color: "#334155",
-                    marginBottom: "6px",
-                  }}
-                >
-                  Password
-                </label>
-                <input
-                  id="login-password"
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  style={{
-                    width: "100%",
-                    height: "38px",
-                    padding: "0 12px",
-                    borderRadius: "8px",
-                    border: "1px solid #CBD5E1",
-                    fontSize: "13.5px",
-                    color: "#0F1B33",
-                    outline: "none",
-                    boxSizing: "border-box",
-                  }}
-                />
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "6px" }}>
+                  <label style={{ fontSize: "12.5px", fontWeight: 600, color: "#334155" }}>
+                    Password
+                  </label>
+                  <span style={{ fontSize: "11px", color: "#64748B" }}>Demo: password123</span>
+                </div>
+                <div style={{ position: "relative" }}>
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    required
+                    placeholder="Enter your account password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    style={{
+                      width: "100%",
+                      height: "42px",
+                      padding: "0 40px 0 14px",
+                      borderRadius: "8px",
+                      border: "1px solid #CBD5E1",
+                      fontSize: "13.5px",
+                      outline: "none",
+                      background: "#F8FAFC",
+                      boxSizing: "border-box",
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    style={{
+                      position: "absolute",
+                      right: "12px",
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      border: "none",
+                      background: "transparent",
+                      color: "#64748B",
+                      cursor: "pointer",
+                      display: "flex",
+                    }}
+                    title={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
               </div>
 
               <button
@@ -324,196 +432,146 @@ export default function LoginPage() {
                 disabled={loading}
                 style={{
                   width: "100%",
-                  height: "40px",
-                  borderRadius: "8px",
-                  border: "none",
+                  height: "44px",
                   background: "#0F1B33",
                   color: "#FFFFFF",
+                  border: "none",
+                  borderRadius: "8px",
                   fontSize: "13.5px",
                   fontWeight: 600,
-                  cursor: loading ? "not-allowed" : "pointer",
+                  cursor: "pointer",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  gap: "6px",
+                  gap: "8px",
+                  boxShadow: "0 2px 6px rgba(15, 27, 51, 0.2)",
+                  transition: "background 0.15s ease",
                 }}
               >
-                {loading ? "Signing in..." : "Sign In"}
+                {loading ? "Verifying..." : "Sign In to Portal"} <ArrowRight size={15} />
               </button>
-
-              <div
-                style={{
-                  marginTop: "16px",
-                  textAlign: "center",
-                  fontSize: "12.5px",
-                  color: "#64748B",
-                }}
-              >
-                First time here?{" "}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setTab("signup");
-                    setError("");
-                  }}
-                  style={{
-                    border: "none",
-                    background: "transparent",
-                    color: "#2F6FED",
-                    fontWeight: 600,
-                    cursor: "pointer",
-                    padding: 0,
-                    textDecoration: "underline",
-                  }}
-                >
-                  Create Account
-                </button>
-              </div>
             </form>
-          )}
-
-          {/* TAB 2: CREATE ACCOUNT */}
-          {tab === "signup" && (
+          ) : (
+            /* CREATE ACCOUNT FORM */
             <form onSubmit={handleSignup}>
               <div style={{ marginBottom: "14px" }}>
-                <label
-                  htmlFor="signup-name"
-                  style={{
-                    display: "block",
-                    fontSize: "12.5px",
-                    fontWeight: 600,
-                    color: "#334155",
-                    marginBottom: "5px",
-                  }}
-                >
+                <label style={{ display: "block", fontSize: "12.5px", fontWeight: 600, color: "#334155", marginBottom: "6px" }}>
                   Full Name
                 </label>
                 <input
-                  id="signup-name"
                   type="text"
                   required
+                  placeholder="e.g. Rahul Verma"
                   value={signupName}
                   onChange={(e) => setSignupName(e.target.value)}
-                  placeholder="e.g. Alex Morgan"
                   style={{
                     width: "100%",
-                    height: "38px",
-                    padding: "0 12px",
+                    height: "40px",
+                    padding: "0 14px",
                     borderRadius: "8px",
                     border: "1px solid #CBD5E1",
                     fontSize: "13.5px",
-                    color: "#0F1B33",
                     outline: "none",
+                    background: "#F8FAFC",
                     boxSizing: "border-box",
                   }}
                 />
               </div>
 
               <div style={{ marginBottom: "14px" }}>
-                <label
-                  htmlFor="signup-email"
-                  style={{
-                    display: "block",
-                    fontSize: "12.5px",
-                    fontWeight: 600,
-                    color: "#334155",
-                    marginBottom: "5px",
-                  }}
-                >
-                  Work Email
+                <label style={{ display: "block", fontSize: "12.5px", fontWeight: 600, color: "#334155", marginBottom: "6px" }}>
+                  Company Work Email
                 </label>
                 <input
-                  id="signup-email"
                   type="email"
                   required
+                  placeholder="e.g. rahul.verma@newage.com"
                   value={signupEmail}
                   onChange={(e) => setSignupEmail(e.target.value)}
-                  placeholder="alex@company.com"
                   style={{
                     width: "100%",
-                    height: "38px",
-                    padding: "0 12px",
+                    height: "40px",
+                    padding: "0 14px",
                     borderRadius: "8px",
                     border: "1px solid #CBD5E1",
                     fontSize: "13.5px",
-                    color: "#0F1B33",
                     outline: "none",
+                    background: "#F8FAFC",
                     boxSizing: "border-box",
                   }}
                 />
               </div>
 
               <div style={{ marginBottom: "14px" }}>
-                <label
-                  htmlFor="signup-department"
-                  style={{
-                    display: "block",
-                    fontSize: "12.5px",
-                    fontWeight: 600,
-                    color: "#334155",
-                    marginBottom: "5px",
-                  }}
-                >
-                  Department
+                <label style={{ display: "block", fontSize: "12.5px", fontWeight: 600, color: "#334155", marginBottom: "6px" }}>
+                  Department / Team
                 </label>
                 <select
-                  id="signup-department"
                   value={signupDepartment}
                   onChange={(e) => setSignupDepartment(e.target.value)}
                   style={{
                     width: "100%",
-                    height: "38px",
-                    padding: "0 10px",
-                    borderRadius: "8px",
-                    border: "1px solid #CBD5E1",
-                    fontSize: "13px",
-                    color: "#0F1B33",
-                    outline: "none",
-                    background: "#FFFFFF",
-                    boxSizing: "border-box",
-                  }}
-                >
-                  <option value="Product Team">Product Team</option>
-                  <option value="Marketing Team">Marketing Team</option>
-                  <option value="Sales Team">Sales Team</option>
-                  <option value="Support Team">Support Team</option>
-                  <option value="Finance Team">Finance Team</option>
-                  <option value="IT Support">IT Support</option>
-                </select>
-              </div>
-
-              <div style={{ marginBottom: "22px" }}>
-                <label
-                  htmlFor="signup-password"
-                  style={{
-                    display: "block",
-                    fontSize: "12.5px",
-                    fontWeight: 600,
-                    color: "#334155",
-                    marginBottom: "5px",
-                  }}
-                >
-                  Password
-                </label>
-                <input
-                  id="signup-password"
-                  type="password"
-                  required
-                  value={signupPassword}
-                  onChange={(e) => setSignupPassword(e.target.value)}
-                  placeholder="••••••••"
-                  style={{
-                    width: "100%",
-                    height: "38px",
-                    padding: "0 12px",
+                    height: "40px",
+                    padding: "0 14px",
                     borderRadius: "8px",
                     border: "1px solid #CBD5E1",
                     fontSize: "13.5px",
-                    color: "#0F1B33",
                     outline: "none",
+                    background: "#F8FAFC",
                     boxSizing: "border-box",
+                    cursor: "pointer",
                   }}
-                />
+                >
+                  <option value="Engineering">Engineering</option>
+                  <option value="Product">Product</option>
+                  <option value="Marketing">Marketing</option>
+                  <option value="Sales">Sales</option>
+                  <option value="IT Support">IT Support</option>
+                  <option value="Security & Compliance">Security &amp; Compliance</option>
+                </select>
+              </div>
+
+              <div style={{ marginBottom: "20px" }}>
+                <label style={{ display: "block", fontSize: "12.5px", fontWeight: 600, color: "#334155", marginBottom: "6px" }}>
+                  Create Password
+                </label>
+                <div style={{ position: "relative" }}>
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    required
+                    placeholder="Minimum 6 characters"
+                    value={signupPassword}
+                    onChange={(e) => setSignupPassword(e.target.value)}
+                    style={{
+                      width: "100%",
+                      height: "40px",
+                      padding: "0 40px 0 14px",
+                      borderRadius: "8px",
+                      border: "1px solid #CBD5E1",
+                      fontSize: "13.5px",
+                      outline: "none",
+                      background: "#F8FAFC",
+                      boxSizing: "border-box",
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    style={{
+                      position: "absolute",
+                      right: "12px",
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      border: "none",
+                      background: "transparent",
+                      color: "#64748B",
+                      cursor: "pointer",
+                      display: "flex",
+                    }}
+                  >
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
               </div>
 
               <button
@@ -521,40 +579,26 @@ export default function LoginPage() {
                 disabled={loading}
                 style={{
                   width: "100%",
-                  height: "40px",
-                  borderRadius: "8px",
-                  border: "none",
-                  background: "#0F1B33",
+                  height: "44px",
+                  background: "#2563EB",
                   color: "#FFFFFF",
+                  border: "none",
+                  borderRadius: "8px",
                   fontSize: "13.5px",
                   fontWeight: 600,
-                  cursor: loading ? "not-allowed" : "pointer",
+                  cursor: "pointer",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  gap: "6px",
+                  gap: "8px",
+                  boxShadow: "0 2px 6px rgba(37, 99, 235, 0.25)",
+                  transition: "background 0.15s ease",
                 }}
               >
-                {loading ? "Creating Account..." : "Create Account & Sign In"}
+                {loading ? "Creating Account..." : "Create Account & Sign In"} <ArrowRight size={15} />
               </button>
             </form>
           )}
-
-          {/* Footer note */}
-          <div
-            style={{
-              marginTop: "24px",
-              textAlign: "center",
-              fontSize: "12px",
-              color: "#94A3B8",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "4px",
-            }}
-          >
-            <Lock size={12} /> Powered by Neon Auth & PostgreSQL
-          </div>
         </div>
       </div>
     </div>

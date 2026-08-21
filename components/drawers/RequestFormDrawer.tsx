@@ -1,50 +1,84 @@
 "use client";
 
 import React, { useState } from "react";
-import { X, CheckCircle2, User, Users } from "lucide-react";
-import StatusBadge from "../StatusBadge";
-
-const EMPLOYEES = [
-  "Vanshika Sharma",
-  "Rohit Malhotra",
-  "Ananya Rao",
-  "Kabir Singh",
-  "Priya Menon",
-];
+import {
+  X,
+  CheckCircle2,
+  User,
+  Users,
+  AlertTriangle,
+  Zap,
+  Clock,
+  Send,
+  Copy,
+  CheckCheck,
+} from "lucide-react";
+import ServiceLogo from "../ServiceLogo";
 
 interface RequestFormDrawerProps {
   isOpen: boolean;
   onClose: () => void;
   accessItem: any;
   currentUserName: string;
+  users?: any[];
   onSubmit: (data: {
     accessItemId: string;
     beneficiary: string;
     onBehalf: boolean;
     justification: string;
+    isException?: boolean;
+    exceptionReason?: string;
+    requiredUntil?: string;
+    urgency?: "STANDARD" | "URGENT" | "CRITICAL";
   }) => Promise<string | null>;
 }
+
+const DURATION_PRESETS = [
+  { label: "30 Days", days: 30 },
+  { label: "90 Days (Quarterly)", days: 90 },
+  { label: "6 Months", days: 180 },
+  { label: "Permanent / Indefinite", days: 365 },
+];
 
 export default function RequestFormDrawer({
   isOpen,
   onClose,
   accessItem,
   currentUserName,
+  users = [],
   onSubmit,
 }: RequestFormDrawerProps) {
   const [onBehalf, setOnBehalf] = useState(false);
-  const [beneficiary, setBeneficiary] = useState(EMPLOYEES[0]);
+  const [beneficiary, setBeneficiary] = useState("");
   const [justification, setJustification] = useState("");
+  const [durationDays, setDurationDays] = useState(90);
+  const [urgency, setUrgency] = useState<"STANDARD" | "URGENT" | "CRITICAL">("STANDARD");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [submittedId, setSubmittedId] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   if (!isOpen || !accessItem) return null;
+
+  const isException = !accessItem.isEligible;
+
+  // Calculate target expiration date
+  const targetDate = new Date();
+  targetDate.setDate(targetDate.getDate() + durationDays);
+  const requiredUntilFormatted = targetDate.toISOString().split("T")[0];
+
+  const teamOptions = users.length > 0
+    ? users.map((u) => u.name).filter((n) => n !== currentUserName)
+    : ["Arjun Mehta", "Priya Sharma", "Rahul Verma", "Ananya Sen"];
+
+  const effectiveBeneficiary = onBehalf
+    ? (beneficiary || teamOptions[0])
+    : currentUserName;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!justification.trim()) {
-      setError("Please provide a business justification for this request.");
+      setError("Please provide a business justification for this access request.");
       return;
     }
     setError("");
@@ -52,9 +86,15 @@ export default function RequestFormDrawer({
 
     const reqId = await onSubmit({
       accessItemId: accessItem.id,
-      beneficiary: onBehalf ? beneficiary : currentUserName,
+      beneficiary: effectiveBeneficiary,
       onBehalf,
       justification,
+      isException,
+      exceptionReason: isException
+        ? `Cross-department access: User department requesting ${accessItem.group} resource.`
+        : undefined,
+      requiredUntil: requiredUntilFormatted,
+      urgency,
     });
 
     setLoading(false);
@@ -68,7 +108,17 @@ export default function RequestFormDrawer({
     setJustification("");
     setOnBehalf(false);
     setError("");
+    setDurationDays(90);
+    setUrgency("STANDARD");
     onClose();
+  };
+
+  const copyId = () => {
+    if (submittedId) {
+      navigator.clipboard.writeText(submittedId);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
 
   return (
@@ -80,11 +130,24 @@ export default function RequestFormDrawer({
         aria-modal="true"
         aria-label="Request Access Form"
       >
+        {/* Drawer Header */}
         <div className="drawer-head">
-          <div>
-            <h3>{submittedId ? "Request Submitted" : "Request Access"}</h3>
-            <div className="sub">
-              {accessItem.tool} – {accessItem.name}
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <ServiceLogo tool={accessItem.tool} size={26} />
+            <div>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <h3 style={{ margin: 0, fontSize: "16px", fontWeight: 700, color: "#0F1B33" }}>
+                  {submittedId ? "Request Submitted" : "Request Access"}
+                </h3>
+                {isException && (
+                  <span className="badge badge-amber" style={{ fontSize: "10.5px" }}>
+                    Exception Required
+                  </span>
+                )}
+              </div>
+              <div className="sub" style={{ fontSize: "12.5px", color: "#64748B", marginTop: "2px" }}>
+                {accessItem.tool} · {accessItem.name}
+              </div>
             </div>
           </div>
           <button className="drawer-close" onClick={handleResetAndClose} aria-label="Close drawer">
@@ -92,152 +155,273 @@ export default function RequestFormDrawer({
           </button>
         </div>
 
+        {/* Drawer Body */}
         <div className="drawer-body">
           {submittedId ? (
-            <div style={{ textAlign: "center", padding: "14px 0" }}>
+            /* Confirmation Screen */
+            <div style={{ textAlign: "center", padding: "20px 0" }}>
               <div
                 style={{
-                  width: "56px",
-                  height: "56px",
+                  width: "60px",
+                  height: "60px",
                   borderRadius: "999px",
-                  background: "#F0FDF4",
+                  background: "#DCFCE7",
+                  color: "#16A34A",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   margin: "0 auto 16px",
-                  color: "#22C55E",
+                  boxShadow: "0 4px 12px rgba(22, 163, 74, 0.2)",
                 }}
               >
                 <CheckCircle2 size={32} />
               </div>
-              <h3 style={{ fontSize: "17px", fontWeight: 800, margin: 0, color: "#111827" }}>
-                Access request submitted
-              </h3>
-              <p style={{ fontSize: "13px", color: "#6B7280", marginTop: "5px" }}>
-                We'll notify you as it moves through approval.
+
+              <h4 style={{ fontSize: "17px", fontWeight: 700, color: "#0F1B33", margin: "0 0 6px" }}>
+                Request Successfully Submitted
+              </h4>
+              <p style={{ fontSize: "13px", color: "#64748B", margin: "0 0 20px" }}>
+                Your request has been routed to <strong>{accessItem.approver}</strong> for review.
               </p>
 
               <div
                 style={{
-                  marginTop: "24px",
-                  padding: "16px",
                   background: "#F8FAFC",
-                  borderRadius: "10px",
-                  border: "1px solid var(--border)",
-                  textAlign: "left",
+                  border: "1px solid #E2E8F0",
+                  borderRadius: "12px",
+                  padding: "16px",
+                  maxWidth: "320px",
+                  margin: "0 auto 24px",
                   display: "flex",
-                  flexDirection: "column",
-                  gap: "12px",
+                  alignItems: "center",
+                  justifyContent: "space-between",
                 }}
               >
-                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px" }}>
-                  <span style={{ color: "#6B7280" }}>Request ID</span>
-                  <span className="mono font-bold text-[#111827]">{submittedId}</span>
+                <div style={{ textAlign: "left" }}>
+                  <div style={{ fontSize: "11px", color: "#64748B", fontWeight: 600 }}>REQUEST ID</div>
+                  <div className="mono" style={{ fontSize: "15px", fontWeight: 700, color: "#0F1B33", marginTop: "2px" }}>
+                    {submittedId}
+                  </div>
                 </div>
-                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px" }}>
-                  <span style={{ color: "#6B7280" }}>Status</span>
-                  <StatusBadge status="Pending Approval" />
-                </div>
-                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px" }}>
-                  <span style={{ color: "#6B7280" }}>Approver</span>
-                  <span style={{ fontWeight: 600, color: "#111827" }}>{accessItem.approver}</span>
-                </div>
-                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px" }}>
-                  <span style={{ color: "#6B7280" }}>Beneficiary</span>
-                  <span style={{ fontWeight: 600, color: "#111827" }}>
-                    {onBehalf ? beneficiary : currentUserName}
-                  </span>
-                </div>
+                <button
+                  type="button"
+                  onClick={copyId}
+                  style={{
+                    border: "1px solid #CBD5E1",
+                    background: "#FFFFFF",
+                    borderRadius: "6px",
+                    padding: "6px 10px",
+                    fontSize: "12px",
+                    fontWeight: 600,
+                    color: "#334155",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "4px",
+                  }}
+                >
+                  {copied ? <CheckCheck size={13} style={{ color: "#16A34A" }} /> : <Copy size={13} />}
+                  {copied ? "Copied" : "Copy"}
+                </button>
               </div>
 
               <button
-                className="btn btn-primary btn-block"
-                style={{ marginTop: "24px" }}
+                type="button"
+                className="btn btn-primary"
+                style={{ width: "100%", height: "42px" }}
                 onClick={handleResetAndClose}
               >
-                Done
+                Done · Return to Dashboard
               </button>
             </div>
           ) : (
+            /* Request Form */
             <form onSubmit={handleSubmit}>
-              <div className="form-group">
-                <label className="form-label">Who is this access for?</label>
-                <div style={{ display: "flex", gap: "10px", marginTop: "4px" }}>
-                  <button
-                    type="button"
-                    className={`btn ${!onBehalf ? "btn-primary" : "btn-secondary"}`}
-                    style={{ flex: 1 }}
-                    onClick={() => setOnBehalf(false)}
-                  >
-                    <User size={15} /> For Myself
-                  </button>
-                  <button
-                    type="button"
-                    className={`btn ${onBehalf ? "btn-primary" : "btn-secondary"}`}
-                    style={{ flex: 1 }}
-                    onClick={() => setOnBehalf(true)}
-                  >
-                    <Users size={15} /> On Behalf Of
-                  </button>
+              {/* Policy Banner */}
+              <div
+                style={{
+                  padding: "12px 14px",
+                  borderRadius: "10px",
+                  background: isException ? "#FFFBEB" : "#F0FDF4",
+                  border: `1px solid ${isException ? "#FDE68A" : "#BBF7D0"}`,
+                  color: isException ? "#92400E" : "#166534",
+                  fontSize: "12px",
+                  lineHeight: 1.45,
+                  display: "flex",
+                  alignItems: "flex-start",
+                  gap: "10px",
+                  marginBottom: "20px",
+                }}
+              >
+                {isException ? (
+                  <AlertTriangle size={16} style={{ flexShrink: 0, marginTop: "1px", color: "#D97706" }} />
+                ) : (
+                  <Zap size={16} style={{ flexShrink: 0, marginTop: "1px", color: "#16A34A" }} />
+                )}
+                <div>
+                  <strong>{isException ? "Exception Required:" : "Standard Policy Match:"}</strong>{" "}
+                  {isException
+                    ? `This tool belongs to ${accessItem.group}. A business justification will be sent to ${accessItem.approver} for exception sign-off.`
+                    : `Pre-approved for your department. Request will fast-track to ${accessItem.approver}.`}
                 </div>
               </div>
 
-              {onBehalf && (
-                <div className="form-group">
-                  <label className="form-label">Select Employee</label>
-                  <select
-                    className="form-select"
-                    value={beneficiary}
-                    onChange={(e) => setBeneficiary(e.target.value)}
+              {/* Beneficiary Option */}
+              <div style={{ marginBottom: "18px" }}>
+                <label className="form-label" style={{ marginBottom: "8px" }}>Who needs this access?</label>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+                  <button
+                    type="button"
+                    onClick={() => setOnBehalf(false)}
+                    style={{
+                      padding: "10px 12px",
+                      borderRadius: "8px",
+                      border: `1.5px solid ${!onBehalf ? "#2563EB" : "#E2E8F0"}`,
+                      background: !onBehalf ? "#EFF6FF" : "#FFFFFF",
+                      color: !onBehalf ? "#1E40AF" : "#64748B",
+                      fontWeight: 600,
+                      fontSize: "12.5px",
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      justifyContent: "center",
+                    }}
                   >
-                    {EMPLOYEES.map((emp) => (
-                      <option key={emp} value={emp}>
-                        {emp}
-                      </option>
-                    ))}
-                  </select>
+                    <User size={14} /> For Myself
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setOnBehalf(true)}
+                    style={{
+                      padding: "10px 12px",
+                      borderRadius: "8px",
+                      border: `1.5px solid ${onBehalf ? "#2563EB" : "#E2E8F0"}`,
+                      background: onBehalf ? "#EFF6FF" : "#FFFFFF",
+                      color: onBehalf ? "#1E40AF" : "#64748B",
+                      fontWeight: 600,
+                      fontSize: "12.5px",
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Users size={14} /> On Behalf of Colleague
+                  </button>
+                </div>
+
+                {onBehalf && (
+                  <div style={{ marginTop: "10px" }}>
+                    <label style={{ fontSize: "11.5px", color: "#64748B", display: "block", marginBottom: "4px" }}>
+                      Select Colleague Name
+                    </label>
+                    <select
+                      className="form-input"
+                      value={beneficiary || teamOptions[0]}
+                      onChange={(e) => setBeneficiary(e.target.value)}
+                      style={{ cursor: "pointer" }}
+                    >
+                      {teamOptions.map((name) => (
+                        <option key={name} value={name}>
+                          {name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+              </div>
+
+              {/* Duration Presets */}
+              <div style={{ marginBottom: "18px" }}>
+                <label className="form-label" style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "8px" }}>
+                  <Clock size={13} style={{ color: "#2563EB" }} /> Access Duration
+                </label>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+                  {DURATION_PRESETS.map((preset) => (
+                    <button
+                      key={preset.days}
+                      type="button"
+                      onClick={() => setDurationDays(preset.days)}
+                      style={{
+                        padding: "8px 10px",
+                        borderRadius: "7px",
+                        border: `1px solid ${durationDays === preset.days ? "#2563EB" : "#E2E8F0"}`,
+                        background: durationDays === preset.days ? "#EFF6FF" : "#F8FAFC",
+                        color: durationDays === preset.days ? "#1E40AF" : "#475569",
+                        fontSize: "12px",
+                        fontWeight: 600,
+                        cursor: "pointer",
+                        textAlign: "center",
+                      }}
+                    >
+                      {preset.label}
+                    </button>
+                  ))}
+                </div>
+                <div style={{ fontSize: "11px", color: "#64748B", marginTop: "6px" }}>
+                  Access will automatically expire on <strong>{requiredUntilFormatted}</strong>.
+                </div>
+              </div>
+
+              {/* Urgency Selector */}
+              <div style={{ marginBottom: "18px" }}>
+                <label className="form-label" style={{ marginBottom: "6px" }}>Request Priority / Urgency</label>
+                <div style={{ display: "flex", gap: "8px" }}>
+                  {(["STANDARD", "URGENT", "CRITICAL"] as const).map((lvl) => (
+                    <button
+                      key={lvl}
+                      type="button"
+                      onClick={() => setUrgency(lvl)}
+                      style={{
+                        flex: 1,
+                        padding: "6px 8px",
+                        borderRadius: "6px",
+                        fontSize: "11.5px",
+                        fontWeight: 600,
+                        border: `1px solid ${urgency === lvl ? (lvl === "CRITICAL" ? "#DC2626" : lvl === "URGENT" ? "#D97706" : "#2563EB") : "#E2E8F0"}`,
+                        background: urgency === lvl ? (lvl === "CRITICAL" ? "#FEF2F2" : lvl === "URGENT" ? "#FFFBEB" : "#EFF6FF") : "#FFFFFF",
+                        color: urgency === lvl ? (lvl === "CRITICAL" ? "#B91C1C" : lvl === "URGENT" ? "#B45309" : "#1D4ED8") : "#64748B",
+                        cursor: "pointer",
+                      }}
+                    >
+                      {lvl === "STANDARD" ? "Standard" : lvl === "URGENT" ? "⚡ Urgent" : "🔥 Critical"}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Justification Textarea */}
+              <div style={{ marginBottom: "20px" }}>
+                <label className="form-label" style={{ marginBottom: "4px" }}>
+                  Business Justification <span style={{ color: "#DC2626" }}>*</span>
+                </label>
+                <span className="form-sublabel" style={{ display: "block", marginBottom: "6px" }}>
+                  Explain why you or your team requires access to this tool.
+                </span>
+                <textarea
+                  className="form-textarea"
+                  rows={3}
+                  placeholder="e.g. Collaborating with marketing on Q3 field campaign assets and sprint sign-offs..."
+                  value={justification}
+                  onChange={(e) => setJustification(e.target.value)}
+                  required
+                />
+              </div>
+
+              {error && (
+                <div style={{ color: "#DC2626", fontSize: "12px", marginBottom: "14px", fontWeight: 500 }}>
+                  {error}
                 </div>
               )}
 
-              <div className="form-group" style={{ marginTop: "16px" }}>
-                <label className="form-label">Business Justification</label>
-                <span className="form-sublabel">
-                  Explain why this access is required for your or the beneficiary's work.
-                </span>
-                <textarea
-                  className={`form-textarea ${error ? "input-error" : ""}`}
-                  rows={4}
-                  placeholder="e.g. Need visibility into customer tickets to resolve escalations..."
-                  value={justification}
-                  onChange={(e) => {
-                    setJustification(e.target.value);
-                    if (error) setError("");
-                  }}
-                />
-                {error && <div className="field-error">{error}</div>}
-              </div>
-
-              <div
-                style={{
-                  marginTop: "20px",
-                  padding: "12px",
-                  background: "#F8FAFC",
-                  borderRadius: "9px",
-                  fontSize: "12px",
-                  color: "#64748B",
-                }}
-              >
-                Approver: <strong style={{ color: "#334155" }}>{accessItem.approver}</strong> · Provisioning:{" "}
-                <strong style={{ color: "#334155" }}>
-                  {accessItem.automation ? "Automated upon approval" : "Manual by access provider"}
-                </strong>
-              </div>
-
-              <div style={{ display: "flex", gap: "10px", marginTop: "24px" }}>
+              {/* Form Action Buttons */}
+              <div style={{ display: "flex", gap: "10px" }}>
                 <button
                   type="button"
                   className="btn btn-secondary"
-                  style={{ flex: 1 }}
+                  style={{ flex: 1, height: "42px" }}
                   onClick={handleResetAndClose}
                 >
                   Cancel
@@ -245,10 +429,10 @@ export default function RequestFormDrawer({
                 <button
                   type="submit"
                   className="btn btn-primary"
-                  style={{ flex: 2 }}
+                  style={{ flex: 1.5, height: "42px" }}
                   disabled={loading}
                 >
-                  {loading ? "Submitting..." : "Submit Access Request"}
+                  <Send size={14} /> {loading ? "Submitting..." : isException ? "Submit Exception Request" : "Submit Request"}
                 </button>
               </div>
             </form>
