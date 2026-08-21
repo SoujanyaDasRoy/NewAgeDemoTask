@@ -946,136 +946,235 @@ function PortalDashboard() {
 
       {/* MAIN CONTENT */}
       <main className="main-container">
-        {/* Welcome & Context Header */}
-        <div className="welcome">
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", flexWrap: "wrap" }}>
-            <div>
-              {isRoleAdmin ? (
-                <>
-                  <h1>Board Administration · {currentUser.name}</h1>
-                  <p>
-                    Manage permissions, review pending approvals, provision manual access, and govern Access IDs.
-                  </p>
-                </>
+        {/* ── 🌟 DYNAMIC CONTEXTUAL COMMAND HUB HERO ─────────────────── */}
+        <div className="command-hero">
+          {/* Left: Dynamic Title & Contextual Status */}
+          <div className="command-hero-left">
+            <div className="command-hero-title-row">
+              <h1 className="command-hero-title">
+                Welcome, {currentUser.name.split(" ")[0]}
+              </h1>
+              {pendingApprovals.length > 0 ? (
+                <div
+                  className="command-status-pill pending"
+                  title={`${pendingApprovals.length} access request(s) awaiting your action`}
+                >
+                  <span className="command-status-dot amber pulse" />
+                  <span>
+                    {pendingApprovals.length} Approval
+                    {pendingApprovals.length > 1 ? "s" : ""} Pending
+                  </span>
+                </div>
               ) : (
-                <>
-                  <h1>Welcome back, {currentUser.name.split(" ")[0]}</h1>
-                  <p>
-                    Discover tools, track your access requests, and act on items awaiting your approval.
-                  </p>
-                </>
+                <div
+                  className="command-status-pill compliant"
+                  title="All policy controls and access authorizations are fully verified"
+                >
+                  <span className="command-status-dot green" />
+                  <span>100% Policy Compliant</span>
+                </div>
               )}
             </div>
 
-            {/* Role Context Pill */}
-            <div className="role-banner">
-              <div className="role-banner-left">
-                <Shield size={14} style={{ color: isRoleAdmin ? "#2563EB" : "#16A34A" }} />
-                <div>
-                  <div className="role-banner-title">
-                    {currentUser.department}
-                  </div>
-                  <div className="role-banner-sub">
-                    {isRoleAdmin ? "Full Administration Tier" : "Standard Employee"}
-                  </div>
-                </div>
-              </div>
+            <p className="command-hero-subtitle">
+              {pendingApprovals.length > 0 ? (
+                <>
+                  ⚡ {pendingApprovals.length} access request
+                  {pendingApprovals.length > 1 ? "s" : ""} require your review before sign-off.
+                </>
+              ) : (
+                <>
+                  All access permissions are up to date across {currentUser.department} tools.
+                </>
+              )}
+            </p>
+          </div>
+
+          {/* Right: Sleek Quick Action Bar */}
+          <div className="command-hero-actions">
+            {/* ⌘K Search quick trigger button */}
+            <button
+              type="button"
+              className="command-hero-btn secondary"
+              onClick={() => setCmdPaletteOpen(true)}
+              title="Quick Search & Command Palette (⌘K)"
+            >
+              <Search size={13} strokeWidth={2.2} />
+              <span>Search</span>
+              <kbd className="command-hero-kbd">⌘K</kbd>
+            </button>
+
+            {/* [+ Request Access] primary CTA */}
+            <button
+              type="button"
+              className="command-hero-btn primary"
+              onClick={() => {
+                if (catalog.length > 0) setRequestFormItem(catalog[0]);
+              }}
+              title="Submit a new access request"
+            >
+              <Plus size={14} strokeWidth={2.4} />
+              <span>Request Access</span>
+            </button>
+
+            {/* Department / Role Badge */}
+            <div className="command-hero-role-badge">
+              <Shield
+                size={12}
+                strokeWidth={2.2}
+                style={{ color: isRoleAdmin ? "var(--accent)" : "#16A34A" }}
+              />
+              <span>
+                {currentUser.department} · {isRoleAdmin ? "Board Admin" : "Employee"}
+              </span>
             </div>
           </div>
         </div>
 
-        {/* ── 🌟 TOP METRICS HEADER ─────────────────── */}
-        <div className="metrics-grid">
-          {/* 1. Directory Tools */}
+        {/* ── 🌟 UNIFIED INTERACTIVE COMMAND STRIP ─────────────────── */}
+        <div className="command-metrics-strip">
+          {/* Segment 1: Enterprise Directory */}
           <div
-            className="metric-card"
+            className="command-strip-segment"
             onClick={() => {
               const el = document.getElementById("search-directory-card");
               el?.scrollIntoView({ behavior: "smooth" });
             }}
-            title="Browse all available tools and boards"
+            title="Browse enterprise catalog and boards"
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                document.getElementById("search-directory-card")?.scrollIntoView({ behavior: "smooth" });
+              }
+            }}
           >
-            <ChevronRight size={14} className="metric-card-arrow" />
-            <div className="metric-top-row">
-              <span className="metric-label">Directory Tools</span>
-              <div className="metric-icon-wrap">
-                <Package size={14} />
+            <div className="command-strip-top">
+              <div className="command-strip-title-wrap">
+                <div className="command-strip-icon-box">
+                  <Package size={14} strokeWidth={2} />
+                </div>
+                <span className="command-strip-label">Enterprise Directory</span>
               </div>
+              <ChevronRight size={14} className="command-strip-arrow" />
             </div>
-            <div className="metric-value-row">
-              <span className="metric-number">{catalog.length}</span>
-              <span className="metric-pill-sub" style={{ color: "#2563EB" }}>
-                <Zap size={10} /> {catalog.filter((c) => c.automation).length} Automated
-              </span>
+            <div className="command-strip-bottom">
+              <div className="command-strip-val-wrap">
+                <span className="command-strip-number">{catalog.length}</span>
+                <span className="command-strip-unit">Tools</span>
+              </div>
+              <div className="command-strip-subtext">
+                <span className="scim-count-pill">
+                  <Zap size={10} strokeWidth={2.5} style={{ color: "var(--accent)" }} />
+                  <span>{catalog.filter((c) => c.automation).length} Automated SCIM</span>
+                </span>
+                <span className="subtext-divider">·</span>
+                <span>{catalog.filter((c) => !c.automation).length} Manual</span>
+              </div>
             </div>
           </div>
 
-          {/* 2. Active Access Requests */}
+          {/* Segment 2: My Requests */}
           <div
-            className="metric-card"
+            className="command-strip-segment"
             onClick={() => {
               setRequestFilter("ALL");
               const el = document.getElementById("my-requests-section");
               el?.scrollIntoView({ behavior: "smooth" });
             }}
-            title="View your active and past requests"
+            title="View and filter your access requests"
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                setRequestFilter("ALL");
+                document.getElementById("my-requests-section")?.scrollIntoView({ behavior: "smooth" });
+              }
+            }}
           >
-            <ChevronRight size={14} className="metric-card-arrow" />
-            <div className="metric-top-row">
-              <span className="metric-label">Active Requests</span>
-              <div className="metric-icon-wrap">
-                <Activity size={14} />
+            <div className="command-strip-top">
+              <div className="command-strip-title-wrap">
+                <div className="command-strip-icon-box">
+                  <Activity size={14} strokeWidth={2} />
+                </div>
+                <span className="command-strip-label">My Requests</span>
               </div>
+              <ChevronRight size={14} className="command-strip-arrow" />
             </div>
-            <div className="metric-value-row">
-              <span className="metric-number">
-                {requests.filter((r) => !["COMPLETED", "REJECTED", "EXPIRED"].includes(r.status)).length}
-              </span>
-              <span className="metric-pill-sub" style={{ color: "#166534" }}>
-                {requests.filter((r) => r.status === "COMPLETED").length} Completed
-              </span>
+            <div className="command-strip-bottom">
+              <div className="command-strip-val-wrap">
+                <span className="command-strip-number">
+                  {requests.filter((r) => !["COMPLETED", "REJECTED", "EXPIRED"].includes(r.status)).length}
+                </span>
+                <span className="command-strip-unit">Active</span>
+              </div>
+              <div className="command-strip-subtext">
+                <span className="provisioned-count-pill">
+                  <Check size={10} strokeWidth={2.5} style={{ color: "#16A34A" }} />
+                  <span>{requests.filter((r) => r.status === "COMPLETED").length} Provisioned</span>
+                </span>
+              </div>
             </div>
           </div>
 
-          {/* 3. Pending Approvals */}
+          {/* Segment 3: Approvals Queue */}
           <div
-            className="metric-card"
+            className="command-strip-segment"
             onClick={() => {
               const el = document.getElementById("approvals-section");
               el?.scrollIntoView({ behavior: "smooth" });
             }}
-            title="Items requiring immediate action"
+            title="Review pending authorization approvals"
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                document.getElementById("approvals-section")?.scrollIntoView({ behavior: "smooth" });
+              }
+            }}
           >
-            <ChevronRight size={14} className="metric-card-arrow" />
-            <div className="metric-top-row">
-              <span className="metric-label">Pending Approvals</span>
-              <div className="metric-icon-wrap">
-                <CheckSquare size={14} />
+            <div className="command-strip-top">
+              <div className="command-strip-title-wrap">
+                <div className="command-strip-icon-box">
+                  <CheckSquare size={14} strokeWidth={2} />
+                </div>
+                <span className="command-strip-label">Approvals Queue</span>
               </div>
+              <ChevronRight size={14} className="command-strip-arrow" />
             </div>
-            <div className="metric-value-row">
-              <span className="metric-number">{pendingApprovals.length}</span>
-              <span
-                className="metric-pill-sub"
-                style={{
-                  color: pendingApprovals.length > 0 ? "#9A6700" : "#1A7F37",
-                  fontWeight: 600,
-                }}
-              >
+            <div className="command-strip-bottom">
+              <div className="command-strip-val-wrap">
                 {pendingApprovals.length > 0 ? (
-                  "Action Needed"
+                  <span className="command-strip-badge-val amber">
+                    <span className="command-strip-number">{pendingApprovals.length}</span>
+                    <span className="command-strip-unit">Need Review</span>
+                  </span>
                 ) : (
-                  <span style={{ display: "inline-flex", alignItems: "center", gap: "3px" }}>
-                    <Check size={11} strokeWidth={2.5} /> All Clear
+                  <span className="command-strip-badge-val clear">
+                    <span className="command-strip-number">0</span>
+                    <span className="command-strip-unit">Pending</span>
                   </span>
                 )}
-              </span>
+              </div>
+              <div className="command-strip-subtext">
+                {pendingApprovals.length > 0 ? (
+                  <span className="strip-status-pill amber">
+                    <Zap size={10} strokeWidth={2.4} />
+                    <span>⚡ Action Required</span>
+                  </span>
+                ) : (
+                  <span className="strip-status-pill green">
+                    <Check size={10} strokeWidth={2.5} />
+                    <span>✓ All Clear</span>
+                  </span>
+                )}
+              </div>
             </div>
           </div>
 
-          {/* 4. Governed Access IDs */}
+          {/* Segment 4: Access Governance */}
           <div
-            className="metric-card"
+            className="command-strip-segment"
             onClick={() => {
               if (isRoleAdmin) {
                 const el = document.getElementById("governance-section");
@@ -1084,34 +1183,39 @@ function PortalDashboard() {
                 setAccessDetailsItem(catalog[0]);
               }
             }}
-            title="Policy-governed and bound Access IDs"
+            title="Inspect Access ID governance & policy registry"
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                if (isRoleAdmin) {
+                  document.getElementById("governance-section")?.scrollIntoView({ behavior: "smooth" });
+                } else if (catalog.length > 0) {
+                  setAccessDetailsItem(catalog[0]);
+                }
+              }
+            }}
           >
-            <ChevronRight size={14} className="metric-card-arrow" />
-            <div className="metric-top-row">
-              <span className="metric-label">Governed Access IDs</span>
-              <div className="metric-icon-wrap">
-                <Key size={14} />
+            <div className="command-strip-top">
+              <div className="command-strip-title-wrap">
+                <div className="command-strip-icon-box">
+                  <Key size={14} strokeWidth={2} />
+                </div>
+                <span className="command-strip-label">Access Governance</span>
               </div>
+              <ChevronRight size={14} className="command-strip-arrow" />
             </div>
-            <div className="metric-value-row">
-              <span className="metric-number">{catalog.filter((c) => c.accessId).length}</span>
-              <span
-                className="metric-pill-sub"
-                style={{
-                  color:
-                    accessIdQueue.filter((q) => q.status === "Pending Governance Review").length > 0
-                      ? "#8250DF"
-                      : "var(--muted)",
-                }}
-              >
-                {accessIdQueue.filter((q) => q.status === "Pending Governance Review").length > 0 ? (
-                  `${accessIdQueue.filter((q) => q.status === "Pending Governance Review").length} Queued`
-                ) : (
-                  <span style={{ display: "inline-flex", alignItems: "center", gap: "3px" }}>
-                    <Check size={11} strokeWidth={2.5} /> 100% Policy Bound
-                  </span>
-                )}
-              </span>
+            <div className="command-strip-bottom">
+              <div className="command-strip-val-wrap">
+                <span className="command-strip-number">{catalog.filter((c) => c.accessId).length}</span>
+                <span className="command-strip-unit">Governed IDs</span>
+              </div>
+              <div className="command-strip-subtext">
+                <span className="strip-status-pill green">
+                  <Check size={10} strokeWidth={2.5} />
+                  <span>✓ 100% Policy Bound</span>
+                </span>
+              </div>
             </div>
           </div>
         </div>
