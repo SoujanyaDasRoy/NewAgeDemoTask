@@ -125,39 +125,73 @@ export function buildSlackAccessRequestBlocks(payload: SlackMessagePayload, port
 }
 
 /**
- * Sends a formatted interactive Slack Block-Kit message to the configured Incoming Webhook.
+ * Sends a formatted interactive Slack Block-Kit message to the configured Incoming Webhook or Bot Token.
  */
 export async function sendSlackNotification(payload: SlackMessagePayload) {
   const webhookUrl = process.env.SLACK_WEBHOOK_URL;
-  if (!webhookUrl || !webhookUrl.startsWith("https://hooks.slack.com")) {
-    return { sent: false, reason: "No SLACK_WEBHOOK_URL configured or invalid URL" };
-  }
+  const botToken = process.env.SLACK_BOT_TOKEN || process.env.SLACK_ACCESS_TOKEN;
+  const channelId = process.env.SLACK_CHANNEL_ID || "general";
 
-  try {
-    const portalBaseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-    const blocks = buildSlackAccessRequestBlocks(payload, portalBaseUrl);
+  const portalBaseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const blocks = buildSlackAccessRequestBlocks(payload, portalBaseUrl);
 
-    const res = await fetch(webhookUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        text: `Access Request: ${payload.accessLabel} (${payload.requestId})`,
-        blocks,
-      }),
-    });
+  // Method 1: Webhook URL
+  if (webhookUrl && webhookUrl.startsWith("https://hooks.slack.com")) {
+    try {
+      const res = await fetch(webhookUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          text: `Access Request: ${payload.accessLabel} (${payload.requestId})`,
+          blocks,
+        }),
+      });
 
-    if (res.ok) {
-      console.log(`[Slack] Live message posted to Slack for ${payload.requestId}`);
-      return { sent: true, status: res.status };
-    } else {
-      const errText = await res.text();
-      console.error("[Slack] Webhook failed:", errText);
-      return { sent: false, status: res.status, error: errText };
+      if (res.ok) {
+        console.log(`[Slack] Live message posted to Slack Webhook for ${payload.requestId}`);
+        return { sent: true, method: "webhook", status: res.status };
+      } else {
+        const errText = await res.text();
+        console.error("[Slack] Webhook failed:", errText);
+        return { sent: false, method: "webhook", status: res.status, error: errText };
+      }
+    } catch (error: any) {
+      console.error("[Slack] Error posting to webhook:", error);
+      return { sent: false, error: error.message };
     }
-  } catch (error: any) {
-    console.error("[Slack] Error posting to webhook:", error);
-    return { sent: false, error: error.message };
   }
+
+  // Method 2: Slack Web API (Bot/User Token)
+  if (botToken) {
+    try {
+      const res = await fetch("https://slack.com/api/chat.postMessage", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${botToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          channel: channelId,
+          text: `Access Request: ${payload.accessLabel} (${payload.requestId})`,
+          blocks,
+        }),
+      });
+
+      const data = await res.json();
+      if (data.ok) {
+        console.log(`[Slack] Live message posted to Slack channel ${channelId} for ${payload.requestId}`);
+        return { sent: true, method: "api", channel: channelId };
+      } else {
+        console.error("[Slack] chat.postMessage failed:", data.error);
+        return { sent: false, method: "api", error: data.error };
+      }
+    } catch (error: any) {
+      console.error("[Slack] Error posting via Slack API:", error);
+      return { sent: false, error: error.message };
+    }
+  }
+
+  return { sent: false, reason: "Neither SLACK_WEBHOOK_URL nor SLACK_BOT_TOKEN is configured" };
 }
 
 /**
