@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import React, { useState, useEffect, useCallback, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Bell,
   Search,
@@ -80,8 +80,9 @@ interface Toast {
 
 let toastCounter = 0;
 
-export default function PortalPage() {
+function PortalDashboard() {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   // Active Authenticated User Session
   const [currentUser, setCurrentUser] = useState<SessionUser | null>(null);
@@ -116,6 +117,18 @@ export default function PortalPage() {
   const [adminProvisionRequest, setAdminProvisionRequest] = useState<any>(null);
   const [boardConfigItem, setBoardConfigItem] = useState<any>(null);
   const [accessIdItem, setAccessIdItem] = useState<any>(null);
+
+  // ── URL DEEP LINK SYNC ───────────────────────────────────────────────────
+  const syncUrlParam = useCallback((key: string | null, value: string | null) => {
+    if (typeof window === "undefined") return;
+    const url = new URL(window.location.href);
+    if (!key || !value) {
+      url.search = "";
+    } else {
+      url.search = `?${key}=${encodeURIComponent(value)}`;
+    }
+    window.history.pushState({}, "", url.toString());
+  }, []);
 
   // ── DATA LOADING ──────────────────────────────────────────────────────────
   const loadData = useCallback(async () => {
@@ -153,6 +166,51 @@ export default function PortalPage() {
     loadData();
   }, [loadData]);
 
+  // ── INITIAL DEEP LINK ROUTING ───────────────────────────────────────────
+  useEffect(() => {
+    if (!catalog.length && !requests.length) return;
+
+    const reqId = searchParams.get("request");
+    const apprvId = searchParams.get("approval");
+    const boardId = searchParams.get("board");
+    const tab = searchParams.get("tab");
+
+    if (reqId) {
+      const match = requests.find((r) => r.id.toLowerCase() === reqId.toLowerCase());
+      if (match) setSelectedRequest(match);
+    } else if (apprvId) {
+      const match = requests.find((r) => r.id.toLowerCase() === apprvId.toLowerCase());
+      if (match) setApprovalRequest(match);
+    } else if (boardId) {
+      const match = catalog.find(
+        (c) => c.id.toLowerCase() === boardId.toLowerCase() || (c.accessId && c.accessId.toLowerCase() === boardId.toLowerCase())
+      );
+      if (match) setAccessDetailsItem(match);
+    }
+
+    if (tab) {
+      const el = document.getElementById(tab);
+      if (el) el.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [searchParams, catalog, requests]);
+
+  // ── BROWSER HISTORY POPSTATE HANDLER ────────────────────────────────────
+  useEffect(() => {
+    const handlePopState = () => {
+      setSelectedRequest(null);
+      setApprovalRequest(null);
+      setAccessDetailsItem(null);
+      setRequestFormItem(null);
+      setExceptionFormItem(null);
+      setAdminProvisionRequest(null);
+      setBoardConfigItem(null);
+      setAccessIdItem(null);
+      setNotifOpen(false);
+    };
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, []);
+
   // ── TOAST HELPER ─────────────────────────────────────────────────────────
   const pushToast = (text: string, type: "success" | "error" = "success") => {
     const id = ++toastCounter;
@@ -178,11 +236,12 @@ export default function PortalPage() {
         setBoardConfigItem(null);
         setAccessIdItem(null);
         setNotifOpen(false);
+        syncUrlParam(null, null);
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
+  }, [syncUrlParam]);
 
   // ── SEARCH HANDLER ────────────────────────────────────────────────────────
   useEffect(() => {
@@ -1973,7 +2032,10 @@ export default function PortalPage() {
           isOpen={!!selectedRequest}
           request={selectedRequest}
           currentUserName={currentUser.name}
-          onClose={() => setSelectedRequest(null)}
+          onClose={() => {
+            setSelectedRequest(null);
+            syncUrlParam(null, null);
+          }}
           onCloseRequest={async (id) => handleCloseRequest(id)}
           onRequestExtension={async (id) => handleExtension(id, 14, "Project extension requested")}
         />
@@ -1984,7 +2046,10 @@ export default function PortalPage() {
           isOpen={!!approvalRequest}
           request={approvalRequest}
           actingUserName={currentUser.name}
-          onClose={() => setApprovalRequest(null)}
+          onClose={() => {
+            setApprovalRequest(null);
+            syncUrlParam(null, null);
+          }}
           onApprove={async (id) => handleApprove(id)}
           onReject={async (id, reason) => handleReject(id, reason)}
         />
@@ -1994,7 +2059,10 @@ export default function PortalPage() {
         <AdminRequestDetailDrawer
           isOpen={!!adminProvisionRequest}
           request={adminProvisionRequest}
-          onClose={() => setAdminProvisionRequest(null)}
+          onClose={() => {
+            setAdminProvisionRequest(null);
+            syncUrlParam(null, null);
+          }}
           onProvision={async (id) => handleProvision(id)}
         />
       )}
@@ -2042,5 +2110,13 @@ export default function PortalPage() {
         ))}
       </div>
     </div>
+  );
+}
+
+export default function PortalPage() {
+  return (
+    <Suspense fallback={<SkeletonLoader />}>
+      <PortalDashboard />
+    </Suspense>
   );
 }

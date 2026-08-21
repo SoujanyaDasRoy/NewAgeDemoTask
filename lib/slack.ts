@@ -86,7 +86,7 @@ export async function sendSlackNotification(payload: SlackMessagePayload) {
               emoji: true,
             },
             style: "primary",
-            url: portalBaseUrl,
+            url: `${portalBaseUrl}/?approval=${payload.requestId}`,
           },
         ],
       },
