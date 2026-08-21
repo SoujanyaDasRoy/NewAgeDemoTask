@@ -50,8 +50,8 @@ async function handleSlackTest(req: NextRequest) {
 
   const portalBaseUrl =
     process.env.NEXT_PUBLIC_APP_URL ||
-    `${req.nextUrl.protocol}//${req.nextUrl.host}` ||
-    "http://localhost:3000";
+    process.env.PORTAL_URL ||
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "https://newage-access-portal.vercel.app");
 
   const blocks = buildSlackAccessRequestBlocks(samplePayload, portalBaseUrl);
 

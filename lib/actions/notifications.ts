@@ -39,7 +39,7 @@ export async function markNotificationsRead() {
         read: false,
         OR: [
           { userId: user.id },
-          { userId: null, role: user.role === "ADMIN" ? "admin" : "employee" },
+          { userId: null },
         ],
       },
       data: { read: true },

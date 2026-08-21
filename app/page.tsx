@@ -314,6 +314,22 @@ function PortalDashboard() {
     setNotifOpen((prev) => !prev);
   };
 
+  const handleMarkAllRead = async () => {
+    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+    await markNotificationsRead();
+    await loadData();
+    pushToast("All notifications marked as read");
+  };
+
+  const getToolName = (req: any) => {
+    if (req.accessItem?.tool) return req.accessItem.tool;
+    if (req.tool) return req.tool;
+    const label = req.accessLabel || "";
+    if (label.includes("–")) return label.split("–")[0].trim();
+    if (label.includes("-")) return label.split("-")[0].trim();
+    return "App";
+  };
+
   // ── ACTIONS ───────────────────────────────────────────────────────────────
   const handleApprove = async (id: string) => {
     if (!currentUser) return;
@@ -698,10 +714,7 @@ function PortalDashboard() {
                   <span>Notifications</span>
                   <span
                     style={{ fontSize: "11px", color: "var(--muted)", cursor: "pointer", fontWeight: 500 }}
-                    onClick={async () => {
-                      await markNotificationsRead();
-                      await loadData();
-                    }}
+                    onClick={handleMarkAllRead}
                   >
                     Mark all read
                   </span>
@@ -1510,76 +1523,79 @@ function PortalDashboard() {
               </div>
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                {myRequests.map((req) => (
-                  <div
-                    key={req.id}
-                    className="list-row"
-                    onClick={() => setSelectedRequest(req)}
-                  >
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "6px",
-                          flexWrap: "wrap",
-                        }}
-                      >
-                        <span
-                          style={{
-                            fontSize: "13px",
-                            fontWeight: 600,
-                            color: "var(--text)",
-                          }}
-                        >
-                          {req.accessLabel}
-                        </span>
-                        <StatusBadge status={req.status} />
-                        {req.isException && (
-                          <span className="badge badge-amber" style={{ fontSize: "10.5px" }}>Exception</span>
+                {myRequests.map((req) => {
+                  const toolName = getToolName(req);
+                  return (
+                    <div
+                      key={req.id}
+                      className="list-row request-row"
+                      onClick={() => setSelectedRequest(req)}
+                    >
+                      <div className="row-content">
+                        {/* Top Line: Tool name & Service Logo + Title + Status Pill */}
+                        <div className="row-top-line">
+                          <div className="tool-logo-badge">
+                            <ServiceLogo tool={toolName} size={18} />
+                          </div>
+                          <span className="row-title">
+                            {req.accessLabel}
+                          </span>
+                          <StatusBadge status={req.status} />
+                          {req.isException && (
+                            <span className="badge badge-amber" style={{ fontSize: "10.5px" }}>Exception</span>
+                          )}
+                        </div>
+
+                        {/* Second Line: Request ID (mono), Requester/Beneficiary, Date, and Urgency tag */}
+                        <div className="row-second-line">
+                          <span className="mono row-id">{req.id}</span>
+                          <span className="row-meta-divider">•</span>
+                          <span className="row-meta-user">
+                            {req.onBehalf ? `For ${req.beneficiaryName}` : (req.requester?.name || req.beneficiaryName || "Self")}
+                          </span>
+                          <span className="row-meta-divider">•</span>
+                          <span className="row-meta-date">
+                            Updated {new Date(req.updatedAt || req.createdAt).toLocaleDateString("en-GB", {
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                            })}
+                          </span>
+                          {req.urgency && (
+                            <>
+                              <span className="row-meta-divider">•</span>
+                              <span className={`urgency-pill urgency-${req.urgency.toLowerCase()}`}>
+                                {req.urgency}
+                              </span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Right-aligned Group */}
+                      <div className="request-row-right" onClick={(e) => e.stopPropagation()}>
+                        {req.status === "ACCESS_PROVISIONED" && req.onBehalf ? (
+                          <button
+                            className="btn btn-primary"
+                            style={{
+                              fontSize: "11.5px",
+                              height: "30px",
+                              padding: "0 12px",
+                              fontWeight: 600,
+                            }}
+                            onClick={() => handleCloseRequest(req.id)}
+                          >
+                            Close
+                          </button>
+                        ) : (
+                          <div onClick={() => setSelectedRequest(req)}>
+                            <RequestMiniStepper status={req.status} />
+                          </div>
                         )}
                       </div>
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          flexWrap: "wrap",
-                          gap: "10px",
-                          marginTop: "5px",
-                        }}
-                      >
-                        <div style={{ fontSize: "11.5px", color: "#64748B" }}>
-                          <span className="mono">{req.id}</span> · Updated{" "}
-                          {new Date(req.updatedAt || req.createdAt).toLocaleDateString("en-GB", {
-                            day: "numeric",
-                            month: "short",
-                            year: "numeric",
-                          })}
-                        </div>
-                        <RequestMiniStepper status={req.status} />
-                      </div>
                     </div>
-                    {/* Quick-decision for on-behalf provisioned */}
-                    {req.status === "ACCESS_PROVISIONED" && req.onBehalf && (
-                      <button
-                        className="btn btn-primary"
-                        style={{
-                          fontSize: "11px",
-                          height: "28px",
-                          padding: "0 10px",
-                          marginLeft: "8px",
-                        }}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleCloseRequest(req.id);
-                        }}
-                      >
-                        Close
-                      </button>
-                    )}
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
@@ -1634,10 +1650,11 @@ function PortalDashboard() {
               <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                 {pendingApprovals.map((req) => {
                   const isSelected = selectedApprovalIds.includes(req.id);
+                  const toolName = getToolName(req);
                   return (
                     <div
                       key={req.id}
-                      className="list-row"
+                      className="list-row approval-row"
                       style={{
                         background: isSelected ? "var(--accent-light)" : "var(--surface)",
                         borderColor: isSelected ? "var(--accent)" : "var(--border)",
@@ -1647,90 +1664,72 @@ function PortalDashboard() {
                       {/* Multi-Select Checkbox */}
                       <div
                         onClick={(e) => toggleSelectApproval(req.id, e)}
-                        style={{
-                          width: "18px",
-                          height: "18px",
-                          borderRadius: "4px",
-                          border: isSelected ? "1.5px solid #16A34A" : "1.5px solid var(--border)",
-                          background: isSelected ? "#16A34A" : "var(--surface)",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          cursor: "pointer",
-                          flexShrink: 0,
-                        }}
+                        className={`approval-checkbox ${isSelected ? "checked" : ""}`}
                         title={isSelected ? "Deselect request" : "Select request for batch approval"}
                       >
-                        {isSelected && <Check size={12} style={{ color: "#FFFFFF", strokeWidth: 3 }} />}
+                        {isSelected && <Check size={12} strokeWidth={3} />}
                       </div>
 
-                      <div
-                        className="avatar"
-                        style={{
-                          width: "28px",
-                          height: "28px",
-                          fontSize: "10.5px",
-                          fontWeight: 600,
-                          flexShrink: 0,
-                        }}
-                      >
-                        {(req.requester?.name || req.beneficiaryName || "NA")
-                          .split(" ")
-                          .map((n: string) => n[0])
-                          .join("")
-                          .slice(0, 2)
-                          .toUpperCase()}
-                      </div>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "6px",
-                            flexWrap: "wrap",
-                          }}
-                        >
-                          <span
-                            style={{
-                              fontSize: "13px",
-                              fontWeight: 600,
-                              color: "var(--text)",
-                            }}
-                          >
+                      <div className="row-content">
+                        {/* Top Line: Tool name & Service Logo + Title + Status Pill */}
+                        <div className="row-top-line">
+                          <div className="tool-logo-badge">
+                            <ServiceLogo tool={toolName} size={18} />
+                          </div>
+                          <span className="row-title">
                             {req.accessLabel}
                           </span>
                           <StatusBadge status={req.status} />
                           {req.isException && (
-                            <span className="badge badge-amber" style={{ fontSize: "10px" }}>
+                            <span className="badge badge-amber" style={{ fontSize: "10.5px" }}>
                               Exception
                             </span>
                           )}
                         </div>
-                        <div style={{ fontSize: "11.5px", color: "var(--muted)", marginTop: "3px" }}>
-                          <span className="mono">{req.id}</span> ·{" "}
-                          {req.requester?.name || req.beneficiaryName} ·{" "}
-                          {new Date(req.createdAt).toLocaleDateString("en-GB", {
-                            day: "numeric",
-                            month: "short",
-                          })}
+
+                        {/* Second Line: Request ID (mono), Requester/Beneficiary, Date, and Urgency tag */}
+                        <div className="row-second-line">
+                          <span className="mono row-id">{req.id}</span>
+                          <span className="row-meta-divider">•</span>
+                          <span className="row-meta-user">
+                            {req.requester?.name || req.beneficiaryName}
+                          </span>
+                          <span className="row-meta-divider">•</span>
+                          <span className="row-meta-date">
+                            {new Date(req.createdAt).toLocaleDateString("en-GB", {
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                            })}
+                          </span>
+                          {req.urgency && (
+                            <>
+                              <span className="row-meta-divider">•</span>
+                              <span className={`urgency-pill urgency-${req.urgency.toLowerCase()}`}>
+                                {req.urgency}
+                              </span>
+                            </>
+                          )}
                         </div>
                       </div>
 
-                      {/* Inline Quick Action Buttons */}
+                      {/* Right-aligned Action Group: High-contrast ✓ Approve / ✕ Reject */}
                       <div className="quick-action-wrap" onClick={(e) => e.stopPropagation()}>
                         <button
+                          type="button"
                           className="quick-action-btn quick-action-approve"
                           title="1-Click Approve"
                           onClick={() => handleApprove(req.id)}
                         >
-                          <Check size={12} strokeWidth={2.5} /> Approve
+                          <Check size={13} strokeWidth={2.5} /> ✓ Approve
                         </button>
                         <button
+                          type="button"
                           className="quick-action-btn quick-action-reject"
                           title="Reject"
                           onClick={() => setApprovalRequest(req)}
                         >
-                          <X size={12} strokeWidth={2.5} /> Reject
+                          <X size={13} strokeWidth={2.5} /> ✕ Reject
                         </button>
                       </div>
                     </div>

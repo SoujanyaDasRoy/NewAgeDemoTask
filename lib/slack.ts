@@ -24,7 +24,11 @@ export interface SlackMessagePayload {
  * Builds the interactive Slack Block-Kit payload for an access request.
  */
 export function buildSlackAccessRequestBlocks(payload: SlackMessagePayload, portalBaseUrl?: string) {
-  const baseUrl = portalBaseUrl || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const baseUrl =
+    portalBaseUrl ||
+    process.env.NEXT_PUBLIC_APP_URL ||
+    process.env.PORTAL_URL ||
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "https://newage-access-portal.vercel.app");
   const formattedTimestamp = new Date().toLocaleString("en-US", {
     timeZone: "UTC",
     dateStyle: "medium",
@@ -132,7 +136,10 @@ export async function sendSlackNotification(payload: SlackMessagePayload) {
   const botToken = process.env.SLACK_BOT_TOKEN || process.env.SLACK_ACCESS_TOKEN;
   const channelId = process.env.SLACK_CHANNEL_ID || "general";
 
-  const portalBaseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const portalBaseUrl =
+    process.env.NEXT_PUBLIC_APP_URL ||
+    process.env.PORTAL_URL ||
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "https://newage-access-portal.vercel.app");
   const blocks = buildSlackAccessRequestBlocks(payload, portalBaseUrl);
 
   // Method 1: Webhook URL

@@ -3,12 +3,12 @@
 import React from "react";
 
 interface ServiceLogoProps {
-  tool: string;
+  tool?: string;
   size?: number;
 }
 
-export default function ServiceLogo({ tool, size = 18 }: ServiceLogoProps) {
-  const t = tool.toLowerCase();
+export default function ServiceLogo({ tool = "App", size = 18 }: ServiceLogoProps) {
+  const t = (tool || "app").toLowerCase();
 
   if (t.includes("monday")) {
     return (
@@ -74,21 +74,102 @@ export default function ServiceLogo({ tool, size = 18 }: ServiceLogoProps) {
     );
   }
 
-  // Default clean app icon
+  if (t.includes("datadog")) {
+    return (
+      <svg
+        width={size}
+        height={size}
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        style={{ flexShrink: 0 }}
+      >
+        <rect width="24" height="24" rx="5" fill="#632CA6" />
+        <path
+          d="M6.5 7.5H11C14 7.5 16.5 9.5 16.5 12C16.5 14.5 14 16.5 11 16.5H6.5V7.5ZM9 14.5H11C12.5 14.5 14 13.5 14 12C14 10.5 12.5 9.5 11 9.5H9V14.5Z"
+          fill="#FFFFFF"
+        />
+      </svg>
+    );
+  }
+
+  if (t.includes("figma")) {
+    return (
+      <svg
+        width={size}
+        height={size}
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        style={{ flexShrink: 0 }}
+      >
+        <path d="M8 24C10.2091 24 12 22.2091 12 20V16H8C5.79086 16 4 17.7909 4 20C4 22.2091 5.79086 24 8 24Z" fill="#0ACF83" />
+        <path d="M4 12C4 9.79086 5.79086 8 8 8H12V16H8C5.79086 16 4 14.2091 4 12Z" fill="#A259FF" />
+        <path d="M4 4C4 1.79086 5.79086 0 8 0H12V8H8C5.79086 8 4 6.20914 4 4Z" fill="#F24E1E" />
+        <path d="M12 0H16C18.2091 0 20 1.79086 20 4C20 6.20914 18.2091 8 16 8H12V0Z" fill="#FF7262" />
+        <circle cx="16" cy="12" r="4" fill="#1ABCFE" />
+      </svg>
+    );
+  }
+
+  if (t.includes("snowflake")) {
+    return (
+      <svg
+        width={size}
+        height={size}
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        style={{ flexShrink: 0 }}
+      >
+        <rect width="24" height="24" rx="5" fill="#29B5E8" />
+        <path
+          d="M12 4V20M4 12H20M6.34 6.34L17.66 17.66M6.34 17.66L17.66 6.34"
+          stroke="#FFFFFF"
+          strokeWidth="2.2"
+          strokeLinecap="round"
+        />
+      </svg>
+    );
+  }
+
+  if (t.includes("slack")) {
+    return (
+      <svg
+        width={size}
+        height={size}
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        style={{ flexShrink: 0 }}
+      >
+        <rect width="24" height="24" rx="5" fill="#4A154B" />
+        <path d="M6 10a2 2 0 112-2v2H6zm0 2h5a2 2 0 110 4H6v-4zm8-6a2 2 0 112 2h-2V6zm-2 0a2 2 0 114 0v5h-4V6zm6 8a2 2 0 11-2 2v-2h2zm0-2h-5a2 2 0 110-4h5v4zm-8 6a2 2 0 11-2-2h2v2zm2 0a2 2 0 11-4 0v-5h4v5z" fill="#E01E5A" />
+      </svg>
+    );
+  }
+
+  // Default clean branded app icon
+  const colors = ["#2563EB", "#7C3AED", "#059669", "#D97706", "#DC2626", "#0D9488", "#4F46E5"];
+  const charCode = (tool.charCodeAt(0) || 0) + (tool.charCodeAt(1) || 0);
+  const bgColor = colors[charCode % colors.length];
+
   return (
     <div
       style={{
         width: size,
         height: size,
-        borderRadius: "4px",
-        background: "#0F1B33",
+        borderRadius: size > 16 ? "5px" : "4px",
+        background: bgColor,
         color: "#FFF",
-        fontSize: size * 0.55,
+        fontSize: Math.max(9, Math.round(size * 0.52)),
         fontWeight: 700,
-        display: "flex",
+        display: "inline-flex",
         alignItems: "center",
         justifyContent: "center",
         flexShrink: 0,
+        boxShadow: "0 1px 2px rgba(0,0,0,0.15)",
+        textTransform: "uppercase",
       }}
     >
       {tool.slice(0, 1).toUpperCase()}
