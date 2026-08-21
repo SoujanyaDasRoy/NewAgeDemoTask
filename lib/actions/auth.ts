@@ -6,6 +6,7 @@ import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { neonAuth } from "@/lib/neon-auth";
+import { getTestSession } from "@/lib/test-session";
 
 export interface SessionUser {
   id: string;
@@ -20,6 +21,9 @@ export interface SessionUser {
 const SESSION_COOKIE = "newage_session_user";
 
 export async function getCurrentUser(): Promise<SessionUser | null> {
+  // Test-context shortcut — only active outside production (no-op in prod)
+  const testSession = getTestSession();
+  if (testSession !== null) return testSession;
   try {
     const cookieStore = await cookies();
     const sessionCookie = cookieStore.get(SESSION_COOKIE);
@@ -201,16 +205,10 @@ export async function signup(formData: {
     });
 
     if (existing) {
-      // If user already exists in DB, update password & details, and sign in!
-      newUser = await prisma.user.update({
-        where: { email },
-        data: {
-          name,
-          passwordHash,
-          department,
-          initials,
-        },
-      });
+      return {
+        success: false,
+        error: "An account with this email address already exists. Please log in instead.",
+      };
     } else {
       // 1. Create user in Neon Auth
       const neonRes = await neonAuth.signUp({ name, email, password });

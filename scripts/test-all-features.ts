@@ -20,6 +20,7 @@ import {
 import { getNotifications, markNotificationsRead } from "../lib/actions/notifications";
 import { getAuditLogs } from "../lib/actions/audit";
 import { login, signup, switchSessionUser } from "../lib/actions/auth";
+import { setSessionForTesting } from "../lib/test-session";
 
 interface TestResult {
   suite: string;
@@ -50,27 +51,48 @@ async function runTestSuite() {
   await prisma.timelineStep.deleteMany({});
   await prisma.accessRequest.deleteMany({});
   await prisma.accessIdQueue.deleteMany({});
-  await prisma.accessItem.update({ where: { id: "acc-3" }, data: { accessId: null } });
-  await prisma.accessItem.update({ where: { id: "acc-2" }, data: { automation: false } });
+  await prisma.accessItem.update({ where: { id: "acc-monday-product" }, data: { accessId: null } });
+  await prisma.accessItem.update({ where: { id: "acc-salesforce-crm" }, data: { automation: false } });
+
+  // ── Inject admin session for all privileged server actions ────────────────
+  // Server actions using requireAdmin() / getCurrentUser() call cookies() which
+  // throws outside a Next.js request context. We inject a real admin from the DB
+  // so all suites run cleanly in the tsx test runner. Cleared after Suite 10.
+  console.log("🔑 Injecting admin session for privileged suites...");
+  const adminUser = await prisma.user.findFirst({
+    where: { role: "ADMIN" },
+    select: { id: true, name: true, email: true, role: true, department: true, initials: true, avatarTone: true },
+  });
+  if (!adminUser) throw new Error("No admin user found in DB — run seed first.");
+  setSessionForTesting({
+    id: adminUser.id,
+    name: adminUser.name,
+    email: adminUser.email,
+    role: adminUser.role as "ADMIN" | "EMPLOYEE",
+    department: adminUser.department,
+    initials: adminUser.initials,
+    avatarTone: adminUser.avatarTone,
+  });
 
   // ── TEST SUITE 1: Access Catalog & Dynamic Eligibility ───────────────────
   console.log("📁 SUITE 1: Access Catalog & Dynamic Eligibility");
   const catalogProduct = await getCatalog("Product Team");
-  assert(catalogProduct.length === 5, "Catalog", "Returns all 5 access items", { count: catalogProduct.length });
+  assert(catalogProduct.length === 8, "Catalog", "Returns all 8 access items", { count: catalogProduct.length });
 
-  const eligibleItem = catalogProduct.find((i) => i.id === "acc-1");
-  assert(eligibleItem?.isEligible === true, "Catalog", "acc-1 is eligible for Product Team");
+  const eligibleItem = catalogProduct.find((i) => i.id === "acc-monday-marketing");
+  assert(eligibleItem?.isEligible === true, "Catalog", "acc-monday-marketing is eligible for Product Team");
 
-  const supportOnlyItem = catalogProduct.find((i) => i.id === "acc-4");
-  assert(supportOnlyItem?.isEligible === false, "Catalog", "acc-4 requires exception for Product Team");
+  // acc-salesforce-crm is only eligible for Sales Team & IT Support — not Product Team
+  const ineligibleItem = catalogProduct.find((i) => i.id === "acc-salesforce-crm");
+  assert(ineligibleItem?.isEligible === false, "Catalog", "acc-salesforce-crm requires exception for Product Team");
 
-  const missingAccessIdItem = catalogProduct.find((i) => i.id === "acc-3");
-  assert(missingAccessIdItem?.accessId === null, "Catalog", "acc-3 correctly has null Access ID");
+  const missingAccessIdItem = catalogProduct.find((i) => i.id === "acc-monday-product");
+  assert(missingAccessIdItem?.accessId === null, "Catalog", "acc-monday-product correctly has null Access ID");
 
   // ── TEST SUITE 2: Standard Access Request Lifecycle (Self & On-Behalf) ───
   console.log("\n📁 SUITE 2: Request Submission (Self & On-Behalf)");
   const selfReqRes = await submitRequest({
-    accessItemId: "acc-1",
+    accessItemId: "acc-monday-marketing",
     beneficiary: "Manvi Mehta",
     onBehalf: false,
     justification: "Need marketing metrics board access for Q3 roadmap alignment.",
@@ -81,7 +103,7 @@ async function runTestSuite() {
   const selfReqId = selfReqRes.requestId!;
 
   const onBehalfRes = await submitRequest({
-    accessItemId: "acc-2",
+    accessItemId: "acc-salesforce-crm",
     beneficiary: "Vanshika Sharma",
     onBehalf: true,
     justification: "Onboarding new marketing manager into sales pipeline review.",
@@ -98,7 +120,7 @@ async function runTestSuite() {
   const requiredUntil = tomorrow.toISOString().split("T")[0];
 
   const exceptionRes = await submitExceptionRequest({
-    accessItemId: "acc-4", // Zendesk
+    accessItemId: "acc-zendesk-helpdesk", // Zendesk
     reason: "Cross-team Project Collaboration",
     justification: "Debugging customer onboarding crash in staging environment.",
     requiredUntil,
@@ -163,7 +185,7 @@ async function runTestSuite() {
   await prisma.accessRequest.create({
     data: {
       id: expiredReqId,
-      accessItemId: "acc-4",
+      accessItemId: "acc-zendesk-helpdesk",
       accessLabel: "Zendesk – Customer Support Queue",
       requesterId: (await prisma.user.findFirst())!.id,
       beneficiaryName: "Test User",
@@ -187,35 +209,36 @@ async function runTestSuite() {
   // ── TEST SUITE 8: Access ID Governance & Duplicate Verification ──────────
   console.log("\n📁 SUITE 8: Access ID Governance & Duplicate Check");
   // Check duplicate for item with no ID (acc-3)
-  const dupCheckAcc3 = await checkDuplicateAccessId("acc-3");
+  const dupCheckAcc3 = await checkDuplicateAccessId("acc-monday-product");
   assert(dupCheckAcc3.isDuplicate === false, "Access ID", "acc-3 has no duplicate Access ID initially");
 
   // Request Access ID creation
-  const idReqRes = await requestAccessIdCreation("acc-3", "Manvi Mehta");
+  const idReqRes = await requestAccessIdCreation("acc-monday-product", "Manvi Mehta");
   assert(idReqRes.success === true && !!idReqRes.queueId, "Access ID", "Access ID request queued", idReqRes);
 
   // Check duplicate while in queue -> should detect pending
-  const dupCheckPending = await checkDuplicateAccessId("acc-3");
+  const dupCheckPending = await checkDuplicateAccessId("acc-monday-product");
   assert(dupCheckPending.isDuplicate === true, "Access ID", "Duplicate check catches already-queued request");
 
   // Admin approves Access ID
   const approveIdRes = await approveAccessId(idReqRes.queueId!, "Rahul Sharma");
   assert(approveIdRes.success === true && !!approveIdRes.accessId, "Access ID", "Admin approved and issued AC-XXXX", approveIdRes);
 
-  const acc3Updated = await prisma.accessItem.findUnique({ where: { id: "acc-3" } });
+  const acc3Updated = await prisma.accessItem.findUnique({ where: { id: "acc-monday-product" } });
   assert(acc3Updated?.accessId?.startsWith("AC-") === true, "Access ID", `acc-3 now has valid ID ${acc3Updated?.accessId}`);
 
   // Re-check duplicate on now-assigned item
-  const dupCheckCompleted = await checkDuplicateAccessId("acc-3");
+  const dupCheckCompleted = await checkDuplicateAccessId("acc-monday-product");
   assert(dupCheckCompleted.isDuplicate === true, "Access ID", "Duplicate check detects active Access ID on board");
+
 
   // ── TEST SUITE 9: Board Configuration & Automation Toggle ────────────────
   console.log("\n📁 SUITE 9: Board Configuration & Automation Toggle");
-  const toggleRes = await toggleAutomation("acc-2", "Rahul Sharma");
+  const toggleRes = await toggleAutomation("acc-salesforce-crm", "Rahul Sharma");
   assert(toggleRes.success === true, "Board Config", "Toggled automation on acc-2", toggleRes);
 
   const configRes = await updateAccessConfig(
-    "acc-2",
+    "acc-salesforce-crm",
     {
       approver: "Arjun Mehta",
       backupApprover: "Neha Kapoor",
@@ -225,10 +248,11 @@ async function runTestSuite() {
   );
   assert(configRes.success === true, "Board Config", "Updated board approver to Arjun Mehta");
 
-  const acc2Updated = await prisma.accessItem.findUnique({ where: { id: "acc-2" } });
+  const acc2Updated = await prisma.accessItem.findUnique({ where: { id: "acc-salesforce-crm" } });
   assert(acc2Updated?.approver === "Arjun Mehta", "Board Config", "Board configuration saved to DB");
 
   // ── TEST SUITE 10: Notifications & Audit Log ─────────────────────────────
+  // Admin session is still active from injection above.
   console.log("\n📁 SUITE 10: Notifications & Audit Log Trail");
   const notifs = await getNotifications();
   assert(notifs.length > 0, "Notifications", "Fetched notifications for current user", { count: notifs.length });
@@ -239,18 +263,21 @@ async function runTestSuite() {
   const auditLogs = await getAuditLogs(10);
   assert(auditLogs.length >= 5, "Audit Logs", "Audit logs captured chronological events", { count: auditLogs.length });
 
+  // Clear test session after privileged suites
+  setSessionForTesting(null);
+
   // ── TEST SUITE 11: Authentication & Credential Verification ──────────────
   console.log("\n📁 SUITE 11: Authentication & Credentials");
-  const loginValidRes = await login({ email: "admin@newage.com", password: "password123" });
-  assert(loginValidRes.success === true && loginValidRes.user?.name === "Master Admin", "Auth", "Login with valid credentials succeeded", loginValidRes.user);
+  const loginValidRes = await login({ email: "soujanyadasroy@gmail.com", password: "password123" });
+  assert(loginValidRes.success === true && loginValidRes.user?.name === "Soujanya Das Roy", "Auth", "Login with valid credentials succeeded", loginValidRes.user);
 
-  const loginAdminRes = await login({ email: "admin@newage.com", password: "password123" });
+  const loginAdminRes = await login({ email: "soujanyadasroy@gmail.com", password: "password123" });
   assert(loginAdminRes.success === true && loginAdminRes.user?.role === "ADMIN", "Auth", "Admin login succeeded with ADMIN role", loginAdminRes.user);
 
   const loginInvalidRes = await login({ email: "unknown@newage.com", password: "wrongpassword" });
   assert(loginInvalidRes.success === false, "Auth", "Login with invalid user correctly rejected");
 
-  const switchRes = await switchSessionUser("admin@newage.com");
+  const switchRes = await switchSessionUser("rahul.verma@newage.com");
   assert(switchRes.success === true, "Auth", "Session switch succeeded");
 
   // Test Signup
