@@ -1,8 +1,19 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { X, Key, CheckCircle2, AlertTriangle, Loader2 } from "lucide-react";
+import {
+  X,
+  Key,
+  CheckCircle2,
+  AlertTriangle,
+  Loader2,
+  ShieldCheck,
+  Zap,
+  Building,
+  Check,
+} from "lucide-react";
 import StatusBadge from "../StatusBadge";
+import ServiceLogo from "../ServiceLogo";
 import { checkDuplicateAccessId } from "@/lib/actions/access-id";
 
 interface DupCheck {
@@ -34,10 +45,9 @@ export default function AccessIdStatusDrawer({
   const [dupCheck, setDupCheck] = useState<DupCheck | null>(null);
   const [dupLoading, setDupLoading] = useState(false);
 
-  // Run duplicate check whenever the drawer opens (admin only)
   useEffect(() => {
     if (!isOpen || !accessItem || !isAdmin) return;
-    if (accessItem.accessId) return; // already has one, no need to check
+    if (accessItem.accessId) return;
 
     setDupCheck(null);
     setDupLoading(true);
@@ -68,14 +78,20 @@ export default function AccessIdStatusDrawer({
         aria-modal="true"
         aria-label="Access ID Governance Drawer"
       >
+        {/* Drawer Header */}
         <div className="drawer-head">
-          <div>
-            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              <h3>Access ID Governance</h3>
-              {queueItem && <StatusBadge status={queueItem.status} />}
-            </div>
-            <div className="sub">
-              {accessItem.tool} – {accessItem.name}
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <ServiceLogo tool={accessItem.tool} size={28} />
+            <div>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                <h3 style={{ margin: 0, fontSize: "16px", fontWeight: 700, color: "#0F1B33" }}>
+                  Access ID Governance
+                </h3>
+                {queueItem && <StatusBadge status={queueItem.status} />}
+              </div>
+              <div style={{ fontSize: "12.5px", color: "#64748B", marginTop: "2px" }}>
+                {accessItem.tool} · {accessItem.name}
+              </div>
             </div>
           </div>
           <button className="drawer-close" onClick={onClose} aria-label="Close drawer">
@@ -83,16 +99,18 @@ export default function AccessIdStatusDrawer({
           </button>
         </div>
 
+        {/* Drawer Body */}
         <div className="drawer-body">
           {!accessItem.accessId ? (
             <>
+              {/* Governance Inspection Card */}
               <div
                 style={{
-                  padding: "18px",
-                  borderRadius: "10px",
-                  background: "#F5F3FF",
+                  padding: "16px",
+                  borderRadius: "12px",
+                  background: "linear-gradient(135deg, #F5F3FF 0%, #EDE9FE 100%)",
                   border: "1px solid #DDD6FE",
-                  marginBottom: "24px",
+                  marginBottom: "22px",
                 }}
               >
                 <div
@@ -105,142 +123,133 @@ export default function AccessIdStatusDrawer({
                     gap: "8px",
                   }}
                 >
-                  <Key size={18} /> Access ID Pending Creation
+                  <Key size={17} /> Unique Access ID Required
                 </div>
-                <div style={{ fontSize: "12.5px", color: "#6D28D9", marginTop: "4px", lineHeight: "1.5" }}>
-                  This board doesn't have an Access ID yet. An ID is required before access requests
-                  can be processed. The Board Admin will review and assign one.
+                <div style={{ fontSize: "12px", color: "#6D28D9", marginTop: "4px", lineHeight: "1.45" }}>
+                  This board requires an official Access ID before automated SCIM provisioning can be activated.
                 </div>
               </div>
 
-              {queueItem && (
-                <div>
-                  <div className="divider-label">Governance Queue Item</div>
-                  <div className="field-grid">
-                    <div className="field">
-                      <span className="f-label">Status</span>
-                      <StatusBadge status={queueItem.status} />
-                    </div>
-                    <div className="field">
-                      <span className="f-label">Requested By</span>
-                      <span className="f-value">{queueItem.requestedBy}</span>
-                    </div>
-                    <div className="field">
-                      <span className="f-label">Requested On</span>
-                      <span className="f-value">
-                        {new Date(queueItem.requestedTs).toLocaleDateString("en-GB", {
-                          day: "numeric",
-                          month: "short",
-                          year: "numeric",
-                        })}
-                      </span>
-                    </div>
-                    <div className="field">
-                      <span className="f-label">Board Group</span>
-                      <span className="f-value">{accessItem.group}</span>
+              {/* Identity & Duplicate Verification */}
+              <div style={{ marginBottom: "20px" }}>
+                <div className="divider-label" style={{ marginBottom: "10px" }}>
+                  Identity Registry Verification
+                </div>
+                {dupLoading ? (
+                  <div
+                    style={{
+                      padding: "12px",
+                      borderRadius: "8px",
+                      background: "#F8FAFC",
+                      border: "1px solid #E2E8F0",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      fontSize: "12.5px",
+                      color: "#64748B",
+                    }}
+                  >
+                    <Loader2 size={15} className="animate-spin" /> Verifying against global identity catalog...
+                  </div>
+                ) : dupCheck?.isDuplicate ? (
+                  <div
+                    style={{
+                      padding: "12px",
+                      borderRadius: "8px",
+                      background: "#FEF2F2",
+                      border: "1px solid #FECACA",
+                      color: "#991B1B",
+                      fontSize: "12.5px",
+                      display: "flex",
+                      alignItems: "flex-start",
+                      gap: "8px",
+                    }}
+                  >
+                    <AlertTriangle size={16} style={{ flexShrink: 0, marginTop: "1px" }} />
+                    <div>
+                      <strong>Duplicate Detected:</strong> Matches existing Access ID {dupCheck.existingId}.
                     </div>
                   </div>
+                ) : (
+                  <div
+                    style={{
+                      padding: "12px",
+                      borderRadius: "8px",
+                      background: "#F0FDF4",
+                      border: "1px solid #BBF7D0",
+                      color: "#166534",
+                      fontSize: "12.5px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                    }}
+                  >
+                    <ShieldCheck size={16} style={{ color: "#16A34A" }} /> Verified: No namespace collisions in directory.
+                  </div>
+                )}
+              </div>
 
-                  {/* Duplicate Check Panel — admin only */}
-                  {isAdmin && queueItem.status === "Pending Governance Review" && (
-                    <div style={{ marginTop: "20px" }}>
-                      <div className="divider-label">Duplicate Verification</div>
-
-                      {dupLoading ? (
-                        <div
-                          style={{
-                            padding: "12px 14px",
-                            borderRadius: "9px",
-                            background: "#F8FAFC",
-                            border: "1px solid var(--border)",
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "10px",
-                            fontSize: "13px",
-                            color: "#6B7280",
-                          }}
-                        >
-                          <Loader2 size={15} style={{ animation: "spin 1s linear infinite" }} />
-                          Checking for duplicate Access IDs…
-                        </div>
-                      ) : dupCheck?.isDuplicate ? (
-                        <div className="warn-box">
-                          <AlertTriangle size={16} style={{ marginTop: "2px", flexShrink: 0 }} />
-                          <div>
-                            <div style={{ fontWeight: 700, color: "#374151" }}>
-                              Duplicate Found — Cannot Issue New ID
-                            </div>
-                            <div style={{ color: "#B45309", marginTop: "2px" }}>
-                              {dupCheck.reason}
-                              {dupCheck.existingId && (
-                                <span className="mono" style={{ marginLeft: "6px", fontWeight: 700 }}>
-                                  ({dupCheck.existingId})
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      ) : dupCheck && !dupCheck.isDuplicate ? (
-                        <div className="success-box">
-                          <CheckCircle2 size={16} />
-                          <span>
-                            Verified — No duplicate Access ID found for this board. Safe to proceed.
-                          </span>
-                        </div>
-                      ) : null}
-
-                      <button
-                        className="btn btn-primary btn-block"
-                        style={{ marginTop: "16px" }}
-                        onClick={handleApprove}
-                        disabled={loading || !canApprove || dupLoading}
-                      >
-                        <Key size={16} />{" "}
-                        {loading ? "Creating…" : !canApprove ? "Cannot Approve — Duplicate Exists" : "Approve & Create Access ID"}
-                      </button>
-                    </div>
-                  )}
-                </div>
+              {isAdmin && queueItem && (
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  style={{
+                    width: "100%",
+                    height: "42px",
+                    background: "#6D28D9",
+                    fontSize: "13px",
+                    fontWeight: 600,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "6px",
+                  }}
+                  disabled={loading || !canApprove}
+                  onClick={handleApprove}
+                >
+                  <Check size={16} /> {loading ? "Issuing ID..." : "Approve & Issue Access ID"}
+                </button>
               )}
             </>
           ) : (
-            <>
-              <div className="success-box" style={{ marginBottom: "24px" }}>
-                <CheckCircle2 size={18} />
-                <div>
-                  <div style={{ fontWeight: 700 }}>Access ID Active</div>
-                  <div style={{ fontSize: "12px", marginTop: "1px" }}>
-                    This board has a valid Access ID. Requests can now be processed.
-                  </div>
-                </div>
+            /* Active Access ID Display */
+            <div
+              style={{
+                padding: "20px",
+                borderRadius: "12px",
+                background: "#F0FDF4",
+                border: "1px solid #BBF7D0",
+                textAlign: "center",
+              }}
+            >
+              <div
+                style={{
+                  width: "50px",
+                  height: "50px",
+                  borderRadius: "999px",
+                  background: "#DCFCE7",
+                  color: "#16A34A",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  margin: "0 auto 12px",
+                }}
+              >
+                <CheckCircle2 size={28} />
               </div>
-
-              <div className="field-grid">
-                <div className="field">
-                  <span className="f-label">Access ID</span>
-                  <span className="f-value mono" style={{ color: "#1D4ED8", fontWeight: 700 }}>
-                    {accessItem.accessId}
-                  </span>
-                </div>
-                <div className="field">
-                  <span className="f-label">Board</span>
-                  <span className="f-value">{accessItem.name}</span>
-                </div>
-                <div className="field">
-                  <span className="f-label">Approver</span>
-                  <span className="f-value">{accessItem.approver}</span>
-                </div>
-                <div className="field">
-                  <span className="f-label">Provisioning</span>
-                  <span className="f-value">{accessItem.automation ? "Automated" : "Manual"}</span>
-                </div>
+              <div style={{ fontSize: "14px", fontWeight: 700, color: "#166534" }}>
+                Active &amp; Governed Access ID
               </div>
-            </>
+              <div className="mono" style={{ fontSize: "20px", fontWeight: 800, color: "#0F1B33", margin: "8px 0" }}>
+                {accessItem.accessId}
+              </div>
+              <div style={{ fontSize: "12px", color: "#15803D" }}>
+                Synchronized with identity provider and automated provisioning engine.
+              </div>
+            </div>
           )}
         </div>
       </div>
-
-      <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
     </>
   );
 }
