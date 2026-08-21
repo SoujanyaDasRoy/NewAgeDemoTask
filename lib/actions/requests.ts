@@ -28,6 +28,9 @@ export async function getRequests(filters?: {
   }
 }
 
+/**
+ * 1. Submit Standard Access Request (Atomic Transaction)
+ */
 export async function submitRequest(opts: {
   accessItemId: string;
   beneficiary: string;
@@ -37,135 +40,151 @@ export async function submitRequest(opts: {
   requesterEmail: string;
 }) {
   try {
-    const access = await prisma.accessItem.findUnique({
-      where: { id: opts.accessItemId },
-    });
-
-    if (!access) throw new Error("Access item not found");
-
-    let requester = await prisma.user.findUnique({
-      where: { email: opts.requesterEmail },
-    });
-
-    if (!requester) {
-      requester = await prisma.user.findFirst({
-        where: { name: opts.requesterName },
+    const result = await prisma.$transaction(async (tx) => {
+      const access = await tx.accessItem.findUnique({
+        where: { id: opts.accessItemId },
       });
-    }
 
-    if (!requester) {
-      requester = await prisma.user.create({
+      if (!access) throw new Error("Access item not found");
+
+      let requester = await tx.user.findUnique({
+        where: { email: opts.requesterEmail },
+      });
+
+      if (!requester) {
+        requester = await tx.user.findFirst({
+          where: { name: opts.requesterName },
+        });
+      }
+
+      if (!requester) {
+        requester = await tx.user.create({
+          data: {
+            name: opts.requesterName,
+            email: opts.requesterEmail || `user_${Date.now()}@newage.com`,
+            department: "Product Team",
+            initials: opts.requesterName
+              .split(" ")
+              .map((n) => n[0])
+              .join("")
+              .slice(0, 2)
+              .toUpperCase(),
+          },
+        });
+      }
+
+      // Generate NAR ID atomically
+      const count = await tx.accessRequest.count();
+      const requestId = `NAR-${10480 + count + 1}`;
+
+      const nowFormatted = new Date().toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+      });
+
+      const newReq = await tx.accessRequest.create({
         data: {
-          name: opts.requesterName,
-          email: opts.requesterEmail || `user_${Date.now()}@newage.com`,
-          department: "Product Team",
-          initials: opts.requesterName.split(" ").map((n) => n[0]).join("").slice(0, 2),
+          id: requestId,
+          accessItemId: access.id,
+          accessLabel: `${access.tool} – ${access.name}`,
+          requesterId: requester.id,
+          beneficiaryName: opts.beneficiary,
+          onBehalf: opts.onBehalf,
+          isException: false,
+          justification: opts.justification,
+          status: "PENDING_APPROVAL",
+          approverName: access.approver,
+          providerName: access.provider,
+          automation: access.automation,
+          timeline: {
+            create: [
+              {
+                label: "Request Submitted",
+                actor: opts.requesterName,
+                timestamp: nowFormatted,
+                state: "DONE",
+                orderIndex: 0,
+              },
+              {
+                label: "Pending Approval",
+                actor: access.approver,
+                timestamp: "—",
+                state: "CURRENT",
+                orderIndex: 1,
+              },
+              {
+                label: access.automation ? "Provisioning" : "Pending Manual Provisioning",
+                actor: "",
+                timestamp: "",
+                state: "PENDING",
+                orderIndex: 2,
+              },
+              {
+                label: opts.onBehalf ? "Access Provisioned" : "Completed",
+                actor: "",
+                timestamp: "",
+                state: "PENDING",
+                orderIndex: 3,
+              },
+            ],
+          },
         },
       });
-    }
 
-    // Generate NAR ID
-    const count = await prisma.accessRequest.count();
-    const requestId = `NAR-${10480 + count + 1}`;
-
-    const nowFormatted = new Date().toLocaleDateString("en-GB", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-    });
-
-    const newReq = await prisma.accessRequest.create({
-      data: {
-        id: requestId,
-        accessItemId: access.id,
-        accessLabel: `${access.tool} – ${access.name}`,
-        requesterId: requester.id,
-        beneficiaryName: opts.beneficiary,
-        onBehalf: opts.onBehalf,
-        isException: false,
-        justification: opts.justification,
-        status: "PENDING_APPROVAL",
-        approverName: access.approver,
-        providerName: access.provider,
-        automation: access.automation,
-        timeline: {
-          create: [
-            {
-              label: "Request Submitted",
-              actor: opts.requesterName,
-              timestamp: nowFormatted,
-              state: "DONE",
-              orderIndex: 0,
-            },
-            {
-              label: "Pending Approval",
-              actor: access.approver,
-              timestamp: "—",
-              state: "CURRENT",
-              orderIndex: 1,
-            },
-            {
-              label: access.automation ? "Provisioning" : "Pending Manual Provisioning",
-              actor: "",
-              timestamp: "",
-              state: "PENDING",
-              orderIndex: 2,
-            },
-            {
-              label: opts.onBehalf ? "Access Provisioned" : "Completed",
-              actor: "",
-              timestamp: "",
-              state: "PENDING",
-              orderIndex: 3,
-            },
-          ],
-        },
-      },
-    });
-
-    // Record audit
-    await prisma.auditLog.create({
-      data: {
-        action: "Request created",
-        userName: opts.requesterName,
-        detail: `${requestId} — ${access.tool} – ${access.name}`,
-      },
-    });
-
-    // Push notification to approver
-    if (access.approver !== opts.requesterName) {
-      await prisma.notification.create({
+      // Record audit log atomically
+      await tx.auditLog.create({
         data: {
-          role: access.approver === "Rahul Sharma" ? "admin" : "employee",
-          text: `New access request ${requestId} from ${opts.requesterName} awaiting your approval.`,
-          channel: "slack",
+          action: "Request created",
+          userId: requester.id,
+          userName: opts.requesterName,
+          detail: `${requestId} — ${access.tool} – ${access.name}`,
         },
       });
-    }
 
-    // Live Slack webhook notification (if SLACK_WEBHOOK_URL is configured in .env)
+      // Push notification atomically
+      if (access.approver !== opts.requesterName) {
+        await tx.notification.create({
+          data: {
+            role: access.approver === "Rahul Sharma" ? "admin" : "employee",
+            text: `New access request ${requestId} from ${opts.requesterName} awaiting your approval.`,
+            channel: "slack",
+          },
+        });
+      }
+
+      return { requestId, access };
+    });
+
+    // Post-transaction notifications
     sendSlackNotification({
-      requestId,
-      accessLabel: `${access.tool} – ${access.name}`,
+      requestId: result.requestId,
+      accessLabel: `${result.access.tool} – ${result.access.name}`,
       requesterName: opts.requesterName,
       beneficiaryName: opts.beneficiary,
       isException: false,
       justification: opts.justification,
-      approverName: access.approver,
-      automation: access.automation,
+      approverName: result.access.approver,
+      automation: result.access.automation,
       status: "Pending Approval",
     }).catch((e) => console.error("[Slack] Async notification error:", e));
 
-    try { revalidatePath("/"); } catch {}
-    return { success: true, requestId };
+    try {
+      revalidatePath("/");
+    } catch {}
+
+    return { success: true, requestId: result.requestId };
   } catch (error: any) {
     console.error("Failed to submit request:", error);
     return { success: false, error: error.message };
   }
 }
 
+/**
+ * 2. Submit Exception Access Request (Atomic Transaction)
+ */
 export async function submitExceptionRequest(opts: {
   accessItemId: string;
   reason: string;
@@ -176,158 +195,602 @@ export async function submitExceptionRequest(opts: {
   requesterEmail: string;
 }) {
   try {
-    const access = await prisma.accessItem.findUnique({
-      where: { id: opts.accessItemId },
-    });
+    const result = await prisma.$transaction(async (tx) => {
+      const access = await tx.accessItem.findUnique({
+        where: { id: opts.accessItemId },
+      });
 
-    if (!access) throw new Error("Access item not found");
+      if (!access) throw new Error("Access item not found");
 
-    let requester = await prisma.user.findFirst({
-      where: { name: opts.requesterName },
-    });
+      let requester = await tx.user.findFirst({
+        where: { name: opts.requesterName },
+      });
 
-    if (!requester) {
-      requester = await prisma.user.create({
+      if (!requester) {
+        requester = await tx.user.create({
+          data: {
+            name: opts.requesterName,
+            email: opts.requesterEmail || `user_${Date.now()}@newage.com`,
+            department: "Product Team",
+            initials: opts.requesterName
+              .split(" ")
+              .map((n) => n[0])
+              .join("")
+              .slice(0, 2)
+              .toUpperCase(),
+          },
+        });
+      }
+
+      const count = await tx.accessRequest.count();
+      const requestId = `NAR-${10480 + count + 1}`;
+
+      const nowFormatted = new Date().toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+      });
+
+      await tx.accessRequest.create({
         data: {
-          name: opts.requesterName,
-          email: opts.requesterEmail || `user_${Date.now()}@newage.com`,
-          department: "Product Team",
-          initials: opts.requesterName.split(" ").map((n) => n[0]).join("").slice(0, 2),
+          id: requestId,
+          accessItemId: access.id,
+          accessLabel: `${access.tool} – ${access.name}`,
+          requesterId: requester.id,
+          beneficiaryName: opts.requesterName,
+          onBehalf: false,
+          isException: true,
+          exceptionReason: opts.reason,
+          requiredUntil: opts.requiredUntil,
+          urgency: opts.urgency,
+          justification: opts.justification,
+          status: "PENDING_EXCEPTION_APPROVAL",
+          approverName: access.approver,
+          providerName: access.provider,
+          automation: access.automation,
+          timeline: {
+            create: [
+              {
+                label: "Exception Request Submitted",
+                actor: opts.requesterName,
+                timestamp: nowFormatted,
+                state: "DONE",
+                orderIndex: 0,
+              },
+              {
+                label: "Pending Exception Approval",
+                actor: access.approver,
+                timestamp: "—",
+                state: "CURRENT",
+                orderIndex: 1,
+              },
+              {
+                label: access.automation ? "Provisioning" : "Pending Manual Provisioning",
+                actor: "",
+                timestamp: "",
+                state: "PENDING",
+                orderIndex: 2,
+              },
+              {
+                label: "Completed",
+                actor: "",
+                timestamp: "",
+                state: "PENDING",
+                orderIndex: 3,
+              },
+            ],
+          },
         },
       });
-    }
 
-    const count = await prisma.accessRequest.count();
-    const requestId = `NAR-${10480 + count + 1}`;
-
-    const nowFormatted = new Date().toLocaleDateString("en-GB", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-    });
-
-    await prisma.accessRequest.create({
-      data: {
-        id: requestId,
-        accessItemId: access.id,
-        accessLabel: `${access.tool} – ${access.name}`,
-        requesterId: requester.id,
-        beneficiaryName: opts.requesterName,
-        onBehalf: false,
-        isException: true,
-        exceptionReason: opts.reason,
-        requiredUntil: opts.requiredUntil,
-        urgency: opts.urgency,
-        justification: opts.justification,
-        status: "PENDING_EXCEPTION_APPROVAL",
-        approverName: access.approver,
-        providerName: access.provider,
-        automation: access.automation,
-        timeline: {
-          create: [
-            {
-              label: "Exception Request Submitted",
-              actor: opts.requesterName,
-              timestamp: nowFormatted,
-              state: "DONE",
-              orderIndex: 0,
-            },
-            {
-              label: "Pending Exception Approval",
-              actor: access.approver,
-              timestamp: "—",
-              state: "CURRENT",
-              orderIndex: 1,
-            },
-            {
-              label: access.automation ? "Provisioning" : "Pending Manual Provisioning",
-              actor: "",
-              timestamp: "",
-              state: "PENDING",
-              orderIndex: 2,
-            },
-            {
-              label: "Completed",
-              actor: "",
-              timestamp: "",
-              state: "PENDING",
-              orderIndex: 3,
-            },
-          ],
+      // Audit log
+      await tx.auditLog.create({
+        data: {
+          action: "Exception request created",
+          userId: requester.id,
+          userName: opts.requesterName,
+          detail: `${requestId} — ${access.tool} – ${access.name} (outside ${access.group})`,
         },
-      },
+      });
+
+      // Notification
+      await tx.notification.create({
+        data: {
+          role: access.approver === "Rahul Sharma" ? "admin" : "employee",
+          text: `Access exception request ${requestId} from ${opts.requesterName} awaiting your review.`,
+          channel: "slack",
+        },
+      });
+
+      return { requestId, access };
     });
 
-    // Audit log
-    await prisma.auditLog.create({
-      data: {
-        action: "Exception request created",
-        userName: opts.requesterName,
-        detail: `${requestId} — ${access.tool} – ${access.name} (outside ${access.group})`,
-      },
-    });
-
-    // Notification
-    await prisma.notification.create({
-      data: {
-        role: access.approver === "Rahul Sharma" ? "admin" : "employee",
-        text: `Access exception request ${requestId} from ${opts.requesterName} awaiting your review.`,
-        channel: "slack",
-      },
-    });
-
-    // Live Slack webhook notification (if SLACK_WEBHOOK_URL is configured in .env)
     sendSlackNotification({
-      requestId,
-      accessLabel: `${access.tool} – ${access.name}`,
+      requestId: result.requestId,
+      accessLabel: `${result.access.tool} – ${result.access.name}`,
       requesterName: opts.requesterName,
       beneficiaryName: opts.requesterName,
       isException: true,
       urgency: opts.urgency,
       justification: `[${opts.reason}] ${opts.justification}`,
-      approverName: access.approver,
-      automation: access.automation,
+      approverName: result.access.approver,
+      automation: result.access.automation,
       status: "Pending Exception Approval",
     }).catch((e) => console.error("[Slack] Async notification error:", e));
 
-    try { revalidatePath("/"); } catch {}
-    return { success: true, requestId };
+    try {
+      revalidatePath("/");
+    } catch {}
+
+    return { success: true, requestId: result.requestId };
   } catch (error: any) {
     console.error("Failed to submit exception request:", error);
     return { success: false, error: error.message };
   }
 }
 
+/**
+ * 3. Approve Request (Atomic Transaction)
+ */
 export async function approveRequest(requestId: string, actingUserName: string) {
   try {
-    const r = await prisma.accessRequest.findUnique({
-      where: { id: requestId },
-      include: { timeline: { orderBy: { orderIndex: "asc" } }, accessItem: true },
+    const outcome = await prisma.$transaction(async (tx) => {
+      const r = await tx.accessRequest.findUnique({
+        where: { id: requestId },
+        include: {
+          timeline: { orderBy: { orderIndex: "asc" } },
+          accessItem: true,
+        },
+      });
+
+      if (!r) throw new Error(`Request ${requestId} not found`);
+
+      const nowFormatted = new Date().toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+      });
+
+      if (r.automation) {
+        const finalStatus = r.onBehalf ? "ACCESS_PROVISIONED" : "COMPLETED";
+
+        await tx.accessRequest.update({
+          where: { id: requestId },
+          data: { status: finalStatus },
+        });
+
+        // Update timeline atomically
+        await tx.timelineStep.deleteMany({ where: { requestId } });
+        await tx.timelineStep.createMany({
+          data: [
+            {
+              requestId,
+              label: r.timeline[0]?.label || "Request Submitted",
+              actor: r.timeline[0]?.actor || "Requester",
+              timestamp: r.timeline[0]?.timestamp || nowFormatted,
+              state: "DONE",
+              orderIndex: 0,
+            },
+            {
+              requestId,
+              label: "Approved",
+              actor: actingUserName || r.approverName,
+              timestamp: nowFormatted,
+              state: "DONE",
+              orderIndex: 1,
+            },
+            {
+              requestId,
+              label: "Access Automatically Provisioned",
+              actor: "Automated Provisioning",
+              timestamp: nowFormatted,
+              state: "DONE",
+              orderIndex: 2,
+            },
+            {
+              requestId,
+              label: r.onBehalf ? "Access Provisioned — awaiting closure" : "Completed",
+              actor: r.onBehalf ? "" : "System",
+              timestamp: r.onBehalf ? "" : nowFormatted,
+              state: r.onBehalf ? "CURRENT" : "DONE",
+              orderIndex: 3,
+            },
+          ],
+        });
+
+        // Notification
+        await tx.notification.create({
+          data: {
+            role: "employee",
+            text: `Access automatically provisioned for ${requestId} — ${r.accessLabel}.`,
+            channel: "portal",
+          },
+        });
+      } else {
+        // Manual flow
+        await tx.accessRequest.update({
+          where: { id: requestId },
+          data: { status: "PENDING_MANUAL_PROVISIONING" },
+        });
+
+        await tx.timelineStep.deleteMany({ where: { requestId } });
+        await tx.timelineStep.createMany({
+          data: [
+            {
+              requestId,
+              label: r.timeline[0]?.label || "Request Submitted",
+              actor: r.timeline[0]?.actor || "Requester",
+              timestamp: r.timeline[0]?.timestamp || nowFormatted,
+              state: "DONE",
+              orderIndex: 0,
+            },
+            {
+              requestId,
+              label: "Approved",
+              actor: actingUserName || r.approverName,
+              timestamp: nowFormatted,
+              state: "DONE",
+              orderIndex: 1,
+            },
+            {
+              requestId,
+              label: "Pending Manual Provisioning",
+              actor: r.providerName,
+              timestamp: "—",
+              state: "CURRENT",
+              orderIndex: 2,
+            },
+            {
+              requestId,
+              label: r.onBehalf ? "Access Provisioned" : "Completed",
+              actor: "",
+              timestamp: "",
+              state: "PENDING",
+              orderIndex: 3,
+            },
+          ],
+        });
+
+        // Notification to Admin
+        await tx.notification.create({
+          data: {
+            role: "admin",
+            text: `${requestId} (${r.accessLabel}) approved and ready for manual provisioning.`,
+            channel: "portal",
+          },
+        });
+      }
+
+      // Audit log atomically
+      await tx.auditLog.create({
+        data: {
+          action: "Request approved",
+          userName: actingUserName || r.approverName,
+          detail: `${requestId} — ${r.accessLabel}`,
+        },
+      });
+
+      return {
+        autoCompleted: r.automation && !r.onBehalf,
+        onBehalf: r.automation && r.onBehalf,
+      };
     });
 
-    if (!r) throw new Error("Request not found");
+    try {
+      revalidatePath("/");
+    } catch {}
 
-    const nowFormatted = new Date().toLocaleDateString("en-GB", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
+    return { success: true, ...outcome };
+  } catch (error: any) {
+    console.error("Failed to approve request:", error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * 4. Batch Approve Requests (Atomic Transaction)
+ */
+export async function batchApproveRequests(
+  requestIds: string[],
+  actingUserName: string
+) {
+  try {
+    if (!requestIds || requestIds.length === 0) {
+      return { success: true, count: 0, requestIds: [] };
+    }
+
+    const result = await prisma.$transaction(async (tx) => {
+      const nowFormatted = new Date().toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+      });
+
+      let approvedCount = 0;
+
+      for (const requestId of requestIds) {
+        const r = await tx.accessRequest.findUnique({
+          where: { id: requestId },
+          include: {
+            timeline: { orderBy: { orderIndex: "asc" } },
+            accessItem: true,
+          },
+        });
+
+        if (!r) continue;
+
+        if (r.automation) {
+          const finalStatus = r.onBehalf ? "ACCESS_PROVISIONED" : "COMPLETED";
+
+          await tx.accessRequest.update({
+            where: { id: requestId },
+            data: { status: finalStatus },
+          });
+
+          await tx.timelineStep.deleteMany({ where: { requestId } });
+          await tx.timelineStep.createMany({
+            data: [
+              {
+                requestId,
+                label: r.timeline[0]?.label || "Request Submitted",
+                actor: r.timeline[0]?.actor || "Requester",
+                timestamp: r.timeline[0]?.timestamp || nowFormatted,
+                state: "DONE",
+                orderIndex: 0,
+              },
+              {
+                requestId,
+                label: "Approved (Batch)",
+                actor: actingUserName || r.approverName,
+                timestamp: nowFormatted,
+                state: "DONE",
+                orderIndex: 1,
+              },
+              {
+                requestId,
+                label: "Access Automatically Provisioned",
+                actor: "Automated Provisioning",
+                timestamp: nowFormatted,
+                state: "DONE",
+                orderIndex: 2,
+              },
+              {
+                requestId,
+                label: r.onBehalf ? "Access Provisioned — awaiting closure" : "Completed",
+                actor: r.onBehalf ? "" : "System",
+                timestamp: r.onBehalf ? "" : nowFormatted,
+                state: r.onBehalf ? "CURRENT" : "DONE",
+                orderIndex: 3,
+              },
+            ],
+          });
+
+          await tx.notification.create({
+            data: {
+              role: "employee",
+              text: `Access automatically provisioned for ${requestId} — ${r.accessLabel} (Batch Approval).`,
+              channel: "portal",
+            },
+          });
+        } else {
+          // Manual provisioning path
+          await tx.accessRequest.update({
+            where: { id: requestId },
+            data: { status: "PENDING_MANUAL_PROVISIONING" },
+          });
+
+          await tx.timelineStep.deleteMany({ where: { requestId } });
+          await tx.timelineStep.createMany({
+            data: [
+              {
+                requestId,
+                label: r.timeline[0]?.label || "Request Submitted",
+                actor: r.timeline[0]?.actor || "Requester",
+                timestamp: r.timeline[0]?.timestamp || nowFormatted,
+                state: "DONE",
+                orderIndex: 0,
+              },
+              {
+                requestId,
+                label: "Approved (Batch)",
+                actor: actingUserName || r.approverName,
+                timestamp: nowFormatted,
+                state: "DONE",
+                orderIndex: 1,
+              },
+              {
+                requestId,
+                label: "Pending Manual Provisioning",
+                actor: r.providerName,
+                timestamp: "—",
+                state: "CURRENT",
+                orderIndex: 2,
+              },
+              {
+                requestId,
+                label: r.onBehalf ? "Access Provisioned" : "Completed",
+                actor: "",
+                timestamp: "",
+                state: "PENDING",
+                orderIndex: 3,
+              },
+            ],
+          });
+
+          await tx.notification.create({
+            data: {
+              role: "admin",
+              text: `${requestId} (${r.accessLabel}) batch-approved and queued for manual provisioning.`,
+              channel: "portal",
+            },
+          });
+        }
+
+        // Audit log
+        await tx.auditLog.create({
+          data: {
+            action: "Request approved (Batch)",
+            userName: actingUserName || r.approverName,
+            detail: `${requestId} — ${r.accessLabel} [Batch Operator: ${actingUserName}]`,
+          },
+        });
+
+        approvedCount++;
+      }
+
+      return approvedCount;
     });
 
-    if (r.automation) {
+    try {
+      revalidatePath("/");
+    } catch {}
+
+    return { success: true, count: result, requestIds };
+  } catch (error: any) {
+    console.error("Failed to batch approve requests:", error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * 5. Reject Request (Atomic Transaction)
+ */
+export async function rejectRequest(
+  requestId: string,
+  arg2: string,
+  arg3?: string
+) {
+  // Support both (requestId, reason, actingUserName) and (requestId, actingUserName, reason)
+  let reason = "Not specified";
+  let actingUserName = "Approver";
+
+  if (arg3 !== undefined) {
+    // If 3 arguments provided: let's determine which is user vs reason
+    if (arg2 && !arg2.includes(" ") && arg3.includes(" ")) {
+      actingUserName = arg2;
+      reason = arg3;
+    } else {
+      reason = arg2;
+      actingUserName = arg3;
+    }
+  } else {
+    reason = arg2 || "Not specified";
+  }
+
+  try {
+    await prisma.$transaction(async (tx) => {
+      const r = await tx.accessRequest.findUnique({
+        where: { id: requestId },
+        include: { timeline: { orderBy: { orderIndex: "asc" } } },
+      });
+
+      if (!r) throw new Error(`Request ${requestId} not found`);
+
+      const nowFormatted = new Date().toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+      });
+
+      await tx.accessRequest.update({
+        where: { id: requestId },
+        data: {
+          status: "REJECTED",
+          rejectionReason: reason || "Not specified",
+        },
+      });
+
+      // Update timeline atomically
+      await tx.timelineStep.deleteMany({ where: { requestId } });
+      await tx.timelineStep.createMany({
+        data: [
+          {
+            requestId,
+            label: r.timeline[0]?.label || "Request Submitted",
+            actor: r.timeline[0]?.actor || "Requester",
+            timestamp: r.timeline[0]?.timestamp || nowFormatted,
+            state: "DONE",
+            orderIndex: 0,
+          },
+          {
+            requestId,
+            label: `Rejected: ${reason || "Not specified"}`,
+            actor: actingUserName || r.approverName,
+            timestamp: nowFormatted,
+            state: "DONE",
+            orderIndex: 1,
+          },
+        ],
+      });
+
+      // Audit log
+      await tx.auditLog.create({
+        data: {
+          action: "Request rejected",
+          userName: actingUserName || r.approverName,
+          detail: `${requestId} — Reason: ${reason || "Not specified"}`,
+        },
+      });
+
+      // Notification
+      await tx.notification.create({
+        data: {
+          role: "employee",
+          text: `Your request ${requestId} was rejected by ${actingUserName || r.approverName}.`,
+          channel: "portal",
+        },
+      });
+    });
+
+    try {
+      revalidatePath("/");
+    } catch {}
+
+    return { success: true };
+  } catch (error: any) {
+    console.error("Failed to reject request:", error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * 6. Provision Manually (Atomic Transaction)
+ */
+export async function provisionManually(requestId: string, actingUserName: string) {
+  try {
+    const outcome = await prisma.$transaction(async (tx) => {
+      const r = await tx.accessRequest.findUnique({
+        where: { id: requestId },
+        include: { timeline: { orderBy: { orderIndex: "asc" } } },
+      });
+
+      if (!r) throw new Error(`Request ${requestId} not found`);
+
+      const nowFormatted = new Date().toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+      });
+
       const finalStatus = r.onBehalf ? "ACCESS_PROVISIONED" : "COMPLETED";
 
-      await prisma.accessRequest.update({
+      await tx.accessRequest.update({
         where: { id: requestId },
         data: { status: finalStatus },
       });
 
-      // Update timeline
-      await prisma.timelineStep.deleteMany({ where: { requestId } });
-      await prisma.timelineStep.createMany({
+      await tx.timelineStep.deleteMany({ where: { requestId } });
+      await tx.timelineStep.createMany({
         data: [
           {
             requestId,
@@ -341,14 +804,14 @@ export async function approveRequest(requestId: string, actingUserName: string) 
             requestId,
             label: "Approved",
             actor: r.approverName,
-            timestamp: nowFormatted,
+            timestamp: r.timeline[1]?.timestamp || nowFormatted,
             state: "DONE",
             orderIndex: 1,
           },
           {
             requestId,
-            label: "Access Automatically Provisioned",
-            actor: "Automated Provisioning",
+            label: "Access Provisioned",
+            actor: actingUserName || r.providerName,
             timestamp: nowFormatted,
             state: "DONE",
             orderIndex: 2,
@@ -364,306 +827,102 @@ export async function approveRequest(requestId: string, actingUserName: string) 
         ],
       });
 
+      // Audit log
+      await tx.auditLog.create({
+        data: {
+          action: "Access provisioned (manual)",
+          userName: actingUserName,
+          detail: `${requestId} — ${r.accessLabel}`,
+        },
+      });
+
       // Notification
-      await prisma.notification.create({
+      await tx.notification.create({
         data: {
           role: "employee",
-          text: `Access automatically provisioned for ${requestId} — ${r.accessLabel}.`,
+          text: `Access has been manually provisioned for ${requestId} (${r.accessLabel}).`,
           channel: "portal",
         },
       });
-    } else {
-      // Manual flow
-      await prisma.accessRequest.update({
-        where: { id: requestId },
-        data: { status: "PENDING_MANUAL_PROVISIONING" },
-      });
 
-      await prisma.timelineStep.deleteMany({ where: { requestId } });
-      await prisma.timelineStep.createMany({
-        data: [
-          {
-            requestId,
-            label: r.timeline[0]?.label || "Request Submitted",
-            actor: r.timeline[0]?.actor || "Requester",
-            timestamp: r.timeline[0]?.timestamp || nowFormatted,
-            state: "DONE",
-            orderIndex: 0,
-          },
-          {
-            requestId,
-            label: "Approved",
-            actor: r.approverName,
-            timestamp: nowFormatted,
-            state: "DONE",
-            orderIndex: 1,
-          },
-          {
-            requestId,
-            label: "Pending Manual Provisioning",
-            actor: r.providerName,
-            timestamp: "—",
-            state: "CURRENT",
-            orderIndex: 2,
-          },
-          {
-            requestId,
-            label: r.onBehalf ? "Access Provisioned" : "Completed",
-            actor: "",
-            timestamp: "",
-            state: "PENDING",
-            orderIndex: 3,
-          },
-        ],
-      });
-
-      // Notification to Admin
-      await prisma.notification.create({
-        data: {
-          role: "admin",
-          text: `${requestId} (${r.accessLabel}) is ready for manual provisioning.`,
-          channel: "portal",
-        },
-      });
-    }
-
-    // Audit log
-    await prisma.auditLog.create({
-      data: {
-        action: "Request approved",
-        userName: actingUserName || r.approverName,
-        detail: `${requestId} — ${r.accessLabel}`,
-      },
+      return { onBehalf: r.onBehalf };
     });
 
-    try { revalidatePath("/"); } catch {}
-    return { success: true };
-  } catch (error: any) {
-    console.error("Failed to approve request:", error);
-    return { success: false, error: error.message };
-  }
-}
+    try {
+      revalidatePath("/");
+    } catch {}
 
-export async function rejectRequest(
-  requestId: string,
-  reason: string,
-  actingUserName: string
-) {
-  try {
-    const r = await prisma.accessRequest.findUnique({
-      where: { id: requestId },
-      include: { timeline: { orderBy: { orderIndex: "asc" } } },
-    });
-
-    if (!r) throw new Error("Request not found");
-
-    const nowFormatted = new Date().toLocaleDateString("en-GB", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-    });
-
-    await prisma.accessRequest.update({
-      where: { id: requestId },
-      data: {
-        status: "REJECTED",
-        rejectionReason: reason || "Not specified",
-      },
-    });
-
-    // Update timeline
-    await prisma.timelineStep.deleteMany({ where: { requestId } });
-    await prisma.timelineStep.createMany({
-      data: [
-        {
-          requestId,
-          label: r.timeline[0]?.label || "Request Submitted",
-          actor: r.timeline[0]?.actor || "Requester",
-          timestamp: r.timeline[0]?.timestamp || nowFormatted,
-          state: "DONE",
-          orderIndex: 0,
-        },
-        {
-          requestId,
-          label: `Rejected: ${reason || "Not specified"}`,
-          actor: actingUserName || r.approverName,
-          timestamp: nowFormatted,
-          state: "DONE",
-          orderIndex: 1,
-        },
-      ],
-    });
-
-    // Audit log
-    await prisma.auditLog.create({
-      data: {
-        action: "Request rejected",
-        userName: actingUserName || r.approverName,
-        detail: `${requestId} — Reason: ${reason || "Not specified"}`,
-      },
-    });
-
-    // Notification
-    await prisma.notification.create({
-      data: {
-        role: "employee",
-        text: `Your request ${requestId} was rejected by ${actingUserName || r.approverName}.`,
-        channel: "portal",
-      },
-    });
-
-    try { revalidatePath("/"); } catch {}
-    return { success: true };
-  } catch (error: any) {
-    console.error("Failed to reject request:", error);
-    return { success: false, error: error.message };
-  }
-}
-
-export async function provisionManually(requestId: string, actingUserName: string) {
-  try {
-    const r = await prisma.accessRequest.findUnique({
-      where: { id: requestId },
-      include: { timeline: { orderBy: { orderIndex: "asc" } } },
-    });
-
-    if (!r) throw new Error("Request not found");
-
-    const nowFormatted = new Date().toLocaleDateString("en-GB", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-    });
-
-    const finalStatus = r.onBehalf ? "ACCESS_PROVISIONED" : "COMPLETED";
-
-    await prisma.accessRequest.update({
-      where: { id: requestId },
-      data: { status: finalStatus },
-    });
-
-    await prisma.timelineStep.deleteMany({ where: { requestId } });
-    await prisma.timelineStep.createMany({
-      data: [
-        {
-          requestId,
-          label: r.timeline[0]?.label || "Request Submitted",
-          actor: r.timeline[0]?.actor || "Requester",
-          timestamp: r.timeline[0]?.timestamp || nowFormatted,
-          state: "DONE",
-          orderIndex: 0,
-        },
-        {
-          requestId,
-          label: "Approved",
-          actor: r.approverName,
-          timestamp: r.timeline[1]?.timestamp || nowFormatted,
-          state: "DONE",
-          orderIndex: 1,
-        },
-        {
-          requestId,
-          label: "Access Provisioned",
-          actor: actingUserName || r.providerName,
-          timestamp: nowFormatted,
-          state: "DONE",
-          orderIndex: 2,
-        },
-        {
-          requestId,
-          label: r.onBehalf ? "Access Provisioned — awaiting closure" : "Completed",
-          actor: r.onBehalf ? "" : "System",
-          timestamp: r.onBehalf ? "" : nowFormatted,
-          state: r.onBehalf ? "CURRENT" : "DONE",
-          orderIndex: 3,
-        },
-      ],
-    });
-
-    // Audit log
-    await prisma.auditLog.create({
-      data: {
-        action: "Access provisioned (manual)",
-        userName: actingUserName,
-        detail: `${requestId} — ${r.accessLabel}`,
-      },
-    });
-
-    // Notification
-    await prisma.notification.create({
-      data: {
-        role: "employee",
-        text: `Access has been manually provisioned for ${requestId} (${r.accessLabel}).`,
-        channel: "portal",
-      },
-    });
-
-    try { revalidatePath("/"); } catch {}
-    return { success: true };
+    return { success: true, ...outcome };
   } catch (error: any) {
     console.error("Failed to provision manually:", error);
     return { success: false, error: error.message };
   }
 }
 
+// Alias provisionRequest to provisionManually for full naming consistency
+export const provisionRequest = provisionManually;
+
+/**
+ * 7. Close Request Action (Atomic Transaction)
+ */
 export async function closeRequestAction(requestId: string, actingUserName: string) {
   try {
-    const r = await prisma.accessRequest.findUnique({
-      where: { id: requestId },
-      include: { timeline: { orderBy: { orderIndex: "asc" } } },
+    await prisma.$transaction(async (tx) => {
+      const r = await tx.accessRequest.findUnique({
+        where: { id: requestId },
+        include: { timeline: { orderBy: { orderIndex: "asc" } } },
+      });
+
+      if (!r) throw new Error("Request not found");
+
+      const nowFormatted = new Date().toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+      });
+
+      await tx.accessRequest.update({
+        where: { id: requestId },
+        data: { status: "COMPLETED" },
+      });
+
+      const steps = r.timeline.map((s) => ({
+        requestId,
+        label: s.state === "CURRENT" ? "Access Provisioned" : s.label,
+        actor: s.actor,
+        timestamp: s.timestamp,
+        state: "DONE" as const,
+        orderIndex: s.orderIndex,
+      }));
+
+      steps.push({
+        requestId,
+        label: "Request Closed",
+        actor: actingUserName,
+        timestamp: nowFormatted,
+        state: "DONE" as const,
+        orderIndex: steps.length,
+      });
+
+      await tx.timelineStep.deleteMany({ where: { requestId } });
+      await tx.timelineStep.createMany({ data: steps });
+
+      // Audit log
+      await tx.auditLog.create({
+        data: {
+          action: "Request closed",
+          userName: actingUserName,
+          detail: `${requestId} — closed on behalf of ${r.beneficiaryName}`,
+        },
+      });
     });
 
-    if (!r) throw new Error("Request not found");
+    try {
+      revalidatePath("/");
+    } catch {}
 
-    const nowFormatted = new Date().toLocaleDateString("en-GB", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-    });
-
-    await prisma.accessRequest.update({
-      where: { id: requestId },
-      data: { status: "COMPLETED" },
-    });
-
-    // Replace awaiting closure step with Request Closed
-    const steps = r.timeline.map((s) => ({
-      requestId,
-      label: s.state === "CURRENT" ? "Access Provisioned" : s.label,
-      actor: s.actor,
-      timestamp: s.timestamp,
-      state: "DONE" as const,
-      orderIndex: s.orderIndex,
-    }));
-
-    steps.push({
-      requestId,
-      label: "Request Closed",
-      actor: actingUserName,
-      timestamp: nowFormatted,
-      state: "DONE" as const,
-      orderIndex: steps.length,
-    });
-
-    await prisma.timelineStep.deleteMany({ where: { requestId } });
-    await prisma.timelineStep.createMany({ data: steps });
-
-    // Audit log
-    await prisma.auditLog.create({
-      data: {
-        action: "Request closed",
-        userName: actingUserName,
-        detail: `${requestId} — closed on behalf of ${r.beneficiaryName}`,
-      },
-    });
-
-    try { revalidatePath("/"); } catch {}
     return { success: true };
   } catch (error: any) {
     console.error("Failed to close request:", error);
@@ -671,7 +930,9 @@ export async function closeRequestAction(requestId: string, actingUserName: stri
   }
 }
 
-// PART 4 IMPROVEMENT: Auto-expire requests past their requiredUntil date
+/**
+ * 8. Auto-expire requests past their requiredUntil date (Atomic per expired item)
+ */
 export async function autoExpireRequests() {
   try {
     const today = new Date().toISOString().split("T")[0]; // "YYYY-MM-DD"
@@ -682,26 +943,31 @@ export async function autoExpireRequests() {
       },
     });
 
-    // Filter in JS since SQLite string comparison works for ISO dates
     const expired = toExpire.filter(
       (r) => r.requiredUntil !== null && r.requiredUntil < today
     );
 
-    for (const r of expired) {
-      await prisma.accessRequest.update({
-        where: { id: r.id },
-        data: { status: "EXPIRED" },
+    if (expired.length > 0) {
+      await prisma.$transaction(async (tx) => {
+        for (const r of expired) {
+          await tx.accessRequest.update({
+            where: { id: r.id },
+            data: { status: "EXPIRED" },
+          });
+          await tx.auditLog.create({
+            data: {
+              action: "Access auto-expired",
+              userName: "System",
+              detail: `${r.id} — ${r.accessLabel}`,
+            },
+          });
+        }
       });
-      await prisma.auditLog.create({
-        data: {
-          action: "Access auto-expired",
-          userName: "System",
-          detail: `${r.id} — ${r.accessLabel}`,
-        },
-      });
+      try {
+        revalidatePath("/");
+      } catch {}
     }
 
-    if (expired.length > 0) try { revalidatePath("/"); } catch {}
     return { expiredCount: expired.length };
   } catch (error: any) {
     console.error("Failed to auto-expire requests:", error);
@@ -709,72 +975,81 @@ export async function autoExpireRequests() {
   }
 }
 
-// PART 4 IMPROVEMENT: Request 14-Day Extension
+/**
+ * 9. Request 14-Day Extension (Atomic Transaction)
+ */
 export async function requestExtension(
   requestId: string,
   days: number = 14,
   actingUserName: string
 ) {
   try {
-    const r = await prisma.accessRequest.findUnique({
-      where: { id: requestId },
+    const result = await prisma.$transaction(async (tx) => {
+      const r = await tx.accessRequest.findUnique({
+        where: { id: requestId },
+      });
+
+      if (!r) throw new Error("Request not found");
+
+      const baseDate = r.requiredUntil ? new Date(r.requiredUntil) : new Date();
+      baseDate.setDate(baseDate.getDate() + days);
+      const newDateStr = baseDate.toISOString().split("T")[0];
+
+      const nowFormatted = new Date().toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+      });
+
+      await tx.accessRequest.update({
+        where: { id: requestId },
+        data: {
+          requiredUntil: newDateStr,
+          status: "PENDING_EXCEPTION_APPROVAL",
+        },
+      });
+
+      await tx.timelineStep.create({
+        data: {
+          requestId,
+          label: `Extension Requested (+${days} days until ${newDateStr})`,
+          actor: actingUserName,
+          timestamp: nowFormatted,
+          state: "DONE",
+          orderIndex: 99,
+        },
+      });
+
+      await tx.auditLog.create({
+        data: {
+          action: `Access extension requested (+${days} days)`,
+          userName: actingUserName,
+          detail: `${requestId} — Extended to ${newDateStr}`,
+        },
+      });
+
+      await tx.notification.create({
+        data: {
+          role: "admin",
+          text: `Extension request for ${requestId} (${r.accessLabel}) awaiting review.`,
+          channel: "portal",
+        },
+      });
+
+      return newDateStr;
     });
 
-    if (!r) throw new Error("Request not found");
+    try {
+      revalidatePath("/");
+    } catch {}
 
-    // Calculate new requiredUntil date
-    const baseDate = r.requiredUntil ? new Date(r.requiredUntil) : new Date();
-    baseDate.setDate(baseDate.getDate() + days);
-    const newDateStr = baseDate.toISOString().split("T")[0];
-
-    const nowFormatted = new Date().toLocaleDateString("en-GB", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-    });
-
-    await prisma.accessRequest.update({
-      where: { id: requestId },
-      data: {
-        requiredUntil: newDateStr,
-        status: "PENDING_EXCEPTION_APPROVAL",
-      },
-    });
-
-    await prisma.timelineStep.create({
-      data: {
-        requestId,
-        label: `Extension Requested (+${days} days until ${newDateStr})`,
-        actor: actingUserName,
-        timestamp: nowFormatted,
-        state: "DONE",
-        orderIndex: 99,
-      },
-    });
-
-    await prisma.auditLog.create({
-      data: {
-        action: `Access extension requested (+${days} days)`,
-        userName: actingUserName,
-        detail: `${requestId} — Extended to ${newDateStr}`,
-      },
-    });
-
-    await prisma.notification.create({
-      data: {
-        role: "admin",
-        text: `Extension request for ${requestId} (${r.accessLabel}) awaiting review.`,
-        channel: "portal",
-      },
-    });
-
-    try { revalidatePath("/"); } catch {}
-    return { success: true, newDate: newDateStr };
+    return { success: true, newDate: result };
   } catch (error: any) {
     console.error("Failed to request extension:", error);
     return { success: false, error: error.message };
   }
 }
+
 

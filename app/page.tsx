@@ -24,6 +24,10 @@ import {
   Trash2,
   User,
   ChevronDown,
+  FileSpreadsheet,
+  Check,
+  X,
+  Layers,
 } from "lucide-react";
 
 import StatusBadge from "@/components/StatusBadge";
@@ -40,7 +44,9 @@ import ApprovalDetailDrawer from "@/components/drawers/ApprovalDetailDrawer";
 import AdminRequestDetailDrawer from "@/components/drawers/AdminRequestDetailDrawer";
 import BoardConfigDrawer from "@/components/drawers/BoardConfigDrawer";
 import AccessIdStatusDrawer from "@/components/drawers/AccessIdStatusDrawer";
+import AuditLogDrawer from "@/components/drawers/AuditLogDrawer";
 import SlackNotifCard from "@/components/SlackNotifCard";
+import SlackPreviewModal from "@/components/SlackPreviewModal";
 
 import {
   getCurrentUser,
@@ -62,6 +68,7 @@ import {
   closeRequestAction,
   requestExtension,
   autoExpireRequests,
+  batchApproveRequests,
 } from "@/lib/actions/requests";
 import {
   getAccessIdQueue,
@@ -107,6 +114,14 @@ function PortalDashboard() {
   const [directoryFilter, setDirectoryFilter] = useState<"ALL" | "AUTOMATED" | "BOARDS" | "APPLICATIONS">("ALL");
   const [userSearchQuery, setUserSearchQuery] = useState("");
   const [userDeptFilter, setUserDeptFilter] = useState("ALL");
+
+  // Multi-Select Batch Approvals State
+  const [selectedApprovalIds, setSelectedApprovalIds] = useState<string[]>([]);
+  const [batchApproving, setBatchApproving] = useState(false);
+
+  // Modals & Drawers State
+  const [auditDrawerOpen, setAuditDrawerOpen] = useState(false);
+  const [slackModalOpen, setSlackModalOpen] = useState(false);
 
   // Active drawers
   const [accessDetailsItem, setAccessDetailsItem] = useState<any>(null);
@@ -333,6 +348,110 @@ function PortalDashboard() {
     }
   };
 
+  // ── BATCH ACTIONS & SELECTION ─────────────────────────────────────────────
+  const toggleSelectApproval = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedApprovalIds((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  };
+
+  const handleSelectAllApprovals = () => {
+    if (selectedApprovalIds.length === pendingApprovals.length) {
+      setSelectedApprovalIds([]);
+    } else {
+      setSelectedApprovalIds(pendingApprovals.map((r) => r.id));
+    }
+  };
+
+  const handleBatchApprove = async () => {
+    if (!currentUser || selectedApprovalIds.length === 0) return;
+    setBatchApproving(true);
+    try {
+      const res = await batchApproveRequests(selectedApprovalIds, currentUser.name);
+      if (res.success) {
+        pushToast(`⚡ Successfully approved ${res.count} requests in atomic batch!`);
+        setSelectedApprovalIds([]);
+        await loadData();
+      } else {
+        pushToast(res.error || "Failed to batch approve requests", "error");
+      }
+    } catch (err: any) {
+      pushToast(err.message || "Batch approval error", "error");
+    } finally {
+      setBatchApproving(false);
+    }
+  };
+
+  // ── 1-CLICK SOC2/ISO-27001 COMPLIANCE CSV EXPORT ──────────────────────────
+  const handleExportComplianceCSV = () => {
+    const headers = [
+      "Request ID",
+      "Access Item",
+      "Tool",
+      "Category",
+      "Access ID",
+      "Requester Name",
+      "Requester Email",
+      "Beneficiary Name",
+      "Department",
+      "Status",
+      "Approver Name",
+      "Provider Name",
+      "Provisioning Method",
+      "Is Exception",
+      "Exception Reason",
+      "Urgency",
+      "Required Until",
+      "Business Justification",
+      "Created Date",
+      "Updated Date",
+      "SOC2 / ISO-27001 Compliance Status",
+    ];
+
+    const rows = requests.map((r) => [
+      r.id,
+      r.accessItem?.name || r.accessLabel,
+      r.accessItem?.tool || "Tool",
+      r.accessItem?.category || "BOARD",
+      r.accessItem?.accessId || "N/A",
+      r.requester?.name || "Unknown",
+      r.requester?.email || "Unknown",
+      r.beneficiaryName,
+      r.requester?.department || "General",
+      r.status,
+      r.approverName,
+      r.providerName,
+      r.automation ? "Automated SCIM" : "Manual Provisioning",
+      r.isException ? "YES" : "NO",
+      r.exceptionReason || "N/A",
+      r.urgency || "STANDARD",
+      r.requiredUntil || "Indefinite",
+      (r.justification || "").replace(/"/g, '""').replace(/\n/g, " "),
+      new Date(r.createdAt).toISOString(),
+      new Date(r.updatedAt || r.createdAt).toISOString(),
+      "COMPLIANT & LOGGED",
+    ]);
+
+    const csvString =
+      "\uFEFF" +
+      [headers, ...rows]
+        .map((row) => row.map((val) => `"${String(val ?? "").replace(/"/g, '""')}"`).join(","))
+        .join("\r\n");
+
+    const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `newage-soc2-iso27001-compliance-export-${new Date().toISOString().split("T")[0]}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    pushToast("📥 SOC2 / ISO-27001 Compliance CSV exported successfully!");
+  };
+
   const handleExtension = async (id: string, days: number, reason: string) => {
     const res = await requestExtension(id, days, reason);
     if (res.success) {
@@ -507,6 +626,63 @@ function PortalDashboard() {
               >
                 <Zap size={11} /> {pendingApprovals.length} Pending
               </span>
+            )}
+
+            {/* Quick Action Utility Buttons */}
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={() => setAuditDrawerOpen(true)}
+              style={{
+                fontSize: "12px",
+                height: "32px",
+                padding: "0 10px",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "5px",
+              }}
+              title="Open Live Audit & Compliance Trail Stream"
+            >
+              <Shield size={13} style={{ color: "#2563EB" }} /> Audit Trail
+            </button>
+
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={() => setSlackModalOpen(true)}
+              style={{
+                fontSize: "12px",
+                height: "32px",
+                padding: "0 10px",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "5px",
+              }}
+              title="Interactive Slack Webhook & Block Kit Simulator"
+            >
+              <MessageSquare size={13} style={{ color: "#E01E5A" }} /> Slack Preview
+            </button>
+
+            {isRoleAdmin && (
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={handleExportComplianceCSV}
+                style={{
+                  fontSize: "12px",
+                  height: "32px",
+                  padding: "0 10px",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "5px",
+                  color: "#166534",
+                  borderColor: "#BBF7D0",
+                  background: "#F0FDF4",
+                }}
+                title="1-Click SOC2/ISO-27001 Access Compliance CSV Export"
+              >
+                <FileSpreadsheet size={13} style={{ color: "#16A34A" }} /> Export CSV
+              </button>
             )}
 
             {/* Role Badge with Live Pulse Dot */}
@@ -1185,9 +1361,26 @@ function PortalDashboard() {
                     </div>
                   </div>
                   {pendingApprovals.length > 0 && (
-                    <span className="badge badge-amber" style={{ fontWeight: 600 }}>
-                      {pendingApprovals.length} pending
-                    </span>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                      <button
+                        type="button"
+                        className="btn btn-secondary"
+                        onClick={handleSelectAllApprovals}
+                        style={{
+                          height: "26px",
+                          fontSize: "11px",
+                          padding: "0 8px",
+                          fontWeight: 600,
+                        }}
+                      >
+                        {selectedApprovalIds.length === pendingApprovals.length
+                          ? "Deselect All"
+                          : `Select All (${pendingApprovals.length})`}
+                      </button>
+                      <span className="badge badge-amber" style={{ fontWeight: 600 }}>
+                        {pendingApprovals.length} pending
+                      </span>
+                    </div>
                   )}
                 </div>
 
@@ -1201,82 +1394,115 @@ function PortalDashboard() {
                   </div>
                 ) : (
                   <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                    {pendingApprovals.map((req) => (
-                      <div
-                        key={req.id}
-                        className="list-row"
-                        style={{ borderLeft: "3px solid #D97706" }}
-                        onClick={() => setApprovalRequest(req)}
-                      >
+                    {pendingApprovals.map((req) => {
+                      const isSelected = selectedApprovalIds.includes(req.id);
+                      return (
                         <div
-                          className="avatar"
+                          key={req.id}
+                          className="list-row"
                           style={{
-                            width: "32px",
-                            height: "32px",
-                            fontSize: "11px",
-                            background: "#0F1B33",
-                            color: "#fff",
-                            fontWeight: 600,
-                            flexShrink: 0,
+                            borderLeft: isSelected ? "3px solid #16A34A" : "3px solid #D97706",
+                            background: isSelected ? "#F0FDF4" : undefined,
+                            transition: "all 0.15s ease",
                           }}
+                          onClick={() => setApprovalRequest(req)}
                         >
-                          {(req.requester?.name || req.beneficiaryName || "NA")
-                            .split(" ")
-                            .map((n: string) => n[0])
-                            .join("")
-                            .slice(0, 2)
-                            .toUpperCase()}
-                        </div>
-                        <div style={{ flex: 1, minWidth: 0 }}>
+                          {/* Multi-Select Checkbox */}
                           <div
+                            onClick={(e) => toggleSelectApproval(req.id, e)}
                             style={{
+                              width: "20px",
+                              height: "20px",
+                              borderRadius: "5px",
+                              border: isSelected ? "2px solid #16A34A" : "2px solid #CBD5E1",
+                              background: isSelected ? "#16A34A" : "#FFFFFF",
                               display: "flex",
                               alignItems: "center",
-                              gap: "8px",
-                              flexWrap: "wrap",
+                              justifyContent: "center",
+                              cursor: "pointer",
+                              flexShrink: 0,
+                              transition: "all 0.15s ease",
+                            }}
+                            title={isSelected ? "Deselect request" : "Select request for batch approval"}
+                          >
+                            {isSelected && <Check size={13} style={{ color: "#FFFFFF", strokeWidth: 3 }} />}
+                          </div>
+
+                          <div
+                            className="avatar"
+                            style={{
+                              width: "32px",
+                              height: "32px",
+                              fontSize: "11px",
+                              background: "#0F1B33",
+                              color: "#fff",
+                              fontWeight: 600,
+                              flexShrink: 0,
                             }}
                           >
-                            <span
+                            {(req.requester?.name || req.beneficiaryName || "NA")
+                              .split(" ")
+                              .map((n: string) => n[0])
+                              .join("")
+                              .slice(0, 2)
+                              .toUpperCase()}
+                          </div>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div
                               style={{
-                                fontSize: "13.5px",
-                                fontWeight: 600,
-                                color: "#0F1B33",
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "8px",
+                                flexWrap: "wrap",
                               }}
                             >
-                              {req.accessLabel}
-                            </span>
-                            <StatusBadge status={req.status} />
+                              <span
+                                style={{
+                                  fontSize: "13.5px",
+                                  fontWeight: 600,
+                                  color: "#0F1B33",
+                                }}
+                              >
+                                {req.accessLabel}
+                              </span>
+                              <StatusBadge status={req.status} />
+                              {req.isException && (
+                                <span className="badge badge-amber" style={{ fontSize: "10.5px" }}>
+                                  Exception
+                                </span>
+                              )}
+                            </div>
+                            <div style={{ fontSize: "12px", color: "#64748B", marginTop: "4px" }}>
+                              <span className="mono">{req.id}</span> ·{" "}
+                              {req.requester?.name || req.beneficiaryName} ·{" "}
+                              {new Date(req.createdAt).toLocaleDateString("en-GB", {
+                                day: "numeric",
+                                month: "short",
+                                year: "numeric",
+                              })}
+                            </div>
                           </div>
-                          <div style={{ fontSize: "12px", color: "#64748B", marginTop: "4px" }}>
-                            <span className="mono">{req.id}</span> ·{" "}
-                            {req.requester?.name || req.beneficiaryName} ·{" "}
-                            {new Date(req.createdAt).toLocaleDateString("en-GB", {
-                              day: "numeric",
-                              month: "short",
-                              year: "numeric",
-                            })}
-                          </div>
-                        </div>
 
-                        {/* Inline Quick Action Buttons */}
-                        <div className="quick-action-wrap" onClick={(e) => e.stopPropagation()}>
-                          <button
-                            className="quick-action-btn quick-action-approve"
-                            title="1-Click Approve"
-                            onClick={() => handleApprove(req.id)}
-                          >
-                            ✓ Approve
-                          </button>
-                          <button
-                            className="quick-action-btn quick-action-reject"
-                            title="Reject"
-                            onClick={() => setApprovalRequest(req)}
-                          >
-                            ✕ Reject
-                          </button>
+                          {/* Inline Quick Action Buttons */}
+                          <div className="quick-action-wrap" onClick={(e) => e.stopPropagation()}>
+                            <button
+                              className="quick-action-btn quick-action-approve"
+                              title="1-Click Approve"
+                              onClick={() => handleApprove(req.id)}
+                            >
+                              ✓ Approve
+                            </button>
+                            <button
+                              className="quick-action-btn quick-action-reject"
+                              title="Reject"
+                              onClick={() => setApprovalRequest(req)}
+                            >
+                              ✕ Reject
+                            </button>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -1368,6 +1594,7 @@ function PortalDashboard() {
         {/* ── ADMIN VIEW ──────────────────────────────────────────── */}
         {isRoleAdmin && (
           <>
+          <div className="grid-2">
             {/* 1. Admin's My Requests */}
             <div className="card">
               <div className="section-head">
@@ -1490,6 +1717,171 @@ function PortalDashboard() {
                 </div>
               )}
             </div>
+
+            {/* Approvals Requiring My Action (Admin View with Batch Select) */}
+            <div className="card card-tinted-amber">
+              <div className="section-head">
+                <div className="section-head-left">
+                  <div
+                    className="section-icon"
+                    style={{ background: "#FEF3C7", color: "#D97706" }}
+                  >
+                    <CheckSquare size={18} />
+                  </div>
+                  <div>
+                    <div className="section-title">Approvals Requiring My Action</div>
+                    <div className="section-sub">
+                      Pending employee requests waiting for approval decisions.
+                    </div>
+                  </div>
+                </div>
+                {pendingApprovals.length > 0 && (
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      onClick={handleSelectAllApprovals}
+                      style={{
+                        height: "26px",
+                        fontSize: "11px",
+                        padding: "0 8px",
+                        fontWeight: 600,
+                      }}
+                    >
+                      {selectedApprovalIds.length === pendingApprovals.length
+                        ? "Deselect All"
+                        : `Select All (${pendingApprovals.length})`}
+                    </button>
+                    <span className="badge badge-amber" style={{ fontWeight: 600 }}>
+                      {pendingApprovals.length} pending
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {pendingApprovals.length === 0 ? (
+                <div className="empty-state">
+                  <div className="circle">
+                    <CheckSquare size={20} />
+                  </div>
+                  <div className="title">All clear</div>
+                  <div className="sub">No requests pending your approval right now.</div>
+                </div>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                  {pendingApprovals.map((req) => {
+                    const isSelected = selectedApprovalIds.includes(req.id);
+                    return (
+                      <div
+                        key={req.id}
+                        className="list-row"
+                        style={{
+                          borderLeft: isSelected ? "3px solid #16A34A" : "3px solid #D97706",
+                          background: isSelected ? "#F0FDF4" : undefined,
+                          transition: "all 0.15s ease",
+                        }}
+                        onClick={() => setApprovalRequest(req)}
+                      >
+                        {/* Multi-Select Checkbox */}
+                        <div
+                          onClick={(e) => toggleSelectApproval(req.id, e)}
+                          style={{
+                            width: "20px",
+                            height: "20px",
+                            borderRadius: "5px",
+                            border: isSelected ? "2px solid #16A34A" : "2px solid #CBD5E1",
+                            background: isSelected ? "#16A34A" : "#FFFFFF",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            cursor: "pointer",
+                            flexShrink: 0,
+                            transition: "all 0.15s ease",
+                          }}
+                          title={isSelected ? "Deselect request" : "Select request for batch approval"}
+                        >
+                          {isSelected && <Check size={13} style={{ color: "#FFFFFF", strokeWidth: 3 }} />}
+                        </div>
+
+                        <div
+                          className="avatar"
+                          style={{
+                            width: "32px",
+                            height: "32px",
+                            fontSize: "11px",
+                            background: "#0F1B33",
+                            color: "#fff",
+                            fontWeight: 600,
+                            flexShrink: 0,
+                          }}
+                        >
+                          {(req.requester?.name || req.beneficiaryName || "NA")
+                            .split(" ")
+                            .map((n: string) => n[0])
+                            .join("")
+                            .slice(0, 2)
+                            .toUpperCase()}
+                        </div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "8px",
+                              flexWrap: "wrap",
+                            }}
+                          >
+                            <span
+                              style={{
+                                fontSize: "13.5px",
+                                fontWeight: 600,
+                                color: "#0F1B33",
+                              }}
+                            >
+                              {req.accessLabel}
+                            </span>
+                            <StatusBadge status={req.status} />
+                            {req.isException && (
+                              <span className="badge badge-amber" style={{ fontSize: "10.5px" }}>
+                                Exception
+                              </span>
+                            )}
+                          </div>
+                          <div style={{ fontSize: "12px", color: "#64748B", marginTop: "4px" }}>
+                            <span className="mono">{req.id}</span> ·{" "}
+                            {req.requester?.name || req.beneficiaryName} ·{" "}
+                            {new Date(req.createdAt).toLocaleDateString("en-GB", {
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                            })}
+                          </div>
+                        </div>
+
+                        {/* Inline Quick Action Buttons */}
+                        <div className="quick-action-wrap" onClick={(e) => e.stopPropagation()}>
+                          <button
+                            className="quick-action-btn quick-action-approve"
+                            title="1-Click Approve"
+                            onClick={() => handleApprove(req.id)}
+                          >
+                            ✓ Approve
+                          </button>
+                          <button
+                            className="quick-action-btn quick-action-reject"
+                            title="Reject"
+                            onClick={() => setApprovalRequest(req)}
+                          >
+                            ✕ Reject
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
 
             {/* 2. My Boards / Access */}
             <div className="card">
@@ -1751,6 +2143,46 @@ function PortalDashboard() {
                       Control employee access tiers and assign Board Admin permissions ({allUsers.length} registered users)
                     </div>
                   </div>
+                </div>
+
+                <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "center" }}>
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={handleExportComplianceCSV}
+                    style={{
+                      fontSize: "12px",
+                      height: "32px",
+                      padding: "0 12px",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      color: "#166534",
+                      background: "#F0FDF4",
+                      borderColor: "#BBF7D0",
+                      fontWeight: 600,
+                    }}
+                    title="Generate & Download 1-Click SOC2/ISO-27001 Access Compliance CSV"
+                  >
+                    <FileSpreadsheet size={14} style={{ color: "#16A34A" }} /> Export Compliance CSV
+                  </button>
+
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={() => setAuditDrawerOpen(true)}
+                    style={{
+                      fontSize: "12px",
+                      height: "32px",
+                      padding: "0 12px",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      fontWeight: 600,
+                    }}
+                  >
+                    <Shield size={14} style={{ color: "#2563EB" }} /> View Audit Trail
+                  </button>
                 </div>
               </div>
 
@@ -2089,6 +2521,129 @@ function PortalDashboard() {
           isAdmin={isRoleAdmin}
         />
       )}
+
+      {/* ── ⚡ FLOATING BATCH APPROVAL BAR (Multi-Select) ─────────────────── */}
+      {selectedApprovalIds.length > 0 && (
+        <div
+          className="floating-batch-bar"
+          style={{
+            position: "fixed",
+            bottom: "28px",
+            left: "50%",
+            transform: "translateX(-50%)",
+            zIndex: 50,
+            background: "rgba(15, 23, 42, 0.96)",
+            backdropFilter: "blur(20px)",
+            color: "#FFFFFF",
+            padding: "10px 18px",
+            borderRadius: "14px",
+            boxShadow: "0 20px 45px -10px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.15)",
+            display: "flex",
+            alignItems: "center",
+            gap: "14px",
+            animation: "fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <div
+              style={{
+                background: "#2563EB",
+                borderRadius: "6px",
+                width: "24px",
+                height: "24px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "12px",
+                fontWeight: 800,
+              }}
+            >
+              {selectedApprovalIds.length}
+            </div>
+            <span style={{ fontSize: "13px", fontWeight: 600, color: "#E2E8F0" }}>
+              Selected {selectedApprovalIds.length} of {pendingApprovals.length} requests
+            </span>
+          </div>
+
+          <div style={{ width: "1px", height: "20px", background: "rgba(255, 255, 255, 0.2)" }} />
+
+          <button
+            type="button"
+            onClick={handleSelectAllApprovals}
+            style={{
+              background: "rgba(255, 255, 255, 0.08)",
+              border: "1px solid rgba(255, 255, 255, 0.15)",
+              color: "#CBD5E1",
+              fontSize: "12px",
+              fontWeight: 600,
+              borderRadius: "6px",
+              cursor: "pointer",
+              padding: "4px 10px",
+            }}
+          >
+            {selectedApprovalIds.length === pendingApprovals.length ? "Deselect All" : "Select All"}
+          </button>
+
+          <button
+            type="button"
+            disabled={batchApproving}
+            onClick={handleBatchApprove}
+            className="btn btn-primary"
+            style={{
+              background: "linear-gradient(135deg, #16A34A 0%, #15803D 100%)",
+              color: "#FFFFFF",
+              border: "none",
+              borderRadius: "8px",
+              padding: "7px 16px",
+              fontSize: "13px",
+              fontWeight: 700,
+              cursor: "pointer",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "6px",
+              boxShadow: "0 4px 12px rgba(22, 163, 74, 0.35)",
+            }}
+          >
+            <Zap size={14} className={batchApproving ? "animate-spin" : ""} />
+            {batchApproving ? "Approving Batch..." : `⚡ Approve Selected (${selectedApprovalIds.length})`}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setSelectedApprovalIds([])}
+            style={{
+              background: "transparent",
+              border: "none",
+              color: "#94A3B8",
+              cursor: "pointer",
+              padding: "4px",
+              display: "flex",
+              alignItems: "center",
+            }}
+            title="Dismiss selection"
+          >
+            <X size={16} />
+          </button>
+        </div>
+      )}
+
+      {/* ── LIVE AUDIT TRAIL STREAM DRAWER ─────────────────────── */}
+      <AuditLogDrawer
+        isOpen={auditDrawerOpen}
+        onClose={() => setAuditDrawerOpen(false)}
+        auditLogs={auditLogs}
+        onRefresh={loadData}
+      />
+
+      {/* ── INTERACTIVE SLACK WEBHOOK SIMULATOR ─────────────────── */}
+      <SlackPreviewModal
+        isOpen={slackModalOpen}
+        onClose={() => setSlackModalOpen(false)}
+        requests={requests}
+        onApprove={handleApprove}
+        onReject={handleReject}
+        onTriggerToast={pushToast}
+      />
 
       {/* COMMAND PALETTE SPOTLIGHT MODAL (⌘K / Ctrl+K) */}
       <CommandPalette
