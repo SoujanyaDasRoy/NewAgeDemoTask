@@ -1146,14 +1146,15 @@ function PortalDashboard() {
                 padding: "0 16px",
                 display: "flex",
                 alignItems: "center",
-                gap: "5px",
+                gap: "6px",
                 flexShrink: 0,
               }}
               onClick={() => {
                 if (catalog.length > 0) setRequestFormItem(catalog[0]);
               }}
             >
-              <Plus size={14} /> + Request Access
+              <Plus size={14} strokeWidth={2.4} />
+              <span>Request Access</span>
             </button>
           </div>
 
@@ -1202,63 +1203,86 @@ function PortalDashboard() {
                 style={{
                   display: "flex",
                   flexDirection: "column",
-                  gap: "8px",
-                  marginTop: "12px",
+                  gap: "10px",
+                  marginTop: "14px",
                 }}
               >
                 {searchResults.map((item) => (
                   <div
                     key={item.id}
-                    className="result-row"
+                    className="result-row catalog-row"
                     onClick={() => setAccessDetailsItem(item)}
                   >
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "6px",
-                          flexWrap: "wrap",
-                        }}
-                      >
-                        <ServiceLogo tool={item.tool} size={16} />
+                    {/* Left: 38px Rounded Service Logo Container */}
+                    <div className="catalog-logo-container">
+                      <ServiceLogo tool={item.tool} size={20} />
+                    </div>
+
+                    {/* Center: Title, Chips, Description & Structured Metadata */}
+                    <div className="catalog-content">
+                      {/* Header Line */}
+                      <div className="catalog-header-line">
                         <span className="result-title">
                           {item.name}
                         </span>
-                        <span className="board-tool-chip" style={{ fontSize: "10.5px" }}>
+                        <span className="catalog-tool-chip">
                           {item.tool}
                         </span>
-                        <span className="badge badge-gray" style={{ fontSize: "10.5px" }}>
+                        <span className="catalog-category-tag">
                           {item.category === "APPLICATION" ? "Application" : "Board"}
                         </span>
                         {item.automation ? (
-                          <span className="badge badge-blue" style={{ fontSize: "10.5px" }}>
-                            <Zap size={9} /> Auto
+                          <span className="catalog-scim-pill automated">
+                            <Zap size={11} strokeWidth={2.5} />
+                            <span>⚡ Automated SCIM</span>
                           </span>
                         ) : (
-                          <span className="badge badge-gray" style={{ fontSize: "10.5px" }}>Manual</span>
+                          <span className="catalog-scim-pill manual">
+                            Manual
+                          </span>
                         )}
                       </div>
+
+                      {/* Description with High-Legibility Contrast */}
                       <div className="result-desc">{item.description}</div>
-                      <div className="result-meta">
-                        <span>Group: {item.group}</span>
-                        <span>Approver: {item.approver}</span>
-                        {item.accessId && <span className="mono">ID: {item.accessId}</span>}
-                        <span>
-                          {item.isEligible ? (
-                            <span style={{ color: "#166534", fontWeight: 600 }}>✓ Eligible</span>
-                          ) : (
-                            <span style={{ color: "#92400E", fontWeight: 600 }}>
-                              Exception Required
-                            </span>
-                          )}
-                        </span>
+
+                      {/* Distinct Clean Badge Pills for Metadata */}
+                      <div className="catalog-meta-pills">
+                        <div className="catalog-meta-pill">
+                          <span className="meta-pill-label">Group:</span>
+                          <span className="meta-pill-val">{item.group}</span>
+                        </div>
+
+                        <div className="catalog-meta-pill">
+                          <span className="meta-pill-label">Approver:</span>
+                          <span className="meta-pill-val">{item.approver}</span>
+                        </div>
+
+                        {item.accessId && (
+                          <div className="catalog-meta-pill">
+                            <span className="meta-pill-label">ID:</span>
+                            <span className="meta-pill-val mono">{item.accessId}</span>
+                          </div>
+                        )}
+
+                        {item.isEligible ? (
+                          <div className="catalog-status-pill status-eligible">
+                            <Check size={12} strokeWidth={2.5} />
+                            <span>Pre-Approved</span>
+                          </div>
+                        ) : (
+                          <div className="catalog-status-pill status-exception">
+                            <AlertTriangle size={12} strokeWidth={2.2} />
+                            <span>Exception Required</span>
+                          </div>
+                        )}
                       </div>
                     </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: "6px", flexShrink: 0 }}>
+
+                    {/* Right Actions */}
+                    <div className="catalog-actions-wrap" onClick={(e) => e.stopPropagation()}>
                       <button
-                        className="btn btn-secondary"
-                        style={{ fontSize: "11.5px", height: "32px", padding: "0 10px" }}
+                        className="btn btn-secondary catalog-btn-info"
                         aria-label={`View details for ${item.name}`}
                         onClick={(e) => {
                           e.stopPropagation();
@@ -1269,45 +1293,26 @@ function PortalDashboard() {
                       </button>
                       {item.isEligible ? (
                         <button
-                          className="btn btn-primary"
-                          style={{
-                            fontSize: "11.5px",
-                            height: "32px",
-                            padding: "0 12px",
-                            fontWeight: 600,
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "4px",
-                          }}
+                          className="btn btn-primary catalog-btn-request"
                           onClick={(e) => {
                             e.stopPropagation();
                             setRequestFormItem(item);
                           }}
                         >
-                          <Plus size={12} /> Request Access
+                          <Plus size={13} strokeWidth={2.4} />
+                          <span>Request Access</span>
                         </button>
                       ) : (
                         <button
                           type="button"
-                          className="btn btn-secondary"
-                          style={{
-                            fontSize: "11.5px",
-                            height: "32px",
-                            padding: "0 10px",
-                            fontWeight: 600,
-                            background: "#FEF3C7",
-                            color: "#92400E",
-                            borderColor: "#FDE68A",
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "4px",
-                          }}
+                          className="catalog-btn-exception"
                           onClick={(e) => {
                             e.stopPropagation();
                             setExceptionFormItem(item);
                           }}
                         >
-                          <AlertTriangle size={12} /> Request Exception
+                          <AlertTriangle size={13} strokeWidth={2.2} />
+                          <span>Request Exception</span>
                         </button>
                       )}
                     </div>

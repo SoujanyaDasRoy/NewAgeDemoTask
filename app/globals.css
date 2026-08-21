@@ -1114,7 +1114,7 @@ textarea:focus-visible {
 }
 
 /* ---------- 💫 LIST ROWS & HOVER STATES ---------- */
-.result-row, .list-row {
+.list-row {
   border: 1px solid var(--border);
   border-radius: 9px;
   padding: 13px 16px;
@@ -1128,34 +1128,333 @@ textarea:focus-visible {
   box-shadow: var(--shadow-xs);
 }
 
-.result-row:hover, .list-row:hover {
+.list-row:hover {
   border-color: var(--border-focus);
   box-shadow: var(--shadow-hover);
   transform: translateY(-1px);
 }
 
+/* ---------- 💎 CATALOG DIRECTORY ROWS (Linear / Vercel / Stripe Style) ---------- */
+.catalog-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: var(--shadow-xs);
+  cursor: pointer;
+  transition: all 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+.catalog-row:hover {
+  border-color: var(--border-focus);
+  background: var(--surface-subtle);
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-1px);
+}
+
+[data-theme="dark"] .catalog-row:hover {
+  border-color: rgba(255, 255, 255, 0.16);
+  background: #151D2F;
+}
+
+/* 38px Rounded Service Logo Container */
+.catalog-logo-container {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--surface-subtle);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: var(--shadow-xs);
+  transition: all 0.15s ease;
+}
+
+[data-theme="dark"] .catalog-logo-container {
+  background: #1E293B;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.catalog-row:hover .catalog-logo-container {
+  border-color: var(--border-focus);
+}
+
+/* Center Content */
+.catalog-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header Line */
+.catalog-header-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  line-height: 1.3;
+}
+
 .result-title {
-  font-size: 13.5px;
+  font-size: 15px;
   font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+[data-theme="dark"] .result-title {
+  color: #F8FAFC;
+}
+
+/* Tool chip */
+.catalog-tool-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 7px;
+  border-radius: 5px;
+  background: var(--surface-subtle);
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid var(--border);
+}
+
+[data-theme="dark"] .catalog-tool-chip {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #CBD5E1;
+}
+
+/* Category tag */
+.catalog-category-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 7px;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--surface-subtle);
+  color: var(--muted);
+  border: 1px solid var(--border);
+}
+
+[data-theme="dark"] .catalog-category-tag {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+  color: #94A3B8;
+}
+
+/* SCIM Automated / Manual Pill */
+.catalog-scim-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.catalog-scim-pill.automated {
+  background: #EFF6FF;
+  color: #1D4ED8;
+  border: 1px solid #BFDBFE;
+}
+
+[data-theme="dark"] .catalog-scim-pill.automated {
+  background: rgba(37, 99, 235, 0.15);
+  color: #60A5FA;
+  border: 1px solid rgba(96, 165, 250, 0.3);
+}
+
+.catalog-scim-pill.manual {
+  background: var(--surface-subtle);
+  color: var(--muted);
+  border: 1px solid var(--border);
+}
+
+[data-theme="dark"] .catalog-scim-pill.manual {
+  background: rgba(255, 255, 255, 0.05);
+  color: #94A3B8;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Description */
+.result-desc {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #475569;
+  margin: 6px 0 10px;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  transition: color 0.15s ease;
+}
+
+[data-theme="dark"] .result-desc {
+  color: #94A3B8;
+}
+
+.catalog-row:hover .result-desc {
+  color: #1E293B;
+}
+
+[data-theme="dark"] .catalog-row:hover .result-desc {
+  color: #CBD5E1;
+}
+
+/* Metadata Pills */
+.catalog-meta-pills {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.catalog-meta-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 6px;
+  background: var(--surface-subtle);
+  border: 1px solid var(--border);
+  font-size: 11.5px;
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .catalog-meta-pill {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+  color: #E2E8F0;
+}
+
+.meta-pill-label {
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--muted);
+}
+
+[data-theme="dark"] .meta-pill-label {
+  color: #94A3B8;
+}
+
+.meta-pill-val {
+  font-weight: 600;
   color: var(--text);
 }
 
-.result-desc {
-  font-size: 12.5px;
-  color: var(--muted);
-  margin-top: 4px;
-  line-height: 1.45;
-  word-break: break-word;
-  overflow-wrap: anywhere;
+[data-theme="dark"] .meta-pill-val {
+  color: #F8FAFC;
 }
 
-.result-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 14px;
-  margin-top: 8px;
+/* Status / Eligibility Pill */
+.catalog-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  border-radius: 6px;
   font-size: 11.5px;
-  color: var(--muted);
+  font-weight: 600;
+}
+
+.catalog-status-pill.status-eligible {
+  background: #F0FDF4;
+  color: #166534;
+  border: 1px solid #BBF7D0;
+}
+
+[data-theme="dark"] .catalog-status-pill.status-eligible {
+  background: rgba(74, 222, 128, 0.15);
+  color: #4ADE80;
+  border: 1px solid rgba(74, 222, 128, 0.3);
+}
+
+.catalog-status-pill.status-exception {
+  background: #FEF3C7;
+  color: #92400E;
+  border: 1px solid #FDE68A;
+}
+
+[data-theme="dark"] .catalog-status-pill.status-exception {
+  background: rgba(253, 224, 71, 0.15);
+  color: #FDE047;
+  border: 1px solid rgba(253, 224, 71, 0.3);
+}
+
+/* Right Actions Container */
+.catalog-actions-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.catalog-btn-info {
+  font-size: 12px;
+  height: 34px;
+  padding: 0 12px;
+  font-weight: 600;
+  border-radius: 8px;
+}
+
+.catalog-btn-request {
+  font-size: 12px;
+  height: 34px;
+  padding: 0 14px;
+  font-weight: 600;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.catalog-btn-exception {
+  font-size: 12px;
+  height: 34px;
+  padding: 0 14px;
+  font-weight: 600;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  background: #FEF3C7;
+  color: #92400E;
+  border: 1px solid #FDE68A;
+  transition: all 0.14s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+
+.catalog-btn-exception:hover {
+  background: #FDE68A;
+  color: #78350F;
+  border-color: #F59E0B;
+}
+
+[data-theme="dark"] .catalog-btn-exception {
+  background: rgba(245, 158, 11, 0.15);
+  color: #FDE047;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+[data-theme="dark"] .catalog-btn-exception:hover {
+  background: rgba(245, 158, 11, 0.25);
+  color: #FEF08A;
+  border-color: rgba(245, 158, 11, 0.5);
 }
 
 .mono {
