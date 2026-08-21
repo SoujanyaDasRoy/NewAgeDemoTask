@@ -23,6 +23,7 @@ import {
   Shield,
   Trash2,
   User,
+  ChevronDown,
 } from "lucide-react";
 
 import StatusBadge from "@/components/StatusBadge";
@@ -100,6 +101,7 @@ export default function PortalPage() {
   const [notifOpen, setNotifOpen] = useState(false);
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [cmdPaletteOpen, setCmdPaletteOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [requestFilter, setRequestFilter] = useState<"ALL" | "PENDING" | "APPROVED" | "COMPLETED" | "EXCEPTIONS">("ALL");
 
   // Active drawers
@@ -163,6 +165,7 @@ export default function PortalPage() {
         setCmdPaletteOpen((prev) => !prev);
       } else if (e.key === "Escape") {
         setCmdPaletteOpen(false);
+        setUserMenuOpen(false);
         setAccessDetailsItem(null);
         setRequestFormItem(null);
         setExceptionFormItem(null);
@@ -403,17 +406,52 @@ export default function PortalPage() {
       {/* HEADER */}
       <header className="header">
         <div className="header-inner">
-          {/* Brand */}
-          <div className="brand">
+          {/* Brand with Breadcrumb */}
+          <div className="brand" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
             <div className="brand-badge">NA</div>
-            <div>
-              <div className="brand-text-title">New Age</div>
-              <div className="brand-text-sub">Access Management Portal</div>
+            <div className="brand-title-wrap">
+              <span className="brand-main-text">New Age</span>
+              <span className="brand-divider">/</span>
+              <span className="brand-sub-text">Access Portal</span>
             </div>
           </div>
 
+          {/* Center Quick Search Button */}
+          <button
+            type="button"
+            className="header-quick-search"
+            onClick={() => setCmdPaletteOpen(true)}
+            title="Open Spotlight Command Search (⌘K / Ctrl+K)"
+          >
+            <Search size={13} />
+            <span>Search tools, boards, requests...</span>
+            <kbd>⌘K</kbd>
+          </button>
+
           {/* Right side */}
           <div className="header-right">
+            {/* Pending Actions Quick Pill (if any) */}
+            {pendingApprovals.length > 0 && (
+              <span
+                className="badge badge-amber"
+                style={{
+                  cursor: "pointer",
+                  fontWeight: 600,
+                  fontSize: "11.5px",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "4px",
+                }}
+                onClick={() => {
+                  const el = document.querySelector(".card-tinted-amber");
+                  el?.scrollIntoView({ behavior: "smooth" });
+                }}
+                title="Pending approvals requiring your action"
+              >
+                <Zap size={11} /> {pendingApprovals.length} Pending
+              </span>
+            )}
+
             {/* Role Badge with Live Pulse Dot */}
             <span
               className={isRoleAdmin ? "badge badge-blue" : "badge badge-gray"}
@@ -520,31 +558,78 @@ export default function PortalPage() {
               </div>
             </div>
 
-            {/* User chip */}
-            <div className="user-chip">
-              <div
-                className="avatar"
-                style={{
-                  width: "32px",
-                  height: "32px",
-                  fontSize: "11px",
-                  background: currentUser.avatarTone || "#0F1B33",
-                }}
-              >
-                {currentUser.initials}
-              </div>
-              <div>
-                <div className="name">{currentUser.name}</div>
-                <div className="role">{currentUser.department}</div>
-              </div>
+            {/* Interactive User Profile Dropdown Menu */}
+            <div style={{ position: "relative" }}>
               <button
-                onClick={() => logout()}
-                title="Sign Out"
-                className="icon-btn"
-                style={{ width: "30px", height: "30px", marginLeft: "4px", color: "#9CA3AF" }}
+                type="button"
+                className="user-profile-btn"
+                onClick={() => setUserMenuOpen((prev) => !prev)}
+                title="Account Settings"
               >
-                <LogOut size={15} />
+                <div
+                  className="avatar"
+                  style={{
+                    width: "32px",
+                    height: "32px",
+                    fontSize: "11px",
+                    background: currentUser.avatarTone || "#0F1B33",
+                  }}
+                >
+                  {currentUser.initials}
+                </div>
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                  <div className="name" style={{ fontSize: "12.5px", fontWeight: 600, color: "#0F1B33" }}>
+                    {currentUser.name}
+                  </div>
+                  <div className="role" style={{ fontSize: "10.5px", color: "#64748B" }}>
+                    {currentUser.department}
+                  </div>
+                </div>
+                <ChevronDown
+                  size={13}
+                  style={{
+                    color: "#94A3B8",
+                    transform: userMenuOpen ? "rotate(180deg)" : "rotate(0deg)",
+                    transition: "transform 0.15s ease",
+                  }}
+                />
               </button>
+
+              {/* User Menu Popover */}
+              {userMenuOpen && (
+                <div className="user-dropdown-popover">
+                  <div className="user-dropdown-header">
+                    <div className="user-dropdown-name">{currentUser.name}</div>
+                    <div className="user-dropdown-email">{currentUser.email}</div>
+                    <div
+                      className="user-dropdown-badge"
+                      style={{
+                        background: isRoleAdmin ? "#EFF6FF" : "#F1F5F9",
+                        color: isRoleAdmin ? "#1D4ED8" : "#475569",
+                      }}
+                    >
+                      <Shield size={10} /> {isRoleAdmin ? "Board Admin" : "Employee"} · {currentUser.department}
+                    </div>
+                  </div>
+                  <div className="user-dropdown-divider" />
+                  <button
+                    className="user-dropdown-item"
+                    onClick={() => {
+                      setUserMenuOpen(false);
+                      setCmdPaletteOpen(true);
+                    }}
+                  >
+                    <Search size={14} /> Spotlight Search (⌘K)
+                  </button>
+                  <div className="user-dropdown-divider" />
+                  <button
+                    className="user-dropdown-item danger"
+                    onClick={() => logout()}
+                  >
+                    <LogOut size={14} /> Sign out
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
