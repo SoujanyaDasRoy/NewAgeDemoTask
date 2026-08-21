@@ -1,13 +1,26 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { X, Check, Sliders, ToggleLeft, ToggleRight } from "lucide-react";
-import StatusBadge from "../StatusBadge";
+import {
+  X,
+  Check,
+  Zap,
+  User,
+  Shield,
+  Copy,
+  CheckCheck,
+  Building,
+  Key,
+  ToggleLeft,
+  ToggleRight,
+} from "lucide-react";
+import ServiceLogo from "../ServiceLogo";
 
 interface BoardConfigDrawerProps {
   isOpen: boolean;
   onClose: () => void;
   accessItem: any;
+  users?: any[];
   onSaveConfig: (
     accessId: string,
     changes: { approver: string; backupApprover: string; provider: string }
@@ -19,6 +32,7 @@ export default function BoardConfigDrawer({
   isOpen,
   onClose,
   accessItem,
+  users = [],
   onSaveConfig,
   onToggleAutomation,
 }: BoardConfigDrawerProps) {
@@ -27,6 +41,7 @@ export default function BoardConfigDrawer({
   const [provider, setProvider] = useState("");
   const [automation, setAutomation] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (accessItem) {
@@ -34,6 +49,7 @@ export default function BoardConfigDrawer({
       setBackupApprover(accessItem.backupApprover || "");
       setProvider(accessItem.provider || "");
       setAutomation(!!accessItem.automation);
+      setCopied(false);
     }
   }, [accessItem]);
 
@@ -56,6 +72,26 @@ export default function BoardConfigDrawer({
     await onToggleAutomation(accessItem.id);
   };
 
+  const copyAccessId = () => {
+    if (accessItem.accessId) {
+      navigator.clipboard.writeText(accessItem.accessId);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  // Compile unique user names for selection
+  const teamMemberOptions = Array.from(
+    new Set([
+      "Master Admin",
+      "Soujanya Das Roy",
+      "Arjun Mehta",
+      "Priya Sharma",
+      "Rahul Verma",
+      ...users.map((u) => u.name),
+    ])
+  ).filter(Boolean);
+
   return (
     <>
       <div className={`overlay ${isOpen ? "show" : ""}`} onClick={onClose} aria-hidden="true" />
@@ -65,11 +101,22 @@ export default function BoardConfigDrawer({
         aria-modal="true"
         aria-label="Manage Access Configuration Drawer"
       >
+        {/* Drawer Header */}
         <div className="drawer-head">
-          <div>
-            <h3>Manage Access Configuration</h3>
-            <div className="sub">
-              {accessItem.tool} – {accessItem.name}
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <ServiceLogo tool={accessItem.tool} size={26} />
+            <div>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <h3 style={{ margin: 0, fontSize: "16px", fontWeight: 700, color: "#0F1B33" }}>
+                  Manage Configuration
+                </h3>
+                <span className="badge badge-gray" style={{ fontSize: "11px" }}>
+                  {accessItem.tool}
+                </span>
+              </div>
+              <div className="sub" style={{ fontSize: "12.5px", color: "#64748B", marginTop: "2px" }}>
+                {accessItem.name}
+              </div>
             </div>
           </div>
           <button className="drawer-close" onClick={onClose} aria-label="Close drawer">
@@ -77,112 +124,247 @@ export default function BoardConfigDrawer({
           </button>
         </div>
 
+        {/* Drawer Body */}
         <div className="drawer-body">
-          {/* Automation Switch */}
+          {/* Automated Provisioning Switch Card */}
           <div
             style={{
               padding: "16px",
-              borderRadius: "10px",
-              background: automation ? "#EEF2FF" : "#F8FAFC",
-              border: `1px solid ${automation ? "#C7D2FE" : "var(--border)"}`,
+              borderRadius: "12px",
+              background: automation
+                ? "linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%)"
+                : "#F8FAFC",
+              border: `1px solid ${automation ? "#BFDBFE" : "#E2E8F0"}`,
               marginBottom: "24px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: "12px",
+              boxShadow: automation ? "0 4px 14px rgba(37, 99, 235, 0.08)" : "none",
+              transition: "all 0.2s ease",
             }}
           >
-            <div>
-              <div style={{ fontSize: "13.5px", fontWeight: 700, color: "#1E1B4B" }}>
-                Automated Provisioning
+            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "12px" }}>
+              <div style={{ flex: 1 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <span style={{ fontSize: "14px", fontWeight: 700, color: automation ? "#1E3A8A" : "#1E293B" }}>
+                    Automated Provisioning
+                  </span>
+                  {automation ? (
+                    <span
+                      style={{
+                        fontSize: "11px",
+                        fontWeight: 600,
+                        padding: "2px 8px",
+                        borderRadius: "999px",
+                        background: "#2563EB",
+                        color: "#FFFFFF",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "3px",
+                      }}
+                    >
+                      <Zap size={10} /> Active
+                    </span>
+                  ) : (
+                    <span
+                      style={{
+                        fontSize: "11px",
+                        fontWeight: 600,
+                        padding: "2px 8px",
+                        borderRadius: "999px",
+                        background: "#E2E8F0",
+                        color: "#64748B",
+                      }}
+                    >
+                      Manual Queue
+                    </span>
+                  )}
+                </div>
+                <div
+                  style={{
+                    fontSize: "12px",
+                    color: automation ? "#1E40AF" : "#64748B",
+                    marginTop: "4px",
+                    lineHeight: 1.45,
+                  }}
+                >
+                  {automation
+                    ? "Approved requests instantly trigger zero-touch automated API provisioning."
+                    : "Approved requests route to IT Admin for manual account creation."}
+                </div>
               </div>
-              <div style={{ fontSize: "12px", color: "#6366F1", marginTop: "2px" }}>
-                {automation
-                  ? "Approved requests are automatically completed."
-                  : "Approved requests route to the manual provisioning queue."}
-              </div>
-            </div>
 
-            <button
-              type="button"
-              style={{
-                border: "none",
-                background: "transparent",
-                color: automation ? "#4F46E5" : "#94A3B8",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-              }}
-              onClick={handleToggle}
-            >
-              {automation ? <ToggleRight size={36} /> : <ToggleLeft size={36} />}
-            </button>
+              <button
+                type="button"
+                style={{
+                  border: "none",
+                  background: "transparent",
+                  color: automation ? "#2563EB" : "#94A3B8",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  padding: "0",
+                  transition: "transform 0.15s ease",
+                }}
+                onClick={handleToggle}
+                title={automation ? "Disable automation" : "Enable automation"}
+              >
+                {automation ? <ToggleRight size={38} /> : <ToggleLeft size={38} />}
+              </button>
+            </div>
           </div>
 
           <form onSubmit={handleSave}>
-            <div className="divider-label">Role Assignments</div>
+            <div className="divider-label" style={{ marginBottom: "14px" }}>
+              Role Assignments &amp; Workflow
+            </div>
 
-            <div className="form-group">
-              <label className="form-label">Primary Approver</label>
+            {/* Primary Approver */}
+            <div className="form-group" style={{ marginBottom: "16px" }}>
+              <label className="form-label" style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                <User size={13} style={{ color: "#2563EB" }} /> Primary Approver
+              </label>
               <span className="form-sublabel">
                 First recipient of all incoming access requests for this board.
               </span>
-              <input
-                type="text"
-                className="form-input"
-                value={approver}
-                onChange={(e) => setApprover(e.target.value)}
-                required
-              />
+              <div style={{ position: "relative", marginTop: "6px" }}>
+                <select
+                  className="form-input"
+                  value={approver}
+                  onChange={(e) => setApprover(e.target.value)}
+                  style={{ cursor: "pointer", appearance: "auto" }}
+                  required
+                >
+                  {teamMemberOptions.map((name) => (
+                    <option key={name} value={name}>
+                      {name}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
 
-            <div className="form-group" style={{ marginTop: "16px" }}>
-              <label className="form-label">Backup Approver</label>
+            {/* Backup Approver */}
+            <div className="form-group" style={{ marginBottom: "16px" }}>
+              <label className="form-label" style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                <Shield size={13} style={{ color: "#D97706" }} /> Backup Approver
+              </label>
               <span className="form-sublabel">
-                Can step in to approve if primary approver is out of office.
+                Can step in to approve if the primary approver is out of office.
               </span>
-              <input
-                type="text"
-                className="form-input"
-                value={backupApprover}
-                onChange={(e) => setBackupApprover(e.target.value)}
-                required
-              />
+              <div style={{ position: "relative", marginTop: "6px" }}>
+                <select
+                  className="form-input"
+                  value={backupApprover}
+                  onChange={(e) => setBackupApprover(e.target.value)}
+                  style={{ cursor: "pointer", appearance: "auto" }}
+                  required
+                >
+                  {teamMemberOptions.map((name) => (
+                    <option key={name} value={name}>
+                      {name}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
 
-            <div className="form-group" style={{ marginTop: "16px" }}>
-              <label className="form-label">Access Provider (IT Admin)</label>
+            {/* Access Provider (IT Admin) */}
+            <div className="form-group" style={{ marginBottom: "20px" }}>
+              <label className="form-label" style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                <Building size={13} style={{ color: "#64748B" }} /> Access Provider (IT Admin)
+              </label>
               <span className="form-sublabel">
                 Responsible for manual provisioning when automation is disabled.
               </span>
-              <input
-                type="text"
-                className="form-input"
-                value={provider}
-                onChange={(e) => setProvider(e.target.value)}
-                required
-              />
+              <div style={{ position: "relative", marginTop: "6px" }}>
+                <select
+                  className="form-input"
+                  value={provider}
+                  onChange={(e) => setProvider(e.target.value)}
+                  style={{ cursor: "pointer", appearance: "auto" }}
+                  required
+                >
+                  {teamMemberOptions.map((name) => (
+                    <option key={name} value={name}>
+                      {name}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
 
-            <div style={{ marginTop: "24px", paddingTop: "20px", borderTop: "1px solid var(--border)" }}>
-              <div className="divider-label">Metadata & Governance</div>
-              <div className="field-grid">
-                <div className="field">
-                  <span className="f-label">Access ID</span>
-                  <span className="f-value mono">{accessItem.accessId || "Unassigned"}</span>
+            {/* Metadata & Governance Card */}
+            <div style={{ marginTop: "24px", paddingTop: "18px", borderTop: "1px solid var(--border)" }}>
+              <div className="divider-label" style={{ marginBottom: "10px" }}>
+                Metadata &amp; Governance
+              </div>
+
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  gap: "10px",
+                  background: "#F8FAFC",
+                  padding: "12px",
+                  borderRadius: "10px",
+                  border: "1px solid #E2E8F0",
+                }}
+              >
+                <div>
+                  <span style={{ fontSize: "11px", color: "#64748B", fontWeight: 500, display: "flex", alignItems: "center", gap: "4px" }}>
+                    <Key size={11} /> Access ID
+                  </span>
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "4px" }}>
+                    <span className="mono" style={{ fontSize: "13px", fontWeight: 700, color: "#0F1B33" }}>
+                      {accessItem.accessId || "Unassigned"}
+                    </span>
+                    {accessItem.accessId && (
+                      <button
+                        type="button"
+                        onClick={copyAccessId}
+                        style={{
+                          border: "none",
+                          background: "transparent",
+                          cursor: "pointer",
+                          color: copied ? "#16A34A" : "#94A3B8",
+                          padding: "2px",
+                          display: "flex",
+                          alignItems: "center",
+                        }}
+                        title="Copy Access ID"
+                      >
+                        {copied ? <CheckCheck size={13} /> : <Copy size={13} />}
+                      </button>
+                    )}
+                  </div>
                 </div>
-                <div className="field">
-                  <span className="f-label">Owning Group</span>
-                  <span className="f-value">{accessItem.group}</span>
+
+                <div>
+                  <span style={{ fontSize: "11px", color: "#64748B", fontWeight: 500, display: "flex", alignItems: "center", gap: "4px" }}>
+                    <Building size={11} /> Owning Group
+                  </span>
+                  <div style={{ marginTop: "4px" }}>
+                    <span
+                      style={{
+                        fontSize: "12px",
+                        fontWeight: 600,
+                        padding: "2px 8px",
+                        borderRadius: "6px",
+                        background: "#F1F5F9",
+                        color: "#334155",
+                      }}
+                    >
+                      {accessItem.group}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div style={{ display: "flex", gap: "10px", marginTop: "28px" }}>
+            {/* Drawer Actions Footer */}
+            <div style={{ display: "flex", gap: "10px", marginTop: "24px" }}>
               <button
                 type="button"
                 className="btn btn-secondary"
-                style={{ flex: 1 }}
+                style={{ flex: 1, height: "40px" }}
                 onClick={onClose}
               >
                 Cancel
@@ -190,7 +372,7 @@ export default function BoardConfigDrawer({
               <button
                 type="submit"
                 className="btn btn-primary"
-                style={{ flex: 1.5 }}
+                style={{ flex: 1.5, height: "40px" }}
                 disabled={loading}
               >
                 <Check size={16} /> {loading ? "Saving..." : "Save Configuration"}

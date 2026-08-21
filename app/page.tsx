@@ -1731,6 +1731,7 @@ export default function PortalPage() {
         <BoardConfigDrawer
           isOpen={!!boardConfigItem}
           accessItem={boardConfigItem}
+          users={allUsers}
           onClose={() => setBoardConfigItem(null)}
           onSaveConfig={async (id, changes) => handleSaveBoardConfig(id, changes)}
           onToggleAutomation={async (id) => handleToggleAuto(id)}
