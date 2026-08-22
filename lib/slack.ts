@@ -189,6 +189,7 @@ export async function sendSlackNotification(payload: SlackMessagePayload) {
           text: `Access Request: ${payload.accessLabel} (${payload.requestId})`,
           blocks,
         }),
+        signal: AbortSignal.timeout(3000),
       });
 
       if (res.ok) {

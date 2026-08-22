@@ -178,8 +178,8 @@ export async function submitRequest(opts: {
       return { requestId, access };
     });
 
-    // Post-transaction notifications
-    await sendSlackNotification({
+    // Post-transaction notifications (async non-blocking)
+    sendSlackNotification({
       requestId: result.requestId,
       accessLabel: `${result.access.tool} – ${result.access.name}`,
       requesterName: opts.requesterName,
@@ -342,7 +342,8 @@ export async function submitExceptionRequest(opts: {
       return { requestId, access };
     });
 
-    await sendSlackNotification({
+    // Post-transaction notifications (async non-blocking)
+    sendSlackNotification({
       requestId: result.requestId,
       accessLabel: `${result.access.tool} – ${result.access.name}`,
       requesterName: opts.requesterName,
