@@ -24,11 +24,15 @@ export interface SlackMessagePayload {
  * Builds the interactive Slack Block-Kit payload for an access request.
  */
 export function buildSlackAccessRequestBlocks(payload: SlackMessagePayload, portalBaseUrl?: string) {
-  const baseUrl =
+  let rawBaseUrl =
     portalBaseUrl ||
     process.env.NEXT_PUBLIC_APP_URL ||
     process.env.PORTAL_URL ||
-    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "https://newage-access-portal.vercel.app");
+    (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : "") ||
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "") ||
+    "http://localhost:3000";
+
+  const baseUrl = rawBaseUrl.replace(/\/+$/, "");
   const formattedTimestamp = new Date().toLocaleString("en-US", {
     timeZone: "UTC",
     dateStyle: "medium",
