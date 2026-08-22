@@ -220,6 +220,8 @@ function PortalDashboard() {
         (c) => c.id.toLowerCase() === boardId.toLowerCase() || (c.accessId && c.accessId.toLowerCase() === boardId.toLowerCase())
       );
       if (match) setAccessDetailsItem(match);
+    } else if (searchParams.get("audit") === "true" || searchParams.get("audit") === "1") {
+      setAuditDrawerOpen(true);
     }
 
     if (tab) {

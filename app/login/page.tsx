@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { login, signup } from "@/lib/actions/auth";
 import { requestMagicLink } from "@/lib/actions/magic-link";
 import { Mail } from "lucide-react";
@@ -17,8 +17,10 @@ import {
   ArrowRight,
 } from "lucide-react";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || searchParams.get("redirect") || "/";
   const [tab, setTab] = useState<"login" | "signup">("login");
 
   // Login form state
@@ -50,7 +52,7 @@ export default function LoginPage() {
     setLoading(false);
 
     if (res.success) {
-      router.push("/");
+      router.push(callbackUrl);
       router.refresh();
     } else {
       setError(res.error || "Invalid email or password");
@@ -104,7 +106,7 @@ export default function LoginPage() {
     if (res.success) {
       setSuccessMsg("Account created successfully! Signing you in...");
       setTimeout(() => {
-        router.push("/");
+        router.push(callbackUrl);
         router.refresh();
       }, 800);
     } else {
@@ -680,5 +682,13 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <React.Suspense fallback={<div style={{ minHeight: "100vh", background: "var(--bg)" }} />}>
+      <LoginForm />
+    </React.Suspense>
   );
 }
