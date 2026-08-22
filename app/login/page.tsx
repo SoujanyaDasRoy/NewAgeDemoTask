@@ -214,7 +214,7 @@ export default function LoginPage() {
                     <Layers size={14} />
                   </div>
                   <div style={{ fontSize: "12.5px", color: "#E2E8F0" }}>
-                    <strong>Cross-Department</strong> Exception Policies
+                    <strong>Cross-Department</strong> Routing Policies
                   </div>
                 </div>
               </div>
