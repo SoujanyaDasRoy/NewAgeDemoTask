@@ -1489,30 +1489,20 @@ function PortalDashboard() {
                       >
                         Info
                       </button>
-                      {item.isEligible ? (
-                        <button
-                          className="btn btn-primary catalog-action-btn"
-                          onClick={(e) => {
-                            e.stopPropagation();
+                      <button
+                        className="btn btn-primary catalog-action-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (item.isEligible) {
                             setRequestFormItem(item);
-                          }}
-                        >
-                          <Plus size={13} strokeWidth={2.4} />
-                          <span>Request Access</span>
-                        </button>
-                      ) : (
-                        <button
-                          type="button"
-                          className="btn btn-secondary catalog-action-btn"
-                          onClick={(e) => {
-                            e.stopPropagation();
+                          } else {
                             setExceptionFormItem(item);
-                          }}
-                        >
-                          <Plus size={13} strokeWidth={2.4} />
-                          <span>Request Access</span>
-                        </button>
-                      )}
+                          }
+                        }}
+                      >
+                        <Plus size={13} strokeWidth={2.4} />
+                        <span>Request Access</span>
+                      </button>
                     </div>
                   </div>
                 ))}
