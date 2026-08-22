@@ -114,6 +114,7 @@ function PortalDashboard() {
   const [cmdPaletteOpen, setCmdPaletteOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [requestFilter, setRequestFilter] = useState<"ALL" | "PENDING" | "APPROVED" | "COMPLETED" | "EXCEPTIONS">("ALL");
+  const [approvalFilter, setApprovalFilter] = useState<"ALL" | "EXCEPTIONS">("ALL");
   const [directoryFilter, setDirectoryFilter] = useState<"ALL" | "AUTOMATED" | "BOARDS" | "APPLICATIONS">("ALL");
   const [userSearchQuery, setUserSearchQuery] = useState("");
   const [userDeptFilter, setUserDeptFilter] = useState("ALL");
@@ -625,6 +626,13 @@ function PortalDashboard() {
       ["PENDING_APPROVAL", "PENDING_EXCEPTION_APPROVAL"].includes(r.status) &&
       (r.approverName === currentUser.name || isRoleAdmin)
   );
+
+  const pendingExceptionsCount = pendingApprovals.filter((r) => r.isException).length;
+
+  const displayedApprovals = pendingApprovals.filter((r) => {
+    if (approvalFilter === "EXCEPTIONS") return r.isException;
+    return true;
+  });
 
   const manualProvisionQueue = requests.filter((r) =>
     ["PENDING_MANUAL_PROVISIONING", "PROVISIONING"].includes(r.status)
@@ -1517,9 +1525,18 @@ function PortalDashboard() {
                 <div className="title">No requests found</div>
                 <div className="sub">
                   {requestFilter === "ALL"
-                    ? "Search for a tool or board above to submit a request."
+                    ? "Search for a tool or board in the catalog above to submit a request."
                     : `No requests currently in '${requestFilter.toLowerCase()}' status.`}
                 </div>
+                <button
+                  type="button"
+                  className="btn btn-secondary empty-state-btn"
+                  onClick={() =>
+                    document.getElementById("search-directory-card")?.scrollIntoView({ behavior: "smooth" })
+                  }
+                >
+                  + Browse Catalog
+                </button>
               </div>
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
@@ -1614,41 +1631,70 @@ function PortalDashboard() {
                   </div>
                 </div>
               </div>
-              {pendingApprovals.length > 0 && (
-                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    onClick={handleSelectAllApprovals}
-                    style={{
-                      height: "26px",
-                      fontSize: "11px",
-                      padding: "0 8px",
-                      fontWeight: 600,
-                    }}
-                  >
-                    {selectedApprovalIds.length === pendingApprovals.length
-                      ? "Deselect All"
-                      : `Select All (${pendingApprovals.length})`}
-                  </button>
-                  <span className="badge badge-amber">
-                    {pendingApprovals.length} pending
-                  </span>
-                </div>
-              )}
             </div>
 
-            {pendingApprovals.length === 0 ? (
-              <div className="empty-state">
-                <div className="circle">
-                  <CheckSquare size={18} />
+            {/* Symmetric Filter / Status Bar */}
+            {pendingApprovals.length > 0 ? (
+              <div className="filter-pills-row" style={{ justifyContent: "space-between" }}>
+                <div style={{ display: "flex", gap: "6px", alignItems: "center", flexWrap: "wrap" }}>
+                  <button
+                    className={`filter-pill ${approvalFilter === "ALL" ? "active" : ""}`}
+                    onClick={() => setApprovalFilter("ALL")}
+                  >
+                    All Pending ({pendingApprovals.length})
+                  </button>
+                  <button
+                    className={`filter-pill ${approvalFilter === "EXCEPTIONS" ? "active" : ""}`}
+                    onClick={() => setApprovalFilter("EXCEPTIONS")}
+                  >
+                    Exceptions ({pendingExceptionsCount})
+                  </button>
                 </div>
-                <div className="title">All clear</div>
-                <div className="sub">No requests pending your approval right now.</div>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={handleSelectAllApprovals}
+                  style={{
+                    height: "26px",
+                    fontSize: "11px",
+                    padding: "0 8px",
+                    fontWeight: 600,
+                  }}
+                >
+                  {selectedApprovalIds.length === pendingApprovals.length
+                    ? "Deselect All"
+                    : `Select All (${pendingApprovals.length})`}
+                </button>
+              </div>
+            ) : (
+              <div className="filter-pills-row">
+                <span className="filter-pill active" style={{ cursor: "default" }}>
+                  Queue Clear (0)
+                </span>
+                <span className="filter-pill" style={{ cursor: "default", opacity: 0.6 }}>
+                  Exceptions (0)
+                </span>
+              </div>
+            )}
+
+            {displayedApprovals.length === 0 ? (
+              <div className="empty-state">
+                <div className="circle emerald">
+                  <Check size={18} strokeWidth={2.5} />
+                </div>
+                <div className="title">All caught up</div>
+                <div className="sub">
+                  {approvalFilter === "EXCEPTIONS"
+                    ? "No exception requests waiting for your approval right now."
+                    : "No access requests waiting for your approval right now."}
+                </div>
+                <span className="badge badge-green" style={{ marginTop: "12px", fontSize: "11px" }}>
+                  ✓ All Clear
+                </span>
               </div>
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                {pendingApprovals.map((req) => {
+                {displayedApprovals.map((req) => {
                   const isSelected = selectedApprovalIds.includes(req.id);
                   const toolName = getToolName(req);
                   return (
@@ -1713,7 +1759,7 @@ function PortalDashboard() {
                         </div>
                       </div>
 
-                      {/* Right-aligned Action Group: High-contrast ✓ Approve / ✕ Reject */}
+                      {/* Right-aligned Action Group: High-contrast Approve / Reject */}
                       <div className="quick-action-wrap" onClick={(e) => e.stopPropagation()}>
                         <button
                           type="button"
@@ -1721,7 +1767,7 @@ function PortalDashboard() {
                           title="1-Click Approve"
                           onClick={() => handleApprove(req.id)}
                         >
-                          <Check size={13} strokeWidth={2.5} /> ✓ Approve
+                          <Check size={13} strokeWidth={2.5} /> Approve
                         </button>
                         <button
                           type="button"
@@ -1729,7 +1775,7 @@ function PortalDashboard() {
                           title="Reject"
                           onClick={() => setApprovalRequest(req)}
                         >
-                          <X size={13} strokeWidth={2.5} /> ✕ Reject
+                          <X size={13} strokeWidth={2.5} /> Reject
                         </button>
                       </div>
                     </div>

@@ -247,7 +247,7 @@ export default function SlackNotifCard({
                 whiteSpace: "nowrap",
               }}
             >
-              <Check size={14} strokeWidth={2.5} /> ✓ Approve
+              <Check size={14} strokeWidth={2.5} /> Approve
             </button>
 
             {/* Reject dropdown */}
@@ -270,7 +270,7 @@ export default function SlackNotifCard({
                   whiteSpace: "nowrap",
                 }}
               >
-                <X size={14} strokeWidth={2.5} /> ✕ Reject
+                <X size={14} strokeWidth={2.5} /> Reject
                 <ChevronDown size={13} style={{ color: "var(--muted)", marginLeft: "2px" }} />
               </button>
 

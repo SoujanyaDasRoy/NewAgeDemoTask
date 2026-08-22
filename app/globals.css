@@ -1137,9 +1137,15 @@ textarea:focus-visible {
 /* ---------- Grid Layouts ---------- */
 .grid-2 {
   display: grid;
-  grid-template-columns: 1.8fr 1.2fr;
+  grid-template-columns: 1fr 1fr;
   gap: 16px;
-  align-items: start;
+  align-items: stretch;
+}
+
+.grid-2 > .card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .grid-3 {
@@ -2228,37 +2234,85 @@ textarea:focus-visible {
 
 /* Empty State */
 .empty-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 190px;
   text-align: center;
-  padding: 32px 16px;
+  padding: 32px 20px;
+  border: 1px dashed var(--border);
+  background: var(--surface-subtle);
+  border-radius: 12px;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+[data-theme="dark"] .empty-state {
+  background: rgba(255, 255, 255, 0.02);
+  border-color: rgba(255, 255, 255, 0.08);
 }
 
 .empty-state .circle {
-  width: 42px;
-  height: 42px;
+  width: 40px;
+  height: 40px;
   border-radius: 999px;
-  background: var(--surface-subtle);
+  background: var(--surface);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 10px;
+  margin: 0 auto 12px;
   color: var(--muted);
   border: 1px solid var(--border);
+  box-shadow: var(--shadow-xs);
+  flex-shrink: 0;
+}
+
+[data-theme="dark"] .empty-state .circle {
+  background: var(--surface-input);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.empty-state .circle.emerald,
+.empty-state .circle.circle-emerald {
+  background: #DAFBE1;
+  color: #16A34A;
+  border-color: rgba(63, 185, 80, 0.35);
+}
+
+[data-theme="dark"] .empty-state .circle.emerald,
+[data-theme="dark"] .empty-state .circle.circle-emerald {
+  background: rgba(34, 197, 94, 0.12);
+  color: #4ADE80;
+  border-color: rgba(34, 197, 94, 0.3);
 }
 
 .empty-state .title {
   font-size: 13.5px;
   font-weight: 700;
   color: var(--text);
+  letter-spacing: -0.01em;
 }
 
 .empty-state .sub {
   font-size: 12px;
   color: var(--muted);
-  margin-top: 3px;
+  margin-top: 4px;
   max-width: 340px;
   margin-left: auto;
   margin-right: auto;
-  line-height: 1.4;
+  line-height: 1.45;
+}
+
+.empty-state-btn {
+  margin-top: 14px;
+  font-size: 11.5px;
+  height: 30px;
+  padding: 0 12px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
 }
 
 /* Notifications Panel */
