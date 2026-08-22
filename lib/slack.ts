@@ -38,10 +38,18 @@ export function buildSlackAccessRequestBlocks(payload: SlackMessagePayload, port
   }
 
   const baseUrl = rawBaseUrl.replace(/\/+$/, "");
-  const formattedTimestamp = new Date().toLocaleString("en-US", {
-    timeZone: "UTC",
-    dateStyle: "medium",
-    timeStyle: "short",
+  const now = new Date();
+  const unixSec = Math.floor(now.getTime() / 1000);
+
+  // Fallback formatted timestamp for clients that do not parse Slack dynamic date tags
+  const fallbackFormatted = now.toLocaleString("en-IN", {
+    timeZone: "Asia/Kolkata",
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
   });
 
   return [
@@ -130,7 +138,7 @@ export function buildSlackAccessRequestBlocks(payload: SlackMessagePayload, port
       elements: [
         {
           type: "mrkdwn",
-          text: `New Age Access Portal • Status: *${payload.status || "Pending Approval"}* • ${formattedTimestamp} UTC`,
+          text: `New Age Access Portal • Status: *${payload.status || "Pending Approval"}* • <!date^${unixSec}^{date_short_pretty} at {time}|${fallbackFormatted}>`,
         },
       ],
     },
