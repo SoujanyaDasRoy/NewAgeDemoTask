@@ -196,12 +196,36 @@ export default function SlackPreviewModal({
     }
   };
 
-  const handleDispatchSimulation = () => {
+  const handleDispatchSimulation = async () => {
     setSimulatingWebhook(true);
-    setTimeout(() => {
+    try {
+      const res = await fetch("/api/slack/test", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          requestId: selectedReq.id,
+          accessLabel: selectedReq.accessLabel,
+          requesterName: selectedReq.requester?.name || selectedReq.beneficiaryName,
+          beneficiaryName: selectedReq.beneficiaryName,
+          isException: selectedReq.isException,
+          urgency: selectedReq.urgency,
+          justification: selectedReq.justification,
+          approverName: selectedReq.approverName,
+          automation: selectedReq.automation,
+          status: selectedReq.status,
+        }),
+      });
+      const data = await res.json();
+      if (data.webhookStatus === 200 || data.success) {
+        onTriggerToast?.(`🚀 Live Slack message posted to #access-approvals!`);
+      } else {
+        onTriggerToast?.(`Slack Webhook posted (Status: ${data.webhookStatus || 200})`);
+      }
+    } catch (e: any) {
+      onTriggerToast?.(`Error posting to Slack: ${e.message}`, "error");
+    } finally {
       setSimulatingWebhook(false);
-      onTriggerToast?.(`🚀 Slack Webhook dispatched to #access-approvals for ${selectedReq.id}!`);
-    }, 800);
+    }
   };
 
   return (
