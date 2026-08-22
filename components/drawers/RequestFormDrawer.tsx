@@ -6,14 +6,11 @@ import {
   CheckCircle2,
   User,
   Users,
-  AlertTriangle,
-  Zap,
+  Building2,
   Clock,
   Send,
   Copy,
   CheckCheck,
-  ShieldAlert,
-  Sparkles,
 } from "lucide-react";
 import ServiceLogo from "../ServiceLogo";
 
@@ -36,17 +33,17 @@ interface RequestFormDrawerProps {
 }
 
 const DURATION_PRESETS = [
-  { label: "30 Days", days: 30, hint: "Temporary sprint" },
-  { label: "90 Days", days: 90, hint: "Quarterly project" },
-  { label: "6 Months", days: 180, hint: "Long-term engagement" },
-  { label: "Permanent", days: 365, hint: "Indefinite access" },
+  { label: "30 Days", days: 30 },
+  { label: "90 Days", days: 90 },
+  { label: "6 Months", days: 180 },
+  { label: "Permanent", days: 365 },
 ];
 
-const QUICK_JUSTIFICATIONS = [
-  "Daily Sprint & Project Delivery",
-  "Cross-Team Marketing Sync",
-  "Client Engagement & Deliverable",
-  "Operations & Audit Review",
+const QUICK_PRESETS = [
+  { label: "+ Daily Sprint", value: "Daily Sprint & Project Delivery" },
+  { label: "+ Marketing Sync", value: "Cross-Team Marketing Sync" },
+  { label: "+ Client Deliverable", value: "Client Engagement & Deliverable" },
+  { label: "+ Audit Review", value: "Operations & Audit Review" },
 ];
 
 export default function RequestFormDrawer({
@@ -142,8 +139,8 @@ export default function RequestFormDrawer({
         {/* Drawer Header */}
         <div className="drawer-head" style={{ padding: "18px 22px", borderBottom: "1px solid var(--border)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            <div className="tool-logo-badge">
-              <ServiceLogo tool={accessItem.tool} size={28} />
+            <div className="drawer-logo-lightbox">
+              <ServiceLogo tool={accessItem.tool} size={20} />
             </div>
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
@@ -151,11 +148,11 @@ export default function RequestFormDrawer({
                   {submittedId ? "Request Submitted" : "Request Access"}
                 </h3>
                 {isException ? (
-                  <span className="badge badge-amber">
-                    Cross-Team
+                  <span className="badge badge-neutral" style={{ fontSize: "11px", fontWeight: 600, padding: "2.5px 8px" }}>
+                    🏢 Cross-Department
                   </span>
                 ) : (
-                  <span className="badge badge-green">
+                  <span className="badge badge-green" style={{ fontSize: "11px", fontWeight: 600, padding: "2.5px 8px" }}>
                     Standard Policy
                   </span>
                 )}
@@ -256,99 +253,43 @@ export default function RequestFormDrawer({
           ) : (
             /* Request Form */
             <form onSubmit={handleSubmit}>
-              {/* Refined Policy Callout Banner */}
-              <div
-                style={{
-                  padding: "12px 14px",
-                  borderRadius: "10px",
-                  background: isException ? "rgba(245, 158, 11, 0.12)" : "rgba(34, 197, 94, 0.12)",
-                  border: `1px solid ${isException ? "rgba(245, 158, 11, 0.3)" : "rgba(34, 197, 94, 0.3)"}`,
-                  color: isException ? "#FBBF24" : "#4ADE80",
-                  fontSize: "12.5px",
-                  lineHeight: 1.45,
-                  display: "flex",
-                  alignItems: "flex-start",
-                  gap: "10px",
-                  marginBottom: "20px",
-                }}
-              >
-                {isException ? (
-                  <ShieldAlert size={16} style={{ flexShrink: 0, marginTop: "2px", color: "#FBBF24" }} />
-                ) : (
-                  <Zap size={16} style={{ flexShrink: 0, marginTop: "2px", color: "#4ADE80" }} />
-                )}
+              {/* Sleek Elegant Neutral Routing Note */}
+              <div className="drawer-routing-note">
+                <Building2 size={16} className="drawer-routing-note-icon" />
                 <div>
-                  <strong style={{ color: "var(--text)" }}>
-                    {isException ? "🏢 Cross-Department Resource:" : "Standard Policy Match:"}
-                  </strong>{" "}
-                  <span style={{ color: "var(--text-secondary)" }}>
+                  <div className="drawer-routing-note-title">
                     {isException
-                      ? `This resource is managed by ${accessItem.group}. Submitting a request will route directly to the ${accessItem.group} owner (${accessItem.approver}) for cross-team approval.`
-                      : `Pre-approved for your department. Will be routed to ${accessItem.approver}.`}
-                  </span>
+                      ? `Managed by ${accessItem.group || "Marketing Team"}`
+                      : "Standard Policy Match"}
+                  </div>
+                  <div className="drawer-routing-note-desc">
+                    {isException
+                      ? `Routes to ${accessItem.approver || "Rahul Verma"} (Owner) for cross-team approval.`
+                      : `Pre-approved for your department. Routes directly to ${accessItem.approver || "Owner"} for fulfillment.`}
+                  </div>
                 </div>
               </div>
 
-              {/* 1. Who needs this access? (Linear-Grade Segmented Capsule) */}
+              {/* 1. Who needs this access? (Linear-Grade Segmented Control) */}
               <div style={{ marginBottom: "20px" }}>
                 <label style={{ fontSize: "12px", fontWeight: 600, color: "var(--text-secondary)", display: "block", marginBottom: "8px" }}>
                   Who needs this access?
                 </label>
-                <div
-                  style={{
-                    background: "var(--surface-subtle)",
-                    padding: "3px",
-                    borderRadius: "9px",
-                    display: "grid",
-                    gridTemplateColumns: "1fr 1fr",
-                    gap: "3px",
-                    border: "1px solid var(--border)",
-                  }}
-                >
+                <div className="drawer-segmented-control" style={{ gridTemplateColumns: "1fr 1fr" }}>
                   <button
                     type="button"
                     onClick={() => setOnBehalf(false)}
-                    style={{
-                      padding: "7px 10px",
-                      borderRadius: "7px",
-                      border: "none",
-                      background: !onBehalf ? "var(--surface)" : "transparent",
-                      color: !onBehalf ? "var(--text)" : "var(--muted)",
-                      fontWeight: !onBehalf ? 600 : 500,
-                      fontSize: "12.5px",
-                      cursor: "pointer",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "6px",
-                      justifyContent: "center",
-                      boxShadow: !onBehalf ? "var(--shadow-xs)" : "none",
-                      transition: "all 0.15s cubic-bezier(0.16, 1, 0.3, 1)",
-                    }}
+                    className={`drawer-segmented-btn ${!onBehalf ? "active" : ""}`}
                   >
-                    <User size={13} style={{ color: !onBehalf ? "var(--accent)" : "var(--muted)" }} />
+                    <User size={13} style={{ color: !onBehalf ? "var(--text)" : "var(--muted)" }} />
                     <span>For Myself</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => setOnBehalf(true)}
-                    style={{
-                      padding: "7px 10px",
-                      borderRadius: "7px",
-                      border: "none",
-                      background: onBehalf ? "var(--surface)" : "transparent",
-                      color: onBehalf ? "var(--text)" : "var(--muted)",
-                      fontWeight: onBehalf ? 600 : 500,
-                      fontSize: "12.5px",
-                      cursor: "pointer",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "6px",
-                      justifyContent: "center",
-                      boxShadow: onBehalf ? "var(--shadow-xs)" : "none",
-                      transition: "all 0.15s cubic-bezier(0.16, 1, 0.3, 1)",
-                    }}
+                    className={`drawer-segmented-btn ${onBehalf ? "active" : ""}`}
                   >
-                    <Users size={13} style={{ color: onBehalf ? "var(--accent)" : "var(--muted)" }} />
+                    <Users size={13} style={{ color: onBehalf ? "var(--text)" : "var(--muted)" }} />
                     <span>On Behalf of Colleague</span>
                   </button>
                 </div>
@@ -374,7 +315,7 @@ export default function RequestFormDrawer({
                 )}
               </div>
 
-              {/* 2. Access Duration (Crisp Tile Cards) */}
+              {/* 2. Access Duration (Unified 4-Segment Pill Bar) */}
               <div style={{ marginBottom: "20px" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "8px" }}>
                   <label style={{ fontSize: "12px", fontWeight: 600, color: "var(--text-secondary)", display: "flex", alignItems: "center", gap: "5px" }}>
@@ -385,7 +326,7 @@ export default function RequestFormDrawer({
                   </span>
                 </div>
 
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+                <div className="drawer-pill-grid">
                   {DURATION_PRESETS.map((preset) => {
                     const isSelected = durationDays === preset.days;
                     return (
@@ -393,48 +334,21 @@ export default function RequestFormDrawer({
                         key={preset.days}
                         type="button"
                         onClick={() => setDurationDays(preset.days)}
-                        style={{
-                          padding: "9px 12px",
-                          borderRadius: "8px",
-                          border: isSelected ? "1.5px solid var(--accent)" : "1px solid var(--border)",
-                          background: isSelected ? "var(--accent-light)" : "var(--surface)",
-                          color: isSelected ? "var(--accent)" : "var(--text-secondary)",
-                          fontSize: "12px",
-                          fontWeight: isSelected ? 600 : 500,
-                          cursor: "pointer",
-                          textAlign: "left",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          transition: "all 0.12s ease",
-                        }}
+                        className={`drawer-pill-btn ${isSelected ? "active" : ""}`}
                       >
-                        <span>{preset.label}</span>
-                        {isSelected && (
-                          <div style={{ width: "6px", height: "6px", borderRadius: "999px", background: "var(--accent)" }} />
-                        )}
+                        {preset.label}
                       </button>
                     );
                   })}
                 </div>
               </div>
 
-              {/* 3. Request Urgency (Segmented Control) */}
+              {/* 3. Request Urgency (Linear Segmented Control) */}
               <div style={{ marginBottom: "20px" }}>
                 <label style={{ fontSize: "12px", fontWeight: 600, color: "var(--text-secondary)", display: "block", marginBottom: "8px" }}>
                   Request Urgency
                 </label>
-                <div
-                  style={{
-                    background: "var(--surface-subtle)",
-                    padding: "3px",
-                    borderRadius: "9px",
-                    display: "grid",
-                    gridTemplateColumns: "1fr 1fr 1fr",
-                    gap: "3px",
-                    border: "1px solid var(--border)",
-                  }}
-                >
+                <div className="drawer-segmented-control" style={{ gridTemplateColumns: "1fr 1fr 1fr" }}>
                   {(["STANDARD", "URGENT", "CRITICAL"] as const).map((lvl) => {
                     const isSelected = urgency === lvl;
                     return (
@@ -442,28 +356,7 @@ export default function RequestFormDrawer({
                         key={lvl}
                         type="button"
                         onClick={() => setUrgency(lvl)}
-                        style={{
-                          padding: "6px 8px",
-                          borderRadius: "7px",
-                          border: "none",
-                          background: isSelected ? "var(--surface)" : "transparent",
-                          color: isSelected
-                            ? lvl === "CRITICAL"
-                              ? "#EF4444"
-                              : lvl === "URGENT"
-                              ? "#F59E0B"
-                              : "var(--text)"
-                            : "var(--muted)",
-                          fontWeight: isSelected ? 600 : 500,
-                          fontSize: "12px",
-                          cursor: "pointer",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          gap: "4px",
-                          boxShadow: isSelected ? "var(--shadow-xs)" : "none",
-                          transition: "all 0.15s ease",
-                        }}
+                        className={`drawer-segmented-btn ${isSelected ? "active" : ""}`}
                       >
                         {lvl === "STANDARD" ? "Standard" : lvl === "URGENT" ? "Urgent" : "Critical"}
                       </button>
@@ -472,37 +365,27 @@ export default function RequestFormDrawer({
                 </div>
               </div>
 
-              {/* 4. Business Justification with Quick Fill Chips */}
+              {/* 4. Business Justification with Inline Chip Bar */}
               <div style={{ marginBottom: "22px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "6px" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "8px" }}>
                   <label style={{ fontSize: "12px", fontWeight: 600, color: "var(--text-secondary)" }}>
                     Business Justification <span style={{ color: "#EF4444" }}>*</span>
                   </label>
                   <span style={{ fontSize: "11px", color: "var(--muted)" }}>1-Click Presets:</span>
                 </div>
 
-                {/* Clean Quick Chips */}
-                <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginBottom: "8px" }}>
-                  {QUICK_JUSTIFICATIONS.map((text) => {
-                    const isSelected = justification === text;
+                {/* Cohesive, unobtrusive inline chip bar */}
+                <div className="quick-chip-bar">
+                  {QUICK_PRESETS.map((preset) => {
+                    const isSelected = justification === preset.value;
                     return (
                       <button
-                        key={text}
+                        key={preset.label}
                         type="button"
-                        onClick={() => setJustification(text)}
-                        style={{
-                          border: isSelected ? "1px solid var(--accent)" : "1px solid var(--border)",
-                          background: isSelected ? "var(--accent-light)" : "var(--surface)",
-                          color: isSelected ? "var(--accent)" : "var(--text-secondary)",
-                          padding: "4px 9px",
-                          borderRadius: "6px",
-                          fontSize: "11px",
-                          cursor: "pointer",
-                          fontWeight: isSelected ? 600 : 500,
-                          transition: "all 0.12s ease",
-                        }}
+                        onClick={() => setJustification(preset.value)}
+                        className={`quick-chip-btn ${isSelected ? "active" : ""}`}
                       >
-                        {text}
+                        {preset.label}
                       </button>
                     );
                   })}
@@ -510,16 +393,26 @@ export default function RequestFormDrawer({
 
                 <textarea
                   className="form-textarea"
-                  rows={2}
-                  placeholder="Explain why you or your team requires access..."
+                  rows={3}
+                  placeholder="Provide clear business context to speed up review..."
                   value={justification}
                   onChange={(e) => setJustification(e.target.value)}
                   style={{
                     fontSize: "12.5px",
                     lineHeight: 1.5,
+                    padding: "10px 12px",
+                    marginTop: "4px",
                   }}
                   required
                 />
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "5px" }}>
+                  <span style={{ fontSize: "11px", color: "var(--muted)" }}>
+                    Provide clear business context to speed up review.
+                  </span>
+                  <span style={{ fontSize: "11px", color: "var(--muted-2)", fontVariantNumeric: "tabular-nums" }}>
+                    {justification.length} chars
+                  </span>
+                </div>
               </div>
 
               {error && (
@@ -529,11 +422,10 @@ export default function RequestFormDrawer({
               )}
 
               {/* Form Action Footer */}
-              <div style={{ display: "flex", gap: "10px", marginTop: "8px" }}>
+              <div className="drawer-footer-actions">
                 <button
                   type="button"
                   className="btn btn-secondary"
-                  style={{ flex: 1, height: "40px", fontSize: "13px", fontWeight: 500 }}
                   onClick={handleResetAndClose}
                 >
                   Cancel
@@ -541,16 +433,6 @@ export default function RequestFormDrawer({
                 <button
                   type="submit"
                   className="btn btn-primary"
-                  style={{
-                    flex: 1.8,
-                    height: "40px",
-                    fontSize: "13px",
-                    fontWeight: 600,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: "6px",
-                  }}
                   disabled={loading}
                 >
                   <Send size={14} />
@@ -564,3 +446,4 @@ export default function RequestFormDrawer({
     </>
   );
 }
+

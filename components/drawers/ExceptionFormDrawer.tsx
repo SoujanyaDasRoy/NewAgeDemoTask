@@ -1,7 +1,15 @@
 "use client";
 
 import React, { useState } from "react";
-import { X, CheckCircle2, AlertTriangle, Send } from "lucide-react";
+import {
+  X,
+  CheckCircle2,
+  Building2,
+  Send,
+  Copy,
+  CheckCheck,
+  Calendar,
+} from "lucide-react";
 import StatusBadge from "../StatusBadge";
 import ServiceLogo from "../ServiceLogo";
 
@@ -37,13 +45,14 @@ export default function ExceptionFormDrawer({
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [submittedId, setSubmittedId] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   if (!isOpen || !accessItem) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!justification.trim()) {
-      setError("Please provide a business justification for this exception.");
+      setError("Please provide a business justification for this cross-department request.");
       return;
     }
     setError("");
@@ -67,7 +76,16 @@ export default function ExceptionFormDrawer({
     setSubmittedId(null);
     setJustification("");
     setError("");
+    setUrgency("STANDARD");
     onClose();
+  };
+
+  const copyId = () => {
+    if (submittedId) {
+      navigator.clipboard.writeText(submittedId);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
 
   return (
@@ -79,20 +97,23 @@ export default function ExceptionFormDrawer({
         aria-modal="true"
         aria-label="Cross-Department Access Request Form"
       >
-        <div className="drawer-head">
-          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <div className="tool-logo-badge">
-              <ServiceLogo tool={accessItem.tool} size={24} />
+        {/* Drawer Header */}
+        <div className="drawer-head" style={{ padding: "18px 22px", borderBottom: "1px solid var(--border)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <div className="drawer-logo-lightbox">
+              <ServiceLogo tool={accessItem.tool} size={20} />
             </div>
             <div>
-              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                <h3 style={{ margin: 0, fontSize: "15px", fontWeight: 700, color: "var(--text)" }}>
-                  {submittedId ? "Cross-Department Access Request Submitted" : "Cross-Department Access Request"}
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                <h3 style={{ margin: 0, fontSize: "16px", fontWeight: 700, color: "var(--text)", letterSpacing: "-0.02em" }}>
+                  {submittedId ? "Request Submitted" : "Cross-Department Request"}
                 </h3>
-                <span className="badge badge-amber" style={{ fontSize: "10.5px" }}>Cross-Team</span>
+                <span className="badge badge-neutral" style={{ fontSize: "11px", fontWeight: 600, padding: "2.5px 8px" }}>
+                  🏢 Cross-Department
+                </span>
               </div>
-              <div className="sub" style={{ fontSize: "12px", color: "var(--muted)", marginTop: "1px" }}>
-                {accessItem.tool} – {accessItem.name}
+              <div style={{ fontSize: "12.5px", color: "var(--muted)", marginTop: "2px" }}>
+                {accessItem.tool} · {accessItem.name}
               </div>
             </div>
           </div>
@@ -101,87 +122,96 @@ export default function ExceptionFormDrawer({
           </button>
         </div>
 
-        <div className="drawer-body">
+        {/* Drawer Body */}
+        <div className="drawer-body" style={{ padding: "22px" }}>
           {submittedId ? (
-            <div style={{ textAlign: "center", padding: "14px 0" }}>
+            /* Confirmation Screen */
+            <div style={{ textAlign: "center", padding: "20px 0" }}>
               <div
                 style={{
-                  width: "48px",
-                  height: "48px",
+                  width: "52px",
+                  height: "52px",
                   borderRadius: "999px",
-                  background: "rgba(245, 158, 11, 0.15)",
-                  border: "1px solid rgba(245, 158, 11, 0.3)",
+                  background: "rgba(34, 197, 94, 0.15)",
+                  color: "#4ADE80",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  margin: "0 auto 12px",
-                  color: "#FBBF24",
+                  margin: "0 auto 14px",
+                  border: "1px solid rgba(34, 197, 94, 0.3)",
                 }}
               >
-                <AlertTriangle size={24} />
+                <CheckCircle2 size={28} />
               </div>
-              <h4 style={{ fontSize: "16px", fontWeight: 700, margin: 0, color: "var(--text)" }}>
-                Cross-Department Access Request Submitted
+
+              <h4 style={{ fontSize: "17px", fontWeight: 700, color: "var(--text)", margin: "0 0 6px", letterSpacing: "-0.02em" }}>
+                Cross-Department Request Submitted
               </h4>
-              <p style={{ fontSize: "12.5px", color: "var(--muted)", marginTop: "4px" }}>
-                Routed to {accessItem.approver} for cross-team approval.
+              <p style={{ fontSize: "13px", color: "var(--muted)", margin: "0 0 20px" }}>
+                Routed to <strong>{accessItem.approver}</strong> ({accessItem.group} Owner) for cross-team approval.
               </p>
 
               <div
                 style={{
-                  marginTop: "20px",
-                  padding: "12px 14px",
                   background: "var(--surface-subtle)",
-                  borderRadius: "8px",
                   border: "1px solid var(--border)",
-                  textAlign: "left",
+                  borderRadius: "10px",
+                  padding: "14px 16px",
+                  maxWidth: "320px",
+                  margin: "0 auto 24px",
                   display: "flex",
-                  flexDirection: "column",
-                  gap: "10px",
+                  alignItems: "center",
+                  justifyContent: "space-between",
                 }}
               >
-                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12.5px" }}>
-                  <span style={{ color: "var(--muted)" }}>Request ID</span>
-                  <span className="mono font-bold" style={{ color: "var(--text)" }}>{submittedId}</span>
+                <div style={{ textAlign: "left" }}>
+                  <div style={{ fontSize: "10px", color: "var(--muted)", fontWeight: 700, letterSpacing: "0.05em" }}>REQUEST ID</div>
+                  <div className="mono" style={{ fontSize: "15px", fontWeight: 700, color: "var(--text)", marginTop: "2px" }}>
+                    {submittedId}
+                  </div>
                 </div>
-                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12.5px" }}>
-                  <span style={{ color: "var(--muted)" }}>Status</span>
-                  <StatusBadge status="Pending Exception Approval" />
-                </div>
-                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12.5px" }}>
-                  <span style={{ color: "var(--muted)" }}>Approver</span>
-                  <span style={{ fontWeight: 600, color: "var(--text)" }}>{accessItem.approver}</span>
-                </div>
-                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12.5px" }}>
-                  <span style={{ color: "var(--muted)" }}>Access Expiration Date</span>
-                  <span style={{ fontWeight: 600, color: "var(--text)" }}>{requiredUntil}</span>
-                </div>
-                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12.5px" }}>
-                  <span style={{ color: "var(--muted)" }}>Urgency</span>
-                  <span style={{ fontWeight: 600, color: urgency === "CRITICAL" ? "#EF4444" : urgency === "URGENT" ? "#F59E0B" : "var(--text)" }}>
-                    {urgency}
-                  </span>
-                </div>
+                <button
+                  type="button"
+                  onClick={copyId}
+                  style={{
+                    border: "1px solid var(--border)",
+                    background: "var(--surface)",
+                    borderRadius: "6px",
+                    padding: "5px 10px",
+                    fontSize: "12px",
+                    fontWeight: 600,
+                    color: "var(--text-secondary)",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "5px",
+                  }}
+                >
+                  {copied ? <CheckCheck size={13} style={{ color: "#4ADE80" }} /> : <Copy size={13} />}
+                  {copied ? "Copied" : "Copy"}
+                </button>
               </div>
 
               <button
-                className="btn btn-primary btn-block"
-                style={{ marginTop: "20px", height: "38px" }}
+                type="button"
+                className="btn btn-primary"
+                style={{ width: "100%", height: "42px", fontSize: "13px", fontWeight: 600 }}
                 onClick={handleResetAndClose}
               >
-                Done
+                Done · Return to Dashboard
               </button>
             </div>
           ) : (
             <form onSubmit={handleSubmit}>
-              <div className="warn-box" style={{ marginBottom: "16px" }}>
-                <AlertTriangle size={15} style={{ marginTop: "1px", flexShrink: 0, color: "#F59E0B" }} />
+              {/* Sleek Elegant Neutral Routing Note */}
+              <div className="drawer-routing-note">
+                <Building2 size={16} className="drawer-routing-note-icon" />
                 <div>
-                  <div style={{ fontWeight: 700 }}>
-                    🏢 Cross-Department Resource
+                  <div className="drawer-routing-note-title">
+                    Managed by {accessItem.group || "Marketing Team"}
                   </div>
-                  <div style={{ marginTop: "2px", fontSize: "11.5px" }}>
-                    This resource is managed by {accessItem.group}. Submitting a request will route directly to the {accessItem.group} owner ({accessItem.approver}) for cross-team approval.
+                  <div className="drawer-routing-note-desc">
+                    Routes to {accessItem.approver || "Rahul Verma"} (Owner) for cross-team approval.
                   </div>
                 </div>
               </div>
@@ -192,7 +222,7 @@ export default function ExceptionFormDrawer({
                   className="form-select"
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
-                  style={{ height: "36px" }}
+                  style={{ height: "38px" }}
                 >
                   <option value="Cross-team Project Collaboration">
                     Cross-team Project Collaboration
@@ -207,55 +237,82 @@ export default function ExceptionFormDrawer({
                 </select>
               </div>
 
-              <div className="field-grid" style={{ marginBottom: "14px" }}>
-                <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label className="form-label">Access Expiration Date</label>
-                  <input
-                    type="date"
-                    className="form-input"
-                    value={requiredUntil}
-                    onChange={(e) => setRequiredUntil(e.target.value)}
-                    style={{ height: "36px" }}
-                  />
-                </div>
-                <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label className="form-label">Urgency Level</label>
-                  <select
-                    className="form-select"
-                    value={urgency}
-                    onChange={(e) => setUrgency(e.target.value as any)}
-                    style={{ height: "36px" }}
-                  >
-                    <option value="STANDARD">Standard</option>
-                    <option value="URGENT">Urgent (Blocked)</option>
-                    <option value="CRITICAL">Critical (Production)</option>
-                  </select>
+              {/* Expiration Date */}
+              <div className="form-group" style={{ marginBottom: "20px" }}>
+                <label className="form-label" style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+                  <Calendar size={13} style={{ color: "var(--muted)" }} /> Access Expiration Date
+                </label>
+                <input
+                  type="date"
+                  className="form-input"
+                  value={requiredUntil}
+                  onChange={(e) => setRequiredUntil(e.target.value)}
+                  style={{ height: "38px" }}
+                />
+              </div>
+
+              {/* Request Urgency (Linear Segmented Control) */}
+              <div style={{ marginBottom: "20px" }}>
+                <label style={{ fontSize: "12px", fontWeight: 600, color: "var(--text-secondary)", display: "block", marginBottom: "8px" }}>
+                  Request Urgency
+                </label>
+                <div className="drawer-segmented-control" style={{ gridTemplateColumns: "1fr 1fr 1fr" }}>
+                  {(["STANDARD", "URGENT", "CRITICAL"] as const).map((lvl) => {
+                    const isSelected = urgency === lvl;
+                    return (
+                      <button
+                        key={lvl}
+                        type="button"
+                        onClick={() => setUrgency(lvl)}
+                        className={`drawer-segmented-btn ${isSelected ? "active" : ""}`}
+                      >
+                        {lvl === "STANDARD" ? "Standard" : lvl === "URGENT" ? "Urgent" : "Critical"}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
-              <div className="form-group">
-                <label className="form-label">Business Justification</label>
+              <div className="form-group" style={{ marginBottom: "22px" }}>
+                <label className="form-label">
+                  Business Justification <span style={{ color: "#EF4444" }}>*</span>
+                </label>
                 <span className="form-sublabel">
-                  Explain the project scope and why cross-department access is needed.
+                  Explain the project scope and why cross-department access is required.
                 </span>
                 <textarea
                   className="form-textarea"
                   rows={3}
-                  placeholder="Detail project deliverables and rationale..."
+                  placeholder="Detail project deliverables, rationale, and timelines..."
                   value={justification}
                   onChange={(e) => {
                     setJustification(e.target.value);
                     if (error) setError("");
                   }}
+                  style={{
+                    fontSize: "12.5px",
+                    lineHeight: 1.5,
+                    padding: "10px 12px",
+                    marginTop: "4px",
+                  }}
+                  required
                 />
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "5px" }}>
+                  <span style={{ fontSize: "11px", color: "var(--muted)" }}>
+                    Provide clear context to accelerate owner approval.
+                  </span>
+                  <span style={{ fontSize: "11px", color: "var(--muted-2)", fontVariantNumeric: "tabular-nums" }}>
+                    {justification.length} chars
+                  </span>
+                </div>
                 {error && <div style={{ color: "#EF4444", fontSize: "11.5px", marginTop: "4px" }}>{error}</div>}
               </div>
 
-              <div style={{ display: "flex", gap: "8px", marginTop: "20px" }}>
+              {/* Form Action Footer */}
+              <div className="drawer-footer-actions">
                 <button
                   type="button"
                   className="btn btn-secondary"
-                  style={{ flex: 1, height: "38px" }}
                   onClick={handleResetAndClose}
                 >
                   Cancel
@@ -263,10 +320,10 @@ export default function ExceptionFormDrawer({
                 <button
                   type="submit"
                   className="btn btn-primary"
-                  style={{ flex: 1.5, height: "38px" }}
                   disabled={loading}
                 >
-                  <Send size={13} /> {loading ? "Submitting..." : "Submit Cross-Team Request"}
+                  <Send size={14} />
+                  <span>{loading ? "Submitting..." : "Submit Cross-Team Request"}</span>
                 </button>
               </div>
             </form>
@@ -276,3 +333,4 @@ export default function ExceptionFormDrawer({
     </>
   );
 }
+
