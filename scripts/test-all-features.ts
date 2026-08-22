@@ -236,11 +236,11 @@ async function runTestSuite() {
 
   // ── TEST SUITE 9: Board Configuration & Automation Toggle ────────────────
   console.log("\n📁 SUITE 9: Board Configuration & Automation Toggle");
-  const toggleRes = await toggleAutomation("acc-salesforce-crm", "Rahul Sharma");
-  assert(toggleRes.success === true, "Board Config", "Toggled automation on acc-2", toggleRes);
+  const toggleRes = await toggleAutomation("acc-datadog-apm", "Rahul Sharma");
+  assert(toggleRes.success === true, "Board Config", "Toggled automation on acc-datadog-apm", toggleRes);
 
   const configRes = await updateAccessConfig(
-    "acc-salesforce-crm",
+    "acc-datadog-apm",
     {
       approver: "Arjun Mehta",
       backupApprover: "Neha Kapoor",
@@ -250,8 +250,8 @@ async function runTestSuite() {
   );
   assert(configRes.success === true, "Board Config", "Updated board approver to Arjun Mehta");
 
-  const acc2Updated = await prisma.accessItem.findUnique({ where: { id: "acc-salesforce-crm" } });
-  assert(acc2Updated?.approver === "Arjun Mehta", "Board Config", "Board configuration saved to DB");
+  const accDatadogUpdated = await prisma.accessItem.findUnique({ where: { id: "acc-datadog-apm" } });
+  assert(accDatadogUpdated?.approver === "Arjun Mehta", "Board Config", "Board configuration saved to DB");
 
   // ── TEST SUITE 10: Notifications & Audit Log ─────────────────────────────
   // Admin session is still active from injection above.
