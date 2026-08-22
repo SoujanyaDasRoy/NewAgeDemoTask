@@ -91,10 +91,22 @@ export async function getDashboardData(): Promise<DashboardDataPayload> {
         // 4. Notifications scoped to current user (per-user + role broadcast)
         getNotifications(),
 
-        // 5. Audit logs
+        // 5. Audit logs (with rich user relations)
         prisma.auditLog.findMany({
           orderBy: { createdAt: "desc" },
-          take: 50,
+          take: 100,
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                department: true,
+                avatarTone: true,
+                initials: true,
+              },
+            },
+          },
         }),
 
         // 6. All users (for admin dropdowns & user table)

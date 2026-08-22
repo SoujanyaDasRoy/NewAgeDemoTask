@@ -81,7 +81,7 @@ import {
   requestAccessIdCreation,
   approveAccessId,
 } from "@/lib/actions/access-id";
-import { getNotifications, markNotificationsRead } from "@/lib/actions/notifications";
+import { getNotifications, markNotificationsRead, clearAllNotifications } from "@/lib/actions/notifications";
 import { getAuditLogs } from "@/lib/actions/audit";
 
 // ── TOAST ────────────────────────────────────────────────────────────────────
@@ -319,10 +319,10 @@ function PortalDashboard() {
   };
 
   const handleMarkAllRead = async () => {
-    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-    await markNotificationsRead();
+    setNotifications([]);
+    pushToast("All notifications cleared");
+    await clearAllNotifications();
     await loadData();
-    pushToast("All notifications marked as read");
   };
 
   const getToolName = (req: any) => {

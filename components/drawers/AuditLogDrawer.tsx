@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   X,
   Shield,
@@ -53,6 +53,11 @@ export default function AuditLogDrawer({
   const [searchQuery, setSearchQuery] = useState("");
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  useEffect(() => {
+    if (isOpen && auditLogs.length === 0 && onRefresh) {
+      onRefresh();
+    }
+  }, [isOpen, auditLogs.length, onRefresh]);
 
   if (!isOpen) return null;
 
