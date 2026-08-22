@@ -1817,64 +1817,54 @@ textarea:focus-visible {
 
 /* Right Actions Container */
 .catalog-actions-wrap {
-  min-width: 215px;
   display: flex;
   align-items: center;
   justify-content: flex-end;
   gap: 8px;
   flex-shrink: 0;
-  margin-top: 2px;
+  white-space: nowrap;
 }
 
 .catalog-btn-info {
-  width: 60px;
   height: 34px;
-  padding: 0;
+  padding: 0 14px;
   font-size: 12px;
   font-weight: 600;
   border-radius: 8px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
-.catalog-action-btn {
-  width: 140px;
-  height: 34px;
-  padding: 0;
-  font-size: 12px;
-  font-weight: 600;
-  border-radius: 8px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-}
-
+.catalog-action-btn,
 .catalog-btn-request {
-  width: 140px;
   height: 34px;
-  padding: 0;
+  padding: 0 16px;
   font-size: 12px;
   font-weight: 600;
   border-radius: 8px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
+  gap: 6px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .catalog-btn-exception {
-  width: 140px;
   height: 34px;
-  padding: 0;
+  padding: 0 16px;
   font-size: 12px;
   font-weight: 600;
   border-radius: 8px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
+  gap: 6px;
+  white-space: nowrap;
+  flex-shrink: 0;
   cursor: pointer;
   background: var(--btn-secondary-bg);
   color: var(--btn-secondary-text);
@@ -2376,6 +2366,8 @@ textarea:focus-visible {
   border: 1px solid transparent;
   transition: all 0.14s cubic-bezier(0.16, 1, 0.3, 1);
   user-select: none;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .btn:active:not(:disabled) {
