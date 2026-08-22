@@ -18,10 +18,14 @@ export interface SlackMessagePayload {
   approverName: string;
   automation?: boolean;
   status?: string;
+  requiredUntil?: string | null;
+  department?: string;
+  accessId?: string | null;
+  category?: string;
 }
 
 /**
- * Builds the interactive Slack Block-Kit payload for an access request.
+ * Builds the rich interactive Slack Block-Kit payload for an access request.
  */
 export function buildSlackAccessRequestBlocks(payload: SlackMessagePayload, portalBaseUrl?: string) {
   let rawBaseUrl =
@@ -41,7 +45,7 @@ export function buildSlackAccessRequestBlocks(payload: SlackMessagePayload, port
   const now = new Date();
   const unixSec = Math.floor(now.getTime() / 1000);
 
-  // Fallback formatted timestamp for clients that do not parse Slack dynamic date tags
+  // Fallback formatted timestamp in IST
   const fallbackFormatted = now.toLocaleString("en-IN", {
     timeZone: "Asia/Kolkata",
     day: "numeric",
@@ -52,12 +56,29 @@ export function buildSlackAccessRequestBlocks(payload: SlackMessagePayload, port
     hour12: true,
   });
 
+  const isSelf = (payload.requesterName || "").toLowerCase() === (payload.beneficiaryName || "").toLowerCase();
+  const beneficiaryDisplay = isSelf
+    ? `${payload.beneficiaryName} *(Self)*`
+    : `${payload.beneficiaryName} *(On-Behalf)*`;
+  const policyDisplay = payload.isException
+    ? `🏢 *Cross-Department (${payload.urgency || "Standard"})*`
+    : `✓ *Pre-Approved Policy*`;
+  const provisioningDisplay = payload.automation
+    ? `⚡ *Automated SCIM (Instant)*`
+    : `🛠️ *Manual IT Account Setup*`;
+  const durationDisplay = payload.requiredUntil
+    ? `⏳ *Until ${payload.requiredUntil}*`
+    : `♾️ *Standard / 90 Days*`;
+  const governanceDisplay = payload.accessId
+    ? `🔑 \`${payload.accessId}\``
+    : `🔍 *Governance ID Pending*`;
+
   return [
     {
       type: "header",
       text: {
         type: "plain_text",
-        text: `🔔 New Access Request: ${payload.accessLabel}`,
+        text: `🛡️ New Access Request: ${payload.accessLabel}`,
         emoji: true,
       },
     },
@@ -70,23 +91,31 @@ export function buildSlackAccessRequestBlocks(payload: SlackMessagePayload, port
         },
         {
           type: "mrkdwn",
-          text: `*Requester:*\n${payload.requesterName}`,
+          text: `*Requester:*\n${payload.requesterName}${payload.department ? ` (${payload.department})` : ""}`,
         },
         {
           type: "mrkdwn",
-          text: `*Beneficiary:*\n${payload.beneficiaryName}`,
+          text: `*Beneficiary:*\n${beneficiaryDisplay}`,
         },
         {
           type: "mrkdwn",
-          text: `*Type:*\n${payload.isException ? `⚠️ *Exception (${payload.urgency || "Standard"})*` : "Standard"}`,
+          text: `*Policy Routing:*\n${policyDisplay}`,
         },
         {
           type: "mrkdwn",
-          text: `*Approver:*\n${payload.approverName}`,
+          text: `*Assigned Approver:*\n👔 ${payload.approverName}`,
         },
         {
           type: "mrkdwn",
-          text: `*Provisioning Mode:*\n${payload.automation ? "⚡ Automated" : "🛠️ Manual"}`,
+          text: `*Fulfillment Mode:*\n${provisioningDisplay}`,
+        },
+        {
+          type: "mrkdwn",
+          text: `*Access Duration:*\n${durationDisplay}`,
+        },
+        {
+          type: "mrkdwn",
+          text: `*SOC-2 Access ID:*\n${governanceDisplay}`,
         },
       ],
     },
@@ -94,7 +123,7 @@ export function buildSlackAccessRequestBlocks(payload: SlackMessagePayload, port
       type: "section",
       text: {
         type: "mrkdwn",
-        text: `*Business Justification:*\n>${(payload.justification || "No justification provided").replace(/\n/g, "\n>")}`,
+        text: `*📝 Business Justification & Purpose:*\n>${(payload.justification || "No justification provided").replace(/\n/g, "\n>")}`,
       },
     },
     {
@@ -126,7 +155,7 @@ export function buildSlackAccessRequestBlocks(payload: SlackMessagePayload, port
           type: "button",
           text: {
             type: "plain_text",
-            text: "Review in Portal",
+            text: "Review in Portal ↗",
             emoji: true,
           },
           url: `${baseUrl}/?approval=${payload.requestId}`,
@@ -138,7 +167,7 @@ export function buildSlackAccessRequestBlocks(payload: SlackMessagePayload, port
       elements: [
         {
           type: "mrkdwn",
-          text: `New Age Access Portal • Status: *${payload.status || "Pending Approval"}* • <!date^${unixSec}^{date_short_pretty} at {time}|${fallbackFormatted}>`,
+          text: `🛡️ *New Age Governance Engine* • Status: *${payload.status || "Pending Approval"}* • Submitted: <!date^${unixSec}^{date_short_pretty} at {time}|${fallbackFormatted}>`,
         },
       ],
     },

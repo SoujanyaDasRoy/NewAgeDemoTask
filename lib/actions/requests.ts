@@ -189,6 +189,8 @@ export async function submitRequest(opts: {
       approverName: result.access.approver,
       automation: result.access.automation,
       status: "Pending Approval",
+      accessId: result.access.accessId,
+      department: result.access.group,
     }).catch((e) => console.error("[Slack] Async notification error:", e));
 
     try {
@@ -351,6 +353,9 @@ export async function submitExceptionRequest(opts: {
       approverName: result.access.approver,
       automation: result.access.automation,
       status: "Pending Exception Approval",
+      requiredUntil: opts.requiredUntil,
+      accessId: result.access.accessId,
+      department: result.access.group,
     }).catch((e) => console.error("[Slack] Async notification error:", e));
 
     try {
