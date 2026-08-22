@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { sendSlackNotification } from "@/lib/slack";
 import { requireAdmin, getCurrentUser } from "./auth";
 import { randomUUID } from "crypto";
+import { notify } from "@/lib/notifications-engine";
 
 /**
  * Generate a NAR-XXXXX request ID using a 4-byte random suffix. Avoids the
@@ -157,22 +158,21 @@ export async function submitRequest(opts: {
 
       // Push notification atomically
       if (access.approver !== opts.requesterName) {
-        await tx.notification.create({
-          data: {
-            role: access.approver === "Rahul Sharma" ? "admin" : "employee",
-            text: `New access request ${requestId} from ${opts.requesterName} awaiting your approval.`,
-            channel: "slack",
-          },
+        await notify({
+          role: access.approver === "Rahul Sharma" ? "admin" : "employee",
+          eventType: "REQUEST_SUBMITTED",
+          text: `New access request ${requestId} from ${opts.requesterName} awaiting your approval.`,
+          channel: "slack",
+          tx,
         });
       }
       // Confirmation notification to requester (per-user, so only they see it)
-      await tx.notification.create({
-        data: {
-          userId: requester.id,
-          role: "employee",
-          text: `Request ${requestId} for ${access.tool} – ${access.name} submitted for approval.`,
-          channel: "portal",
-        },
+      await notify({
+        userId: requester.id,
+        eventType: "REQUEST_SUBMITTED",
+        text: `Request ${requestId} for ${access.tool} – ${access.name} submitted for approval.`,
+        channel: "portal",
+        tx,
       });
 
       return { requestId, access };
@@ -315,21 +315,20 @@ export async function submitExceptionRequest(opts: {
       });
 
       // Notification
-      await tx.notification.create({
-        data: {
-          role: access.approver === "Rahul Sharma" ? "admin" : "employee",
-          text: `Access exception request ${requestId} from ${opts.requesterName} awaiting your review.`,
-          channel: "slack",
-        },
+      await notify({
+        role: access.approver === "Rahul Sharma" ? "admin" : "employee",
+        eventType: "REQUEST_SUBMITTED",
+        text: `Access exception request ${requestId} from ${opts.requesterName} awaiting your review.`,
+        channel: "slack",
+        tx,
       });
       // Confirmation notification to requester (per-user)
-      await tx.notification.create({
-        data: {
-          userId: requester.id,
-          role: "employee",
-          text: `Exception request ${requestId} for ${access.tool} – ${access.name} submitted for review.`,
-          channel: "portal",
-        },
+      await notify({
+        userId: requester.id,
+        eventType: "REQUEST_SUBMITTED",
+        text: `Exception request ${requestId} for ${access.tool} – ${access.name} submitted for review.`,
+        channel: "portal",
+        tx,
       });
 
       return { requestId, access };
@@ -439,13 +438,12 @@ export async function approveRequest(requestId: string, actingUserName: string) 
         });
 
         // Notification to requester
-        await tx.notification.create({
-          data: {
-            userId: r.requesterId,
-            role: "employee",
-            text: `Access automatically provisioned for ${requestId} — ${r.accessLabel}.`,
-            channel: "portal",
-          },
+        await notify({
+          userId: r.requesterId,
+          eventType: "PROVISIONED",
+          text: `Access automatically provisioned for ${requestId} — ${r.accessLabel}.`,
+          channel: "portal",
+          tx,
         });
       } else {
         // Manual flow
@@ -493,12 +491,12 @@ export async function approveRequest(requestId: string, actingUserName: string) 
         });
 
         // Notification to Admin
-        await tx.notification.create({
-          data: {
-            role: "admin",
-            text: `${requestId} (${r.accessLabel}) approved and ready for manual provisioning.`,
-            channel: "portal",
-          },
+        await notify({
+          role: "admin",
+          eventType: "REQUEST_APPROVED",
+          text: `${requestId} (${r.accessLabel}) approved and ready for manual provisioning.`,
+          channel: "portal",
+          tx,
         });
       }
 
@@ -608,12 +606,12 @@ export async function batchApproveRequests(
             ],
           });
 
-          await tx.notification.create({
-            data: {
-              role: "employee",
-              text: `Access automatically provisioned for ${requestId} — ${r.accessLabel} (Batch Approval).`,
-              channel: "portal",
-            },
+          await notify({
+            role: "employee",
+            eventType: "PROVISIONED",
+            text: `Access automatically provisioned for ${requestId} — ${r.accessLabel} (Batch Approval).`,
+            channel: "portal",
+            tx,
           });
         } else {
           // Manual provisioning path
@@ -660,12 +658,12 @@ export async function batchApproveRequests(
             ],
           });
 
-          await tx.notification.create({
-            data: {
-              role: "admin",
-              text: `${requestId} (${r.accessLabel}) batch-approved and queued for manual provisioning.`,
-              channel: "portal",
-            },
+          await notify({
+            role: "admin",
+            eventType: "REQUEST_APPROVED",
+            text: `${requestId} (${r.accessLabel}) batch-approved and queued for manual provisioning.`,
+            channel: "portal",
+            tx,
           });
         }
 
@@ -769,14 +767,13 @@ export async function rejectRequest(
         },
       });
 
-      // Notification
-      await tx.notification.create({
-        data: {
-          userId: r.requesterId,
-          role: "employee",
-          text: `Your request ${requestId} was rejected by ${finalActor || r.approverName}.`,
-          channel: "portal",
-        },
+      // Notification to requester
+      await notify({
+        userId: r.requesterId,
+        eventType: "REQUEST_REJECTED",
+        text: `Your request ${requestId} was rejected by ${finalActor || r.approverName}.`,
+        channel: "portal",
+        tx,
       });
     });
 
@@ -871,13 +868,12 @@ export async function provisionManually(requestId: string, actingUserName: strin
       });
 
       // Notification to requester
-      await tx.notification.create({
-        data: {
-          userId: r.requesterId,
-          role: "employee",
-          text: `Access has been manually provisioned for ${requestId} (${r.accessLabel}).`,
-          channel: "portal",
-        },
+      await notify({
+        userId: r.requesterId,
+        eventType: "PROVISIONED",
+        text: `Access has been manually provisioned for ${requestId} (${r.accessLabel}).`,
+        channel: "portal",
+        tx,
       });
 
       return { onBehalf: r.onBehalf };
@@ -996,6 +992,13 @@ export async function autoExpireRequests() {
               detail: `${r.id} — ${r.accessLabel}`,
             },
           });
+          await notify({
+            userId: r.requesterId,
+            eventType: "REQUEST_AUTO_EXPIRED",
+            text: `Access ${r.id} (${r.accessLabel}) has auto-expired.`,
+            channel: "portal",
+            tx,
+          });
         }
       });
       try {
@@ -1065,12 +1068,12 @@ export async function requestExtension(
         },
       });
 
-      await tx.notification.create({
-        data: {
-          role: "admin",
-          text: `Extension request for ${requestId} (${r.accessLabel}) awaiting review.`,
-          channel: "portal",
-        },
+      await notify({
+        role: "admin",
+        eventType: "REQUEST_EXTENSION",
+        text: `Extension request for ${requestId} (${r.accessLabel}) awaiting review.`,
+        channel: "portal",
+        tx,
       });
 
       return newDateStr;

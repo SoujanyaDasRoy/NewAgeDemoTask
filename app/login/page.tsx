@@ -3,6 +3,8 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { login, signup } from "@/lib/actions/auth";
+import { requestMagicLink } from "@/lib/actions/magic-link";
+import { Mail } from "lucide-react";
 import {
   Lock,
   AlertCircle,
@@ -53,6 +55,31 @@ export default function LoginPage() {
     } else {
       setError(res.error || "Invalid email or password");
     }
+  };
+
+  const [magicLink, setMagicLink] = useState<{ demoLink: string } | null>(null);
+
+  const handleMagicLink = async () => {
+    if (!email) {
+      setError("Enter your email above first.");
+      return;
+    }
+    setLoading(true);
+    setError("");
+    setSuccessMsg("");
+    setMagicLink(null);
+    const res = await requestMagicLink({ email });
+    setLoading(false);
+    if (!res.success) {
+      setError(res.error || "Failed to send magic link");
+      return;
+    }
+    setSuccessMsg(
+      res.dispatched
+        ? "Magic link sent! Check your inbox."
+        : "Magic link generated. Demo mode: copy the link below to sign in instantly."
+    );
+    if (res.demoLink) setMagicLink({ demoLink: res.demoLink });
   };
 
   const handleSignup = async (e: React.FormEvent) => {
@@ -445,6 +472,66 @@ export default function LoginPage() {
               >
                 {loading ? "Verifying..." : "Sign In to Portal"} <ArrowRight size={15} />
               </button>
+
+              {/* Divider */}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  margin: "16px 0 12px",
+                  color: "var(--muted)",
+                  fontSize: "11px",
+                }}
+              >
+                <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
+                <span style={{ textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 700 }}>Or use passwordless</span>
+                <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
+              </div>
+
+              <button
+                type="button"
+                disabled={loading}
+                onClick={handleMagicLink}
+                style={{
+                  width: "100%",
+                  height: "42px",
+                  borderRadius: "8px",
+                  border: "1px solid var(--border)",
+                  background: "var(--surface-subtle)",
+                  color: "var(--text)",
+                  fontSize: "13px",
+                  fontWeight: 600,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "8px",
+                  cursor: "pointer",
+                }}
+              >
+                <Mail size={15} /> Email me a sign-in link
+              </button>
+
+              {magicLink && (
+                <div
+                  style={{
+                    marginTop: "10px",
+                    padding: "10px 12px",
+                    borderRadius: "8px",
+                    border: "1px dashed var(--border)",
+                    background: "var(--surface-input)",
+                    fontSize: "11.5px",
+                    color: "var(--muted)",
+                    wordBreak: "break-all",
+                    fontFamily: "ui-monospace, monospace",
+                  }}
+                >
+                  <strong style={{ color: "var(--text)" }}>Demo link:</strong>{" "}
+                  <a href={magicLink.demoLink} style={{ color: "#2563EB", textDecoration: "underline" }}>
+                    {magicLink.demoLink}
+                  </a>
+                </div>
+              )}
             </form>
           ) : (
             /* CREATE ACCOUNT FORM */

@@ -59,6 +59,7 @@ model User {
   requests      AccessRequest[] @relation("Requester")
   auditLogs     AuditLog[]
   notifications Notification[]
+  prefs         NotificationPreference[]
 }
 
 model AccessItem {
@@ -162,4 +163,40 @@ model Notification {
 
   @@index([role, read])
   @@index([userId])
+}
+
+/// Per-user notification preferences. One row per (userId, eventType) tuple.
+/// `eventType` is one of: REQUEST_SUBMITTED, REQUEST_APPROVED, REQUEST_REJECTED,
+/// PROVISIONED, ACCESS_ID_REQUESTED, ACCESS_ID_ISSUED, REQUEST_EXTENSION,
+/// REQUEST_AUTO_EXPIRED. `enabled=false` skips notification insert. `quietFrom`
+/// / `quietTo` (HH:mm) pause delivery during a daily window — if either is
+/// null, quiet hours are disabled.
+model NotificationPreference {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  eventType String
+  enabled   Boolean  @default(true)
+  quietFrom String?
+  quietTo   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, eventType])
+  @@index([userId])
+}
+
+/// Single-use tokens issued for passwordless magic-link sign-in. Tokens are
+/// HMAC-signed payloads; we only store the digest + expiry + consumed flag.
+model MagicLinkToken {
+  id         String   @id @default(cuid())
+  email      String
+  tokenHash  String   @unique
+  expiresAt  DateTime
+  consumedAt DateTime?
+  ipAddress  String?
+  createdAt  DateTime @default(now())
+
+  @@index([email])
+  @@index([expiresAt])
 }

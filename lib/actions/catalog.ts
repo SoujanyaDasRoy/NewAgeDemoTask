@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { requireAdmin } from "./auth";
+import { notify } from "@/lib/notifications-engine";
 
 export async function getCatalog(userDepartment: string = "Product Team") {
   try {
@@ -87,6 +88,16 @@ export async function updateAccessConfig(
       },
     });
 
+    // Broadcast to admins that governance changed
+    if (diffs.length > 0) {
+      await notify({
+        role: "admin",
+        eventType: "REQUEST_APPROVED",
+        text: `Access config updated for ${access.tool} – ${access.name}: ${diffs.join("; ")}.`,
+        channel: "portal",
+      });
+    }
+
     try { revalidatePath("/"); } catch {}
     return { success: true };
   } catch (error: any) {
@@ -121,6 +132,13 @@ export async function toggleAutomation(accessId: string, actingUserName: string 
         userName: actingUserName,
         detail: `${access.tool} – ${access.name}`,
       },
+    });
+
+    await notify({
+      role: "admin",
+      eventType: "REQUEST_APPROVED",
+      text: `${access.tool} – ${access.name} automation ${newAutomation ? "enabled" : "disabled"}.`,
+      channel: "portal",
     });
 
     try { revalidatePath("/"); } catch {}

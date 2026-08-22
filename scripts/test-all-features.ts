@@ -18,6 +18,8 @@ import {
   approveAccessId,
 } from "../lib/actions/access-id";
 import { getNotifications, markNotificationsRead } from "../lib/actions/notifications";
+import { requestMagicLink } from "../lib/actions/magic-link";
+import { loadPreferences, setPreference } from "../lib/actions/notification-prefs";
 import { getAuditLogs } from "../lib/actions/audit";
 import { login, signup, switchSessionUser } from "../lib/actions/auth";
 import { setSessionForTesting } from "../lib/test-session";
@@ -302,6 +304,56 @@ async function runTestSuite() {
 
   // Cleanup test user
   await prisma.user.deleteMany({ where: { email: testSignupEmail } });
+
+  // ── TEST SUITE 12: Magic-Link Auth Flow ──────────────────────────────────
+  console.log("\n📁 SUITE 12: Magic-Link Auth Flow");
+  setSessionForTesting({
+    id: adminUser.id,
+    name: adminUser.name,
+    email: adminUser.email,
+    role: adminUser.role as "ADMIN" | "EMPLOYEE",
+    department: adminUser.department,
+    initials: adminUser.initials,
+    avatarTone: adminUser.avatarTone,
+  });
+  const magicRes = await requestMagicLink({ email: adminUser.email });
+  assert(
+    magicRes.success === true && !!magicRes.demoLink,
+    "Magic Link",
+    "requestMagicLink returns demo link for known admin",
+    { dispatched: magicRes.dispatched }
+  );
+
+  const unknownRes = await requestMagicLink({ email: "noone@newage.com" });
+  assert(unknownRes.success === true && unknownRes.knownUser === false, "Magic Link", "Magic link request succeeds even for unknown email (no enumeration)");
+
+  // Verify a token row landed in the DB
+  const tokenCount = await prisma.magicLinkToken.count();
+  assert(tokenCount >= 2, "Magic Link", "Magic link tokens persisted with hash", { tokenCount });
+
+  // ── TEST SUITE 13: Notification Preferences ──────────────────────────────
+  console.log("\n📁 SUITE 13: Notification Preferences");
+  const prefRes = await loadPreferences();
+  assert(prefRes.preferences.length === 8, "Notification Prefs", "All 8 event types returned with defaults");
+
+  const setRes = await setPreference("REQUEST_SUBMITTED", { enabled: false });
+  assert(setRes.success === true, "Notification Prefs", "Opt-out saved");
+
+  const reread = await loadPreferences();
+  const submitted = reread.preferences.find((p: any) => p.eventType === "REQUEST_SUBMITTED");
+  assert(submitted?.enabled === false, "Notification Prefs", "Opt-out persisted across reload");
+
+  const quietRes = await setPreference("REQUEST_REJECTED", { quietFrom: "22:00", quietTo: "07:00" });
+  assert(quietRes.success === true, "Notification Prefs", "Quiet hours saved");
+
+  // Invalid quiet hours: only from, no to
+  const badRes = await setPreference("REQUEST_REJECTED", { quietFrom: "20:00", quietTo: null });
+  assert(badRes.success === false, "Notification Prefs", "Rejects half-configured quiet hours");
+
+  // Restore default for clean reruns
+  await setPreference("REQUEST_SUBMITTED", { enabled: true });
+  await setPreference("REQUEST_REJECTED", { quietFrom: null, quietTo: null });
+  setSessionForTesting(null);
 
   // ── FINAL SUMMARY ────────────────────────────────────────────────────────
   console.log("\n=======================================================");

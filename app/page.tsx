@@ -30,6 +30,7 @@ import {
   AlertTriangle,
   Sun,
   Moon,
+  Building,
 } from "lucide-react";
 
 import StatusBadge from "@/components/StatusBadge";
@@ -1109,19 +1110,6 @@ function PortalDashboard() {
               <kbd className="command-hero-kbd">⌘K</kbd>
             </button>
 
-            {/* [+ Request Access] primary CTA */}
-            <button
-              type="button"
-              className="command-hero-btn primary"
-              onClick={() => {
-                if (catalog.length > 0) setRequestFormItem(catalog[0]);
-              }}
-              title="Submit a new access request"
-            >
-              <Plus size={14} strokeWidth={2.4} />
-              <span>Request Access</span>
-            </button>
-
             {/* Department / Role Badge */}
             <div className="command-hero-role-badge">
               <Shield
@@ -1362,24 +1350,6 @@ function PortalDashboard() {
                 ⌘K
               </button>
             </div>
-            <button
-              className="btn btn-primary"
-              style={{
-                fontSize: "12.5px",
-                height: "42px",
-                padding: "0 16px",
-                display: "flex",
-                alignItems: "center",
-                gap: "6px",
-                flexShrink: 0,
-              }}
-              onClick={() => {
-                if (catalog.length > 0) setRequestFormItem(catalog[0]);
-              }}
-            >
-              <Plus size={14} strokeWidth={2.4} />
-              <span>Request Access</span>
-            </button>
           </div>
 
           {/* Quick Category Filter Pills */}
@@ -1498,8 +1468,8 @@ function PortalDashboard() {
                           </div>
                         ) : (
                           <div className="catalog-status-pill status-exception">
-                            <AlertTriangle size={12} strokeWidth={2.2} />
-                            <span>Cross-Team Approval</span>
+                            <Building size={12} strokeWidth={2} />
+                            <span>Cross-Department</span>
                           </div>
                         )}
                       </div>
@@ -1519,7 +1489,7 @@ function PortalDashboard() {
                       </button>
                       {item.isEligible ? (
                         <button
-                          className="btn btn-primary catalog-btn-request"
+                          className="btn btn-primary catalog-action-btn"
                           onClick={(e) => {
                             e.stopPropagation();
                             setRequestFormItem(item);
@@ -1531,14 +1501,14 @@ function PortalDashboard() {
                       ) : (
                         <button
                           type="button"
-                          className="catalog-btn-exception"
+                          className="btn btn-secondary catalog-action-btn"
                           onClick={(e) => {
                             e.stopPropagation();
                             setExceptionFormItem(item);
                           }}
                         >
-                          <AlertTriangle size={13} strokeWidth={2.2} />
-                          <span>Request Cross-Team Access</span>
+                          <Plus size={13} strokeWidth={2.4} />
+                          <span>Request Access</span>
                         </button>
                       )}
                     </div>
@@ -1903,65 +1873,75 @@ function PortalDashboard() {
                 }}
               >
                 <div className="board-card-body">
-                  {/* Top Row: Service Logo + Tool Name + Automation Pill */}
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                      <ServiceLogo tool={item.tool} size={16} />
-                      <span style={{ fontSize: "11.5px", fontWeight: 600, color: "#475569" }}>
-                        {item.tool}
+                  {/* Header: 28px white lightbox frame with brand logo + Tool Name & Category pill on left, SCIM automation pill on right */}
+                  <div className="board-card-header">
+                    <div className="board-card-header-left">
+                      <div className="board-logo-lightbox">
+                        <ServiceLogo tool={item.tool} size={16} />
+                      </div>
+                      <span className="board-tool-name">{item.tool}</span>
+                      <span className={`catalog-category-tag ${item.category === "APPLICATION" ? "application" : "board"}`}>
+                        {item.category === "APPLICATION" ? "Application" : "Board"}
                       </span>
                     </div>
                     {item.automation ? (
-                      <span className="badge badge-blue" style={{ fontSize: "10.5px" }}>
-                        <Zap size={10} /> Auto
+                      <span className="catalog-scim-pill automated">
+                        <Zap size={10} strokeWidth={2.5} />
+                        <span>Automated</span>
                       </span>
                     ) : (
-                      <span className="badge badge-gray" style={{ fontSize: "10.5px" }}>Manual</span>
+                      <span className="catalog-scim-pill manual">
+                        Manual
+                      </span>
                     )}
                   </div>
 
-                  {/* Primary Board Title */}
+                  {/* Body: Bold, high-contrast title + clean 1-line description */}
                   <div className="board-title-primary">
                     {item.name}
                   </div>
+                  <div className="board-desc-line">
+                    {item.description}
+                  </div>
 
-                  {/* 2-Column Key Metadata Grid */}
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px", marginTop: "10px" }}>
-                    <div style={{ background: "var(--surface-subtle)", padding: "6px 8px", borderRadius: "6px", border: "1px solid var(--border)" }}>
-                      <div style={{ fontSize: "10px", color: "var(--muted)", fontWeight: 600, textTransform: "uppercase" }}>
-                        Eligibility
-                      </div>
-                      <div style={{ fontSize: "11.5px", fontWeight: 600, marginTop: "2px" }}>
-                        {item.isEligible ? (
-                          <span style={{ color: "#1A7F37", display: "inline-flex", alignItems: "center", gap: "3px" }}>
-                            <Check size={11} strokeWidth={2.5} /> Eligible
-                          </span>
-                        ) : (
-                          <span style={{ color: "#9A6700", display: "inline-flex", alignItems: "center", gap: "3px" }}>
-                            <AlertTriangle size={11} strokeWidth={2.2} /> Cross-Team Req.
-                          </span>
-                        )}
-                      </div>
+                  {/* Metadata Strip: Clean horizontal pill tags */}
+                  <div className="board-meta-strip">
+                    <div className="board-meta-pill">
+                      <span className="board-meta-label">Group:</span>
+                      <span className="board-meta-val">{item.group}</span>
                     </div>
-
-                    <div style={{ background: "var(--surface-subtle)", padding: "6px 8px", borderRadius: "6px", border: "1px solid var(--border)" }}>
-                      <div style={{ fontSize: "10px", color: "var(--muted)", fontWeight: 600, textTransform: "uppercase", display: "flex", alignItems: "center", gap: "3px" }}>
-                        <Key size={10} /> Access ID
-                      </div>
-                      <div style={{ fontSize: "11.5px", fontWeight: 600, color: "var(--text)", marginTop: "2px" }} className="mono">
-                        {item.accessId || <span style={{ color: "var(--muted-2)" }}>—</span>}
-                      </div>
+                    <div className="board-meta-pill">
+                      <span className="board-meta-label">Owner:</span>
+                      <span className="board-meta-val">{item.approver || item.creator}</span>
                     </div>
+                    {item.accessId && (
+                      <div className="board-meta-pill">
+                        <span className="board-meta-label">ID:</span>
+                        <span className="board-meta-val mono">{item.accessId}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
 
-                {/* Action Footer */}
-                <div className="manage-link">
-                  <span style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-                    {isRoleAdmin ? <Settings size={12} /> : <ExternalLink size={12} />}
-                    {isRoleAdmin ? "Manage Configuration" : "View Board Details"}
-                  </span>
-                  <ChevronRight size={13} />
+                {/* Footer: Clean policy status indicator on left + View Details ↗ on right */}
+                <div className="board-card-footer">
+                  <div className="board-footer-status">
+                    {item.isEligible ? (
+                      <span className="board-status-badge eligible">
+                        <span className="board-status-dot green" />
+                        <span>Active Permission</span>
+                      </span>
+                    ) : (
+                      <span className="board-status-badge cross-dept">
+                        <Building size={11} strokeWidth={2} />
+                        <span>Cross-Department</span>
+                      </span>
+                    )}
+                  </div>
+                  <div className="board-footer-action">
+                    <span>{isRoleAdmin ? "Manage Config" : "View Details"}</span>
+                    <ExternalLink size={12} className="board-arrow-icon" />
+                  </div>
                 </div>
               </div>
             ))}

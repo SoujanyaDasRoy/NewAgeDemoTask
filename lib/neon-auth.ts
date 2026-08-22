@@ -111,6 +111,32 @@ export class NeonAuthService {
   }
 
   /**
+   * Send a one-time magic link to the given email. Better-Auth's
+   * /sign-in/magic-link endpoint emails a verification URL which we then
+   * accept at /api/auth/magic-callback.
+   */
+  async sendMagicLink(params: { email: string; callbackURL: string }): Promise<{ success: boolean; error?: string }> {
+    try {
+      const res = await fetch(`${this.baseUrl}/sign-in/magic-link`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: params.email.trim().toLowerCase(),
+          callbackURL: params.callbackURL,
+        }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        return { success: false, error: data?.message || data?.error || "Failed to send magic link" };
+      }
+      return { success: true };
+    } catch (err: any) {
+      console.error("[Neon Auth] Magic link error:", err);
+      return { success: false, error: err.message || "Failed to reach Neon Auth server" };
+    }
+  }
+
+  /**
    * Sign out from Neon Auth
    */
   async signOut(token?: string): Promise<{ success: boolean }> {

@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { requireAdmin, getCurrentUser } from "./auth";
 import { randomUUID } from "crypto";
+import { notify } from "@/lib/notifications-engine";
 
 /**
  * Generate the next sequential AC-XXXX code by scanning existing codes and
@@ -108,12 +109,11 @@ export async function requestAccessIdCreation(accessItemId: string, actingUserNa
     });
 
     // Notification to admin
-    await prisma.notification.create({
-      data: {
-        role: "admin",
-        text: `Access ID creation requested for ${access.tool} – ${access.name}.`,
-        channel: "portal",
-      },
+    await notify({
+      role: "admin",
+      eventType: "ACCESS_ID_REQUESTED",
+      text: `Access ID creation requested for ${access.tool} – ${access.name}.`,
+      channel: "portal",
     });
 
     try { revalidatePath("/"); } catch {}
@@ -166,12 +166,11 @@ export async function approveAccessId(queueId: string, actingUserName: string) {
     });
 
     // Notification to requester
-    await prisma.notification.create({
-      data: {
-        role: "employee",
-        text: `Access ID created for ${queueItem.accessItem.tool} – ${queueItem.accessItem.name} (${newAccessIdCode}). You can continue your request.`,
-        channel: "portal",
-      },
+    await notify({
+      role: "employee",
+      eventType: "ACCESS_ID_ISSUED",
+      text: `Access ID created for ${queueItem.accessItem.tool} – ${queueItem.accessItem.name} (${newAccessIdCode}). You can continue your request.`,
+      channel: "portal",
     });
 
     try { revalidatePath("/"); } catch {}
