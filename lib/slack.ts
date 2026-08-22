@@ -30,7 +30,12 @@ export function buildSlackAccessRequestBlocks(payload: SlackMessagePayload, port
     process.env.PORTAL_URL ||
     (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : "") ||
     (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "") ||
-    "http://localhost:3000";
+    "https://new-age-portal.vercel.app";
+
+  // Strict rule: Slack messages sent to Slack channels should NEVER contain localhost!
+  if (!rawBaseUrl || rawBaseUrl.includes("localhost") || rawBaseUrl.includes("127.0.0.1")) {
+    rawBaseUrl = "https://new-age-portal.vercel.app";
+  }
 
   const baseUrl = rawBaseUrl.replace(/\/+$/, "");
   const formattedTimestamp = new Date().toLocaleString("en-US", {
@@ -140,11 +145,7 @@ export async function sendSlackNotification(payload: SlackMessagePayload) {
   const botToken = process.env.SLACK_BOT_TOKEN || process.env.SLACK_ACCESS_TOKEN;
   const channelId = process.env.SLACK_CHANNEL_ID || "general";
 
-  const portalBaseUrl =
-    process.env.NEXT_PUBLIC_APP_URL ||
-    process.env.PORTAL_URL ||
-    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "https://newage-access-portal.vercel.app");
-  const blocks = buildSlackAccessRequestBlocks(payload, portalBaseUrl);
+  const blocks = buildSlackAccessRequestBlocks(payload);
 
   // Method 1: Webhook URL
   if (webhookUrl && webhookUrl.startsWith("https://hooks.slack.com")) {
