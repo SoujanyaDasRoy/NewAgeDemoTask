@@ -31,6 +31,8 @@ import {
   Sun,
   Moon,
   Building,
+  CheckCircle2,
+  AlertCircle,
 } from "lucide-react";
 
 import StatusBadge from "@/components/StatusBadge";
@@ -432,30 +434,72 @@ function PortalDashboard() {
 
   const handleProvision = async (id: string) => {
     if (!currentUser) return;
-    const res = (await provisionManually(id, currentUser.name)) as any;
-    if (res.success) {
-      if (res.onBehalf) {
-        pushToast("Access marked provisioned. Requester can now review and close.");
-      } else {
-        pushToast("Access provisioned successfully. Request completed!");
+
+    // 1. Optimistic UI update: instantly update status in client state
+    setRequests((prev) =>
+      prev.map((r) =>
+        r.id === id
+          ? {
+              ...r,
+              status: r.onBehalf ? "ACCESS_PROVISIONED" : "COMPLETED",
+              updatedAt: new Date().toISOString(),
+            }
+          : r
+      )
+    );
+
+    // 2. Instantly close modal and show green toast
+    setAdminProvisionRequest(null);
+    pushToast("✓ Access provisioned successfully. Request completed!");
+
+    // 3. Background server execution
+    (async () => {
+      try {
+        const res = (await provisionManually(id, currentUser.name)) as any;
+        if (!res.success) {
+          pushToast(res.error || "Failed to mark provisioned", "error");
+        }
+        await loadData();
+      } catch (err: any) {
+        pushToast(err.message || "Provisioning sync error", "error");
+        await loadData();
       }
-      setAdminProvisionRequest(null);
-      await loadData();
-    } else {
-      pushToast(res.error || "Failed to mark provisioned", "error");
-    }
+    })();
   };
 
   const handleCloseRequest = async (id: string) => {
     if (!currentUser) return;
-    const res = await closeRequestAction(id, currentUser.name);
-    if (res.success) {
-      pushToast("Request successfully closed and completed!");
-      setSelectedRequest(null);
-      await loadData();
-    } else {
-      pushToast(res.error || "Failed to close request", "error");
-    }
+
+    // 1. Optimistic UI update
+    setRequests((prev) =>
+      prev.map((r) =>
+        r.id === id
+          ? {
+              ...r,
+              status: "COMPLETED",
+              updatedAt: new Date().toISOString(),
+            }
+          : r
+      )
+    );
+
+    // 2. Instantly close modal and toast
+    setSelectedRequest(null);
+    pushToast("✓ Request successfully closed and archived!");
+
+    // 3. Background server execution
+    (async () => {
+      try {
+        const res = await closeRequestAction(id, currentUser.name);
+        if (!res.success) {
+          pushToast(res.error || "Failed to close request", "error");
+        }
+        await loadData();
+      } catch (err: any) {
+        pushToast(err.message || "Close request sync error", "error");
+        await loadData();
+      }
+    })();
   };
 
   // ── BATCH ACTIONS & SELECTION ─────────────────────────────────────────────
@@ -2598,11 +2642,16 @@ function PortalDashboard() {
         isAdmin={isRoleAdmin}
       />
 
-      {/* TOAST CONTAINER */}
+      {/* TOAST CONTAINER (BOTTOM-RIGHT) */}
       <div className="toast-container" role="status" aria-live="polite">
         {toasts.map((t) => (
-          <div key={t.id} className={`toast ${t.type === "error" ? "toast-error" : ""}`}>
-            {t.text}
+          <div key={t.id} className={`toast ${t.type === "error" ? "toast-error" : "toast-success"}`}>
+            {t.type === "error" ? (
+              <AlertCircle size={16} style={{ color: "#FCA5A5", flexShrink: 0 }} />
+            ) : (
+              <CheckCircle2 size={16} style={{ color: "#34D399", flexShrink: 0 }} />
+            )}
+            <span>{t.text}</span>
           </div>
         ))}
       </div>
