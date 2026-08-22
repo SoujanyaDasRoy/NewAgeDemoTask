@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { X, CheckCircle2, AlertTriangle, Send } from "lucide-react";
 import StatusBadge from "../StatusBadge";
+import ServiceLogo from "../ServiceLogo";
 
 interface ExceptionFormDrawerProps {
   isOpen: boolean;
@@ -76,18 +77,23 @@ export default function ExceptionFormDrawer({
         className={`drawer ${isOpen ? "show" : ""}`}
         role="dialog"
         aria-modal="true"
-        aria-label="Request Access Exception Form"
+        aria-label="Cross-Department Access Request Form"
       >
         <div className="drawer-head">
-          <div>
-            <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-              <h3 style={{ margin: 0, fontSize: "15px", fontWeight: 700, color: "var(--text)" }}>
-                {submittedId ? "Exception Request Submitted" : "Request Access Exception"}
-              </h3>
-              <span className="badge badge-amber" style={{ fontSize: "10.5px" }}>Exception</span>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <div className="tool-logo-badge">
+              <ServiceLogo tool={accessItem.tool} size={24} />
             </div>
-            <div className="sub" style={{ fontSize: "12px", color: "var(--muted)", marginTop: "1px" }}>
-              {accessItem.tool} – {accessItem.name}
+            <div>
+              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                <h3 style={{ margin: 0, fontSize: "15px", fontWeight: 700, color: "var(--text)" }}>
+                  {submittedId ? "Cross-Department Access Request Submitted" : "Cross-Department Access Request"}
+                </h3>
+                <span className="badge badge-amber" style={{ fontSize: "10.5px" }}>Cross-Team</span>
+              </div>
+              <div className="sub" style={{ fontSize: "12px", color: "var(--muted)", marginTop: "1px" }}>
+                {accessItem.tool} – {accessItem.name}
+              </div>
             </div>
           </div>
           <button className="drawer-close" onClick={handleResetAndClose} aria-label="Close drawer">
@@ -115,10 +121,10 @@ export default function ExceptionFormDrawer({
                 <AlertTriangle size={24} />
               </div>
               <h4 style={{ fontSize: "16px", fontWeight: 700, margin: 0, color: "var(--text)" }}>
-                Exception Request Submitted
+                Cross-Department Access Request Submitted
               </h4>
               <p style={{ fontSize: "12.5px", color: "var(--muted)", marginTop: "4px" }}>
-                Routed to {accessItem.approver} for exception evaluation.
+                Routed to {accessItem.approver} for cross-team approval.
               </p>
 
               <div
@@ -147,7 +153,7 @@ export default function ExceptionFormDrawer({
                   <span style={{ fontWeight: 600, color: "var(--text)" }}>{accessItem.approver}</span>
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12.5px" }}>
-                  <span style={{ color: "var(--muted)" }}>Required Until</span>
+                  <span style={{ color: "var(--muted)" }}>Access Expiration Date</span>
                   <span style={{ fontWeight: 600, color: "var(--text)" }}>{requiredUntil}</span>
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12.5px" }}>
@@ -172,16 +178,16 @@ export default function ExceptionFormDrawer({
                 <AlertTriangle size={15} style={{ marginTop: "1px", flexShrink: 0, color: "#F59E0B" }} />
                 <div>
                   <div style={{ fontWeight: 700 }}>
-                    Out-of-Department Resource
+                    🏢 Cross-Department Resource
                   </div>
                   <div style={{ marginTop: "2px", fontSize: "11.5px" }}>
-                    This resource belongs to {accessItem.group}. A justified exception review is required.
+                    This resource is managed by {accessItem.group}. Submitting a request will route directly to the {accessItem.group} owner ({accessItem.approver}) for cross-team approval.
                   </div>
                 </div>
               </div>
 
               <div className="form-group">
-                <label className="form-label">Primary Reason for Exception</label>
+                <label className="form-label">Reason for Cross-Department Access</label>
                 <select
                   className="form-select"
                   value={reason}
@@ -203,7 +209,7 @@ export default function ExceptionFormDrawer({
 
               <div className="field-grid" style={{ marginBottom: "14px" }}>
                 <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label className="form-label">Access Required Until</label>
+                  <label className="form-label">Access Expiration Date</label>
                   <input
                     type="date"
                     className="form-input"
@@ -230,7 +236,7 @@ export default function ExceptionFormDrawer({
               <div className="form-group">
                 <label className="form-label">Business Justification</label>
                 <span className="form-sublabel">
-                  Explain the project scope and why this exception is needed.
+                  Explain the project scope and why cross-department access is needed.
                 </span>
                 <textarea
                   className="form-textarea"
@@ -260,7 +266,7 @@ export default function ExceptionFormDrawer({
                   style={{ flex: 1.5, height: "38px" }}
                   disabled={loading}
                 >
-                  <Send size={13} /> {loading ? "Submitting..." : "Submit Exception"}
+                  <Send size={13} /> {loading ? "Submitting..." : "Submit Cross-Team Request"}
                 </button>
               </div>
             </form>

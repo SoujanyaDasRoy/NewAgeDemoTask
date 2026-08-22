@@ -142,7 +142,9 @@ export default function RequestFormDrawer({
         {/* Drawer Header */}
         <div className="drawer-head" style={{ padding: "18px 22px", borderBottom: "1px solid var(--border)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            <ServiceLogo tool={accessItem.tool} size={28} />
+            <div className="tool-logo-badge">
+              <ServiceLogo tool={accessItem.tool} size={28} />
+            </div>
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
                 <h3 style={{ margin: 0, fontSize: "16px", fontWeight: 700, color: "var(--text)", letterSpacing: "-0.02em" }}>
@@ -150,7 +152,7 @@ export default function RequestFormDrawer({
                 </h3>
                 {isException ? (
                   <span className="badge badge-amber">
-                    Exception
+                    Cross-Team
                   </span>
                 ) : (
                   <span className="badge badge-green">
@@ -277,11 +279,11 @@ export default function RequestFormDrawer({
                 )}
                 <div>
                   <strong style={{ color: "var(--text)" }}>
-                    {isException ? "Exception Required:" : "Standard Policy Match:"}
+                    {isException ? "🏢 Cross-Department Resource:" : "Standard Policy Match:"}
                   </strong>{" "}
                   <span style={{ color: "var(--text-secondary)" }}>
                     {isException
-                      ? `This tool belongs to ${accessItem.group}. Justification will be sent to ${accessItem.approver} for sign-off.`
+                      ? `This resource is managed by ${accessItem.group}. Submitting a request will route directly to the ${accessItem.group} owner (${accessItem.approver}) for cross-team approval.`
                       : `Pre-approved for your department. Will be routed to ${accessItem.approver}.`}
                   </span>
                 </div>
@@ -552,7 +554,7 @@ export default function RequestFormDrawer({
                   disabled={loading}
                 >
                   <Send size={14} />
-                  <span>{loading ? "Submitting..." : isException ? "Submit Exception Request" : "Submit Access Request"}</span>
+                  <span>{loading ? "Submitting..." : isException ? "Submit Cross-Team Request" : "Submit Access Request"}</span>
                 </button>
               </div>
             </form>

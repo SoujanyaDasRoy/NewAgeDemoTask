@@ -51,17 +51,13 @@ export default function ApprovalDetailDrawer({
   const toolName = request.accessItem?.tool || request.accessLabel.split(" – ")[0] || "Tool";
 
   const handleApprove = async () => {
-    setLoading(true);
-    await onApprove(request.id);
-    setLoading(false);
+    onApprove(request.id);
     onClose();
   };
 
   const handleReject = async () => {
     const finalReason = customReason.trim() ? customReason.trim() : rejectReason;
-    setLoading(true);
-    await onReject(request.id, finalReason);
-    setLoading(false);
+    onReject(request.id, finalReason);
     setRejectModalOpen(false);
     onClose();
   };
@@ -78,14 +74,16 @@ export default function ApprovalDetailDrawer({
         {/* Drawer Header */}
         <div className="drawer-head">
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <ServiceLogo tool={toolName} size={24} />
+            <div className="tool-logo-badge">
+              <ServiceLogo tool={toolName} size={24} />
+            </div>
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
                 <h3 style={{ margin: 0, fontSize: "15px", fontWeight: 700, color: "var(--text)" }}>
                   Approval Review
                 </h3>
                 {request.isException ? (
-                  <span className="badge badge-amber">Exception</span>
+                  <span className="badge badge-amber">Cross-Team</span>
                 ) : (
                   <span className="badge badge-green">Standard</span>
                 )}
@@ -144,7 +142,7 @@ export default function ApprovalDetailDrawer({
                 disabled={loading}
                 onClick={handleApprove}
               >
-                <Check size={15} /> {loading ? "Approving..." : "Approve Access"}
+                <Check size={15} /> Approve Access
               </button>
               <button
                 type="button"
@@ -182,12 +180,12 @@ export default function ApprovalDetailDrawer({
               <AlertTriangle size={16} style={{ color: "#F59E0B", flexShrink: 0, marginTop: "1px" }} />
               <div>
                 <div style={{ fontWeight: 700, fontSize: "12.5px" }}>
-                  Cross-Department Exception Request
+                  Cross-Department Access Request
                 </div>
                 <div style={{ marginTop: "3px", fontSize: "11.5px", lineHeight: 1.45 }}>
                   <strong>Reason:</strong> {request.exceptionReason || "Project need outside standard department group"} <br />
                   <strong>Urgency:</strong> {request.urgency || "Standard"} ·{" "}
-                  <strong>Required Until:</strong> {request.requiredUntil || "Indefinite"}
+                  <strong>Access Expiration:</strong> {request.requiredUntil || "Indefinite"}
                 </div>
               </div>
             </div>

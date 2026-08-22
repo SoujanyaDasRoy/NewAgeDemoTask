@@ -29,20 +29,16 @@ export default function SlackNotifCard({
   const [loading, setLoading] = useState(false);
 
   const handleApprove = async () => {
-    setLoading(true);
-    await onApprove(matchedRequest.id);
     setDecided("approved");
-    setLoading(false);
-    setTimeout(() => onClosePanel?.(), 1200);
+    onApprove(matchedRequest.id);
+    onClosePanel?.();
   };
 
   const handleReject = async (reason: string) => {
-    setLoading(true);
     setRejectOpen(false);
-    await onReject(matchedRequest.id, reason);
     setDecided("rejected");
-    setLoading(false);
-    setTimeout(() => onClosePanel?.(), 1200);
+    onReject(matchedRequest.id, reason);
+    onClosePanel?.();
   };
 
   const justificationPreview =
@@ -172,7 +168,7 @@ export default function SlackNotifCard({
                   Type
                 </div>
                 <div style={{ fontSize: "12px", fontWeight: 600, color: matchedRequest?.isException ? "#F59E0B" : "var(--text)", marginTop: "2px" }}>
-                  {matchedRequest?.isException ? "⚠️ Exception" : "Standard"}
+                  {matchedRequest?.isException ? "⚠️ Cross-Team" : "Standard"}
                 </div>
               </div>
             </div>

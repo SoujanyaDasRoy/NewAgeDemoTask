@@ -68,7 +68,9 @@ export default function AccessDetailsDrawer({
         {/* Drawer Header */}
         <div className="drawer-head">
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <ServiceLogo tool={accessItem.tool} size={24} />
+            <div className="tool-logo-badge">
+              <ServiceLogo tool={accessItem.tool} size={24} />
+            </div>
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
                 <h3 style={{ margin: 0, fontSize: "15px", fontWeight: 700, color: "var(--text)" }}>
@@ -112,11 +114,13 @@ export default function AccessDetailsDrawer({
               <AlertTriangle size={15} style={{ color: "#9A6700", flexShrink: 0, marginTop: "1px" }} />
             )}
             <div>
-              <strong style={{ color: "var(--text)" }}>{isEligible ? "Standard Policy Match:" : "Cross-Department Exception:"}</strong>{" "}
+              <strong style={{ color: "var(--text)" }}>
+                {isEligible ? "Standard Policy Match:" : "🏢 Cross-Department Resource:"}
+              </strong>{" "}
               <span style={{ color: "var(--text-secondary)" }}>
                 {isEligible
                   ? `You belong to an authorized department. Requests route directly to ${accessItem.approver}.`
-                  : `This resource belongs to ${accessItem.group}. You can submit a business exception request for review.`}
+                  : `This resource is managed by ${accessItem.group}. Submitting a request will route directly to the ${accessItem.group} owner (${accessItem.approver}) for cross-team approval.`}
               </span>
             </div>
           </div>

@@ -99,13 +99,18 @@ export default function RequestDetailDrawer({
         {/* Drawer Header */}
         <div className="drawer-head">
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <ServiceLogo tool={toolName} size={24} />
+            <div className="tool-logo-badge">
+              <ServiceLogo tool={toolName} size={24} />
+            </div>
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
                 <h3 style={{ margin: 0, fontSize: "15px", fontWeight: 700, color: "var(--text)" }}>
                   {request.accessLabel}
                 </h3>
                 <StatusBadge status={request.status} />
+                {request.isException && (
+                  <span className="badge badge-amber" style={{ fontSize: "10.5px" }}>Cross-Team</span>
+                )}
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "2px" }}>
                 <span className="mono" style={{ fontSize: "11.5px", color: "var(--muted)", fontWeight: 600 }}>
@@ -301,7 +306,7 @@ export default function RequestDetailDrawer({
               <div className="field">
                 <span className="f-label">Request Type</span>
                 <span className="f-value">
-                  {request.isException ? "Exception" : request.onBehalf ? "On-Behalf" : "Direct"}
+                  {request.isException ? "Cross-Team" : request.onBehalf ? "On-Behalf" : "Direct"}
                 </span>
               </div>
             </div>

@@ -48,7 +48,9 @@ export default function AdminRequestDetailDrawer({
         {/* Drawer Header */}
         <div className="drawer-head">
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <ServiceLogo tool={toolName} size={24} />
+            <div className="tool-logo-badge">
+              <ServiceLogo tool={toolName} size={24} />
+            </div>
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
                 <h3 style={{ margin: 0, fontSize: "15px", fontWeight: 700, color: "var(--text)" }}>

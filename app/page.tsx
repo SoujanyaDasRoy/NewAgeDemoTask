@@ -331,35 +331,102 @@ function PortalDashboard() {
     return "App";
   };
 
-  // ── ACTIONS ───────────────────────────────────────────────────────────────
+  // ── ACTIONS (Optimistic UI & Zero Delay) ──────────────────────────────────
   const handleApprove = async (id: string) => {
     if (!currentUser) return;
-    const res = (await approveRequest(id, currentUser.name)) as any;
-    if (res.success) {
-      if (res.autoCompleted) {
-        pushToast("Approved! Automated provisioning completed instantly.");
-      } else if (res.onBehalf) {
-        pushToast("Approved! Request is provisioned and ready for requester closure.");
-      } else {
-        pushToast("Request approved and moved to manual provisioning queue.");
+    const targetReq = requests.find((r) => r.id === id);
+    const nextStatus = targetReq?.automation ? "COMPLETED" : "PENDING_MANUAL_PROVISIONING";
+
+    // 1. Optimistic UI update: immediately transition request status in local state
+    setRequests((prev) =>
+      prev.map((r) =>
+        r.id === id
+          ? {
+              ...r,
+              status: nextStatus,
+              updatedAt: new Date().toISOString(),
+              timeline: [
+                ...(r.timeline || []),
+                {
+                  id: `tl-opt-${Date.now()}`,
+                  step: targetReq?.automation ? "PROVISIONED" : "APPROVED",
+                  label: targetReq?.automation
+                    ? "Automatically Provisioned via SCIM"
+                    : `Approved by ${currentUser.name}`,
+                  timestamp: new Date().toISOString(),
+                },
+              ],
+            }
+          : r
+      )
+    );
+
+    // 2. Immediately close approval modal & clear from batch selection
+    setApprovalRequest(null);
+    setSelectedApprovalIds((prev) => prev.filter((item) => item !== id));
+
+    // 3. Instant toast feedback with zero delay
+    pushToast("⚡ Approved instantly!");
+
+    // 4. Background backend action & data sync without blocking user
+    (async () => {
+      try {
+        const res = (await approveRequest(id, currentUser.name)) as any;
+        if (!res.success) {
+          pushToast(res.error || "Failed to approve request", "error");
+        }
+        await loadData();
+      } catch (err: any) {
+        pushToast(err.message || "Approval sync error", "error");
+        await loadData();
       }
-      setApprovalRequest(null);
-      await loadData();
-    } else {
-      pushToast(res.error || "Failed to approve request", "error");
-    }
+    })();
   };
 
   const handleReject = async (id: string, reason: string) => {
     if (!currentUser) return;
-    const res = await rejectRequest(id, currentUser.name, reason);
-    if (res.success) {
-      pushToast("Request rejected and requester notified.");
-      setApprovalRequest(null);
-      await loadData();
-    } else {
-      pushToast(res.error || "Failed to reject request", "error");
-    }
+
+    // 1. Optimistic UI update: immediately mark request as REJECTED in local state
+    setRequests((prev) =>
+      prev.map((r) =>
+        r.id === id
+          ? {
+              ...r,
+              status: "REJECTED",
+              rejectionReason: reason,
+              updatedAt: new Date().toISOString(),
+              timeline: [
+                ...(r.timeline || []),
+                {
+                  id: `tl-opt-${Date.now()}`,
+                  step: "REJECTED",
+                  label: `Rejected by ${currentUser.name}: ${reason}`,
+                  timestamp: new Date().toISOString(),
+                },
+              ],
+            }
+          : r
+      )
+    );
+
+    // 2. Close modal immediately & toast
+    setApprovalRequest(null);
+    setSelectedApprovalIds((prev) => prev.filter((item) => item !== id));
+    pushToast("Request rejected.");
+
+    // 3. Background asynchronous sync
+    (async () => {
+      try {
+        const res = await rejectRequest(id, currentUser.name, reason);
+        if (!res.success) {
+          pushToast(res.error || "Failed to reject request", "error");
+        }
+        await loadData();
+      } catch (err: any) {
+        pushToast(err.message || "Rejection sync error", "error");
+        await loadData();
+      }
+    })();
   };
 
   const handleProvision = async (id: string) => {
@@ -408,21 +475,38 @@ function PortalDashboard() {
 
   const handleBatchApprove = async () => {
     if (!currentUser || selectedApprovalIds.length === 0) return;
-    setBatchApproving(true);
-    try {
-      const res = await batchApproveRequests(selectedApprovalIds, currentUser.name);
-      if (res.success) {
-        pushToast(`⚡ Successfully approved ${res.count} requests in atomic batch!`);
-        setSelectedApprovalIds([]);
+    const idsToApprove = [...selectedApprovalIds];
+
+    // 1. Optimistic UI update: instantly update all selected requests in client state
+    setRequests((prev) =>
+      prev.map((r) =>
+        idsToApprove.includes(r.id)
+          ? {
+              ...r,
+              status: r.automation ? "COMPLETED" : "PENDING_MANUAL_PROVISIONING",
+              updatedAt: new Date().toISOString(),
+            }
+          : r
+      )
+    );
+
+    // 2. Immediately clear selection and show instant toast
+    setSelectedApprovalIds([]);
+    pushToast(`⚡ Approved ${idsToApprove.length} request${idsToApprove.length > 1 ? "s" : ""} instantly!`);
+
+    // 3. Background server call & sync
+    (async () => {
+      try {
+        const res = await batchApproveRequests(idsToApprove, currentUser.name);
+        if (!res.success) {
+          pushToast(res.error || "Failed to batch approve requests", "error");
+        }
         await loadData();
-      } else {
-        pushToast(res.error || "Failed to batch approve requests", "error");
+      } catch (err: any) {
+        pushToast(err.message || "Batch approval error", "error");
+        await loadData();
       }
-    } catch (err: any) {
-      pushToast(err.message || "Batch approval error", "error");
-    } finally {
-      setBatchApproving(false);
-    }
+    })();
   };
 
   // ── 1-CLICK SOC2/ISO-27001 COMPLIANCE CSV EXPORT ──────────────────────────
@@ -1415,7 +1499,7 @@ function PortalDashboard() {
                         ) : (
                           <div className="catalog-status-pill status-exception">
                             <AlertTriangle size={12} strokeWidth={2.2} />
-                            <span>Exception Required</span>
+                            <span>Cross-Team Approval</span>
                           </div>
                         )}
                       </div>
@@ -1454,7 +1538,7 @@ function PortalDashboard() {
                           }}
                         >
                           <AlertTriangle size={13} strokeWidth={2.2} />
-                          <span>Request Exception</span>
+                          <span>Request Cross-Team Access</span>
                         </button>
                       )}
                     </div>
@@ -1513,7 +1597,7 @@ function PortalDashboard() {
                 className={`filter-pill ${requestFilter === "EXCEPTIONS" ? "active" : ""}`}
                 onClick={() => setRequestFilter("EXCEPTIONS")}
               >
-                Exceptions ({allMyRequests.filter((r) => r.isException).length})
+                Cross-Team ({allMyRequests.filter((r) => r.isException).length})
               </button>
             </div>
 
@@ -1559,7 +1643,7 @@ function PortalDashboard() {
                           </span>
                           <StatusBadge status={req.status} />
                           {req.isException && (
-                            <span className="badge badge-amber" style={{ fontSize: "10.5px" }}>Exception</span>
+                            <span className="badge badge-amber" style={{ fontSize: "10.5px" }}>Cross-Team</span>
                           )}
                         </div>
 
@@ -1647,7 +1731,7 @@ function PortalDashboard() {
                     className={`filter-pill ${approvalFilter === "EXCEPTIONS" ? "active" : ""}`}
                     onClick={() => setApprovalFilter("EXCEPTIONS")}
                   >
-                    Exceptions ({pendingExceptionsCount})
+                    Cross-Team ({pendingExceptionsCount})
                   </button>
                 </div>
                 <button
@@ -1672,7 +1756,7 @@ function PortalDashboard() {
                   Queue Clear (0)
                 </span>
                 <span className="filter-pill" style={{ cursor: "default", opacity: 0.6 }}>
-                  Exceptions (0)
+                  Cross-Team (0)
                 </span>
               </div>
             )}
@@ -1685,7 +1769,7 @@ function PortalDashboard() {
                 <div className="title">All caught up</div>
                 <div className="sub">
                   {approvalFilter === "EXCEPTIONS"
-                    ? "No exception requests waiting for your approval right now."
+                    ? "No cross-team access requests waiting for your approval right now."
                     : "No access requests waiting for your approval right now."}
                 </div>
                 <span className="badge badge-green" style={{ marginTop: "12px", fontSize: "11px" }}>
@@ -1728,7 +1812,7 @@ function PortalDashboard() {
                           <StatusBadge status={req.status} />
                           {req.isException && (
                             <span className="badge badge-amber" style={{ fontSize: "10.5px" }}>
-                              Exception
+                              Cross-Team
                             </span>
                           )}
                         </div>
@@ -1854,7 +1938,7 @@ function PortalDashboard() {
                           </span>
                         ) : (
                           <span style={{ color: "#9A6700", display: "inline-flex", alignItems: "center", gap: "3px" }}>
-                            <AlertTriangle size={11} strokeWidth={2.2} /> Exception Req.
+                            <AlertTriangle size={11} strokeWidth={2.2} /> Cross-Team Req.
                           </span>
                         )}
                       </div>
@@ -2308,7 +2392,7 @@ function PortalDashboard() {
             }
 
             if (res.success) {
-              pushToast(data.isException ? "Exception request submitted for review!" : "Access request submitted successfully!");
+              pushToast(data.isException ? "Cross-team access request submitted for review!" : "Access request submitted successfully!");
               await loadData();
               return res.requestId || null;
             } else {
@@ -2336,12 +2420,12 @@ function PortalDashboard() {
               requesterEmail: currentUser.email,
             });
             if (res.success) {
-              pushToast("Exception request submitted for review!");
+              pushToast("Cross-team access request submitted for review!");
               setExceptionFormItem(null);
               await loadData();
               return res.requestId || null;
             } else {
-              pushToast(res.error || "Failed to submit exception request", "error");
+              pushToast(res.error || "Failed to submit cross-team request", "error");
               return null;
             }
           }}
