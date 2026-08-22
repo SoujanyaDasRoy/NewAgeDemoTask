@@ -52,9 +52,7 @@ export default function RequestDetailDrawer({
   }
 
   const isAwaitingClosure =
-    request.onBehalf &&
-    request.status === "ACCESS_PROVISIONED" &&
-    request.requester?.name === currentUserName;
+    Boolean(request.onBehalf) && request.status === "ACCESS_PROVISIONED";
 
   const isPendingApproval = ["PENDING_APPROVAL", "PENDING_EXCEPTION_APPROVAL"].includes(
     request.status
@@ -147,18 +145,23 @@ export default function RequestDetailDrawer({
           {/* SLA / Nudge Status Banner (If Pending) */}
           {isPendingApproval && (
             <div
-              className="warn-box"
               style={{
+                background: "var(--surface-subtle)",
+                border: "1px solid var(--border)",
+                borderRadius: "10px",
+                padding: "12px 14px",
                 marginBottom: "16px",
+                display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
+                gap: "10px",
               }}
             >
               <div>
-                <div style={{ fontSize: "12.5px", fontWeight: 700, display: "flex", alignItems: "center", gap: "5px" }}>
-                  <Clock size={13} style={{ color: "#F59E0B" }} /> Awaiting {request.approverName}&apos;s Decision
+                <div style={{ fontSize: "12.5px", fontWeight: 700, display: "flex", alignItems: "center", gap: "6px", color: "var(--text)" }}>
+                  <Clock size={14} style={{ color: "var(--accent)" }} /> Awaiting {request.approverName}&apos;s Decision
                 </div>
-                <div style={{ fontSize: "11.5px", marginTop: "1px" }}>
+                <div style={{ fontSize: "11.5px", marginTop: "2px", color: "var(--muted)" }}>
                   Estimated Turnaround: Typically reviewed within 2 hours.
                 </div>
               </div>
@@ -168,7 +171,7 @@ export default function RequestDetailDrawer({
                 onClick={handleSlackNudge}
                 style={{
                   border: "1px solid var(--border)",
-                  background: nudged ? "rgba(245, 158, 11, 0.2)" : "var(--surface)",
+                  background: nudged ? "var(--surface-subtle)" : "var(--surface)",
                   color: "var(--text)",
                   borderRadius: "6px",
                   padding: "4px 8px",
@@ -239,26 +242,39 @@ export default function RequestDetailDrawer({
           {isAwaitingClosure && (
             <div
               style={{
-                marginBottom: "16px",
-                padding: "12px",
-                borderRadius: "8px",
+                marginBottom: "18px",
+                padding: "14px 16px",
+                borderRadius: "10px",
                 background: "var(--surface-subtle)",
                 border: "1px solid var(--border)",
+                boxShadow: "var(--shadow-card)",
               }}
             >
-              <div style={{ fontSize: "12.5px", fontWeight: 700, color: "var(--text)" }}>
-                Access Provisioned for {request.beneficiaryName}
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
+                <CheckCircle2 size={16} style={{ color: "#16A34A" }} />
+                <span style={{ fontSize: "13px", fontWeight: 700, color: "var(--text)" }}>
+                  Access Granted to Beneficiary
+                </span>
               </div>
-              <div style={{ fontSize: "11.5px", color: "var(--muted)", marginTop: "2px" }}>
-                Please confirm with the colleague that access is active, then close this ticket.
+              <div style={{ fontSize: "12px", color: "var(--muted)", lineHeight: 1.45, marginBottom: "12px" }}>
+                Access has been provisioned for <strong>{request.beneficiaryName}</strong>. Please verify and confirm to complete this ticket.
               </div>
               <button
+                type="button"
                 className="btn btn-primary btn-block"
-                style={{ marginTop: "10px", height: "36px" }}
+                style={{
+                  height: "36px",
+                  fontSize: "12.5px",
+                  fontWeight: 600,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "6px",
+                }}
                 onClick={handleClose}
                 disabled={closing}
               >
-                <CheckSquare size={14} /> {closing ? "Closing..." : "Confirm & Close Request"}
+                <CheckSquare size={14} /> {closing ? "Closing..." : "✓ Confirm & Close Request"}
               </button>
             </div>
           )}

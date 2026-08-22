@@ -1454,12 +1454,14 @@ function PortalDashboard() {
                           <span className="meta-pill-val">{item.approver}</span>
                         </div>
 
-                        {item.accessId && (
-                          <div className="catalog-meta-pill">
-                            <span className="meta-pill-label">ID:</span>
+                        <div className="catalog-meta-pill">
+                          <span className="meta-pill-label">ID:</span>
+                          {item.accessId ? (
                             <span className="meta-pill-val mono">{item.accessId}</span>
-                          </div>
-                        )}
+                          ) : (
+                            <span className="meta-pill-val" style={{ color: "var(--muted)" }}>Governance ID Pending</span>
+                          )}
+                        </div>
 
                         {item.isEligible ? (
                           <div className="catalog-status-pill status-eligible">
@@ -1738,9 +1740,7 @@ function PortalDashboard() {
                 </div>
                 <div className="title">All caught up</div>
                 <div className="sub">
-                  {approvalFilter === "EXCEPTIONS"
-                    ? "No cross-team access requests waiting for your approval right now."
-                    : "No access requests waiting for your approval right now."}
+                  You currently have no access requests assigned to you for approval.
                 </div>
                 <span className="badge badge-green" style={{ marginTop: "12px", fontSize: "11px" }}>
                   ✓ All Clear
@@ -1914,12 +1914,14 @@ function PortalDashboard() {
                       <span className="board-meta-label">Owner:</span>
                       <span className="board-meta-val">{item.approver || item.creator}</span>
                     </div>
-                    {item.accessId && (
-                      <div className="board-meta-pill">
-                        <span className="board-meta-label">ID:</span>
+                    <div className="board-meta-pill">
+                      <span className="board-meta-label">ID:</span>
+                      {item.accessId ? (
                         <span className="board-meta-val mono">{item.accessId}</span>
-                      </div>
-                    )}
+                      ) : (
+                        <span className="meta-pill-val" style={{ color: "var(--muted)" }}>Governance ID Pending</span>
+                      )}
+                    </div>
                   </div>
                 </div>
 

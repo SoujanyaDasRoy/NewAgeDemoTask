@@ -10,7 +10,7 @@ export const STATUS_MAP: Record<
     dotClass: "badge-dot-amber-pulse",
   },
   PENDING_EXCEPTION_APPROVAL: {
-    label: "Pending Exception Approval",
+    label: "Pending Cross-Team Review",
     className: "badge-amber",
     dotClass: "badge-dot-amber-pulse",
   },
@@ -30,9 +30,9 @@ export const STATUS_MAP: Record<
     dotClass: "badge-dot-amber-pulse",
   },
   ACCESS_PROVISIONED: {
-    label: "Access Provisioned",
-    className: "badge-green",
-    dotClass: "badge-dot-green",
+    label: "Provisioned · Awaiting Sign-off",
+    className: "badge-blue",
+    dotClass: "badge-dot-blue-pulse",
   },
   COMPLETED: {
     label: "Completed",
@@ -55,7 +55,12 @@ export const STATUS_MAP: Record<
     dotClass: "badge-dot-amber-pulse",
   },
   "Pending Exception Approval": {
-    label: "Pending Exception Approval",
+    label: "Pending Cross-Team Review",
+    className: "badge-amber",
+    dotClass: "badge-dot-amber-pulse",
+  },
+  "Pending Cross-Team Review": {
+    label: "Pending Cross-Team Review",
     className: "badge-amber",
     dotClass: "badge-dot-amber-pulse",
   },
@@ -75,9 +80,14 @@ export const STATUS_MAP: Record<
     dotClass: "badge-dot-amber-pulse",
   },
   "Access Provisioned": {
-    label: "Access Provisioned",
-    className: "badge-green",
-    dotClass: "badge-dot-green",
+    label: "Provisioned · Awaiting Sign-off",
+    className: "badge-blue",
+    dotClass: "badge-dot-blue-pulse",
+  },
+  "Provisioned · Awaiting Sign-off": {
+    label: "Provisioned · Awaiting Sign-off",
+    className: "badge-blue",
+    dotClass: "badge-dot-blue-pulse",
   },
   Completed: {
     label: "Completed",

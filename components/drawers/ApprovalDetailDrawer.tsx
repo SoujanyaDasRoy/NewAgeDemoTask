@@ -9,7 +9,7 @@ import {
   User,
   Clock,
   Send,
-  AlertTriangle,
+  Building2,
   Zap,
 } from "lucide-react";
 import StatusBadge from "../StatusBadge";
@@ -172,17 +172,23 @@ export default function ApprovalDetailDrawer({
           {/* Exception Details Callout */}
           {request.isException && (
             <div
-              className="warn-box"
               style={{
+                background: "var(--surface-subtle)",
+                border: "1px solid var(--border)",
+                borderRadius: "10px",
+                padding: "12px 14px",
                 marginBottom: "18px",
+                display: "flex",
+                gap: "10px",
+                alignItems: "flex-start",
               }}
             >
-              <AlertTriangle size={16} style={{ color: "#F59E0B", flexShrink: 0, marginTop: "1px" }} />
+              <Building2 size={16} style={{ color: "var(--muted)", flexShrink: 0, marginTop: "1px" }} />
               <div>
-                <div style={{ fontWeight: 700, fontSize: "12.5px" }}>
+                <div style={{ fontWeight: 700, fontSize: "12.5px", color: "var(--text)" }}>
                   Cross-Department Access Request
                 </div>
-                <div style={{ marginTop: "3px", fontSize: "11.5px", lineHeight: 1.45 }}>
+                <div style={{ marginTop: "3px", fontSize: "11.5px", lineHeight: 1.45, color: "var(--text-secondary)" }}>
                   <strong>Reason:</strong> {request.exceptionReason || "Project need outside standard department group"} <br />
                   <strong>Urgency:</strong> {request.urgency || "Standard"} ·{" "}
                   <strong>Access Expiration:</strong> {request.requiredUntil || "Indefinite"}
