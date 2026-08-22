@@ -34,12 +34,7 @@ export function buildSlackAccessRequestBlocks(payload: SlackMessagePayload, port
     process.env.PORTAL_URL ||
     (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : "") ||
     (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "") ||
-    "https://new-age-portal.vercel.app";
-
-  // Strict rule: Slack messages sent to Slack channels should NEVER contain localhost!
-  if (!rawBaseUrl || rawBaseUrl.includes("localhost") || rawBaseUrl.includes("127.0.0.1")) {
-    rawBaseUrl = "https://new-age-portal.vercel.app";
-  }
+    "http://localhost:3000";
 
   const baseUrl = rawBaseUrl.replace(/\/+$/, "");
   const now = new Date();
