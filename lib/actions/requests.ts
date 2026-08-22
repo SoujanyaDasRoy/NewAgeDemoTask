@@ -222,9 +222,15 @@ export async function submitExceptionRequest(opts: {
 
       if (!access) throw new Error("Access item not found");
 
-      let requester = await tx.user.findFirst({
-        where: { name: opts.requesterName },
+      let requester = await tx.user.findUnique({
+        where: { email: opts.requesterEmail },
       });
+
+      if (!requester) {
+        requester = await tx.user.findFirst({
+          where: { name: opts.requesterName },
+        });
+      }
 
       if (!requester) {
         requester = await tx.user.create({
